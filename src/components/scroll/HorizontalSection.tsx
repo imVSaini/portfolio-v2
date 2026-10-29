@@ -21,7 +21,6 @@ type HorizontalSectionProps = {
 export function HorizontalSection({ id, label, children, className }: HorizontalSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -49,22 +48,6 @@ export function HorizontalSection({ id, label, children, className }: Horizontal
             invalidateOnRefresh: true,
           },
         });
-
-        gsap.fromTo(
-          progressRef.current,
-          { scaleX: 0 },
-          {
-            scaleX: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: "top top",
-              end: () => `+=${distance()}`,
-              scrub: true,
-              invalidateOnRefresh: true,
-            },
-          },
-        );
 
         gsap.utils.toArray<HTMLElement>("[data-h-parallax]", track).forEach((layer) => {
           const amount = Number(layer.dataset.hParallax) || 10;
@@ -121,9 +104,6 @@ export function HorizontalSection({ id, label, children, className }: Horizontal
         className="flex snap-x snap-mandatory scroll-px-5 scrollbar-none gap-5 overflow-x-auto overscroll-x-contain px-5 pb-6 md:h-full md:w-max md:snap-none md:items-center md:gap-10 md:overflow-visible md:px-14 md:pb-0"
       >
         {children}
-      </div>
-      <div className="pointer-events-none absolute inset-x-14 bottom-8 hidden h-px bg-line md:block">
-        <div ref={progressRef} className="h-full origin-left scale-x-0 bg-accent" />
       </div>
     </section>
   );
