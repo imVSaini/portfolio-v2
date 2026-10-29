@@ -35,7 +35,7 @@ export function Header() {
           <span className="grid size-9 place-items-center rounded-full bg-faded-black font-display text-p4 font-semibold tracking-normal text-manila-light dark:bg-manila-light dark:text-faded-black">
             <RollText text={site.monogram} />
           </span>
-          <span className="hidden font-display text-p3 font-medium uppercase sm:block">
+          <span className="font-display text-p3 font-medium whitespace-nowrap uppercase">
             <RollText text={site.name} />
           </span>
         </ScrollLink>
