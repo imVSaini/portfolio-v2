@@ -101,10 +101,10 @@ export function Hero() {
             data-scroll=""
             data-scroll-speed="0.04"
           >
-            I’m {site.shortName}, a lead engineer who designs multi-tenant SaaS, wires AI into real
-            workflows, and polishes the interfaces people touch every day.{" "}
+            I’m {site.shortName}, a creative developer, who crafts web and mobile products where
+            design and code work as one.{" "}
             <span className="text-faded-black dark:text-manila-light">
-              Five products in production, every one still standing.
+              I enjoy taking the lead on projects because, honestly, someone has to.
             </span>
           </p>
 
