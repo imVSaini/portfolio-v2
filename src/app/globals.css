@@ -1,26 +1,241 @@
 @import "tailwindcss";
+@import "locomotive-scroll/locomotive-scroll.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ---------------------------------------------------------------------------
+ * Variants
+ * ------------------------------------------------------------------------- */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant intent (&:hover, &:focus-within);
+@custom-variant starting-style (&[data-starting-style]);
+@custom-variant ending-style (&[data-ending-style]);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ---------------------------------------------------------------------------
+ * Palette — lifted from videojs.org. `faded-black`, `soot` and `warm-gray`
+ * are re-pointed by the "deep" dark tone below.
+ * ------------------------------------------------------------------------- */
+
+@theme {
+  --color-*: initial;
+  --color-black: #000;
+  --color-white: #fff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --color-manila-light: #f3e7d2;
+  --color-manila-25: #e7ddc6;
+  --color-manila-50: #dcd2bb;
+  --color-manila-75: #ccc3ab;
+  --color-manila-dark: #bfb39e;
+
+  --color-faded-black: #1e1d1d;
+  --color-soot: #32302f;
+  --color-warm-gray: #403c38;
+
+  --color-orange: #ff6200;
+  --color-gold: #ffa81b;
+  --color-red: #eb3132;
+  --color-magenta: #cc3566;
+  --color-magenta-dark: #922e4f;
+  --color-bright-yellow: #ffca18;
+
+  --color-accent: var(--color-orange);
+
+  /* Type */
+  --text-h1: clamp(3rem, min(8.4vw, 15svh), 10rem);
+  --text-h1--line-height: 0.86;
+  --text-h1--letter-spacing: -0.02em;
+  --text-h2: clamp(2.75rem, 7.2vw, 7rem);
+  --text-h2--line-height: 0.92;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h3: clamp(1.875rem, 3.6vw, 3.25rem);
+  --text-h3--line-height: 1;
+  --text-h4: clamp(1.375rem, 2vw, 1.75rem);
+  --text-h4--line-height: 1.15;
+  --text-p1: clamp(1.1875rem, 1.6vw, 1.5rem);
+  --text-p1--line-height: 1.45;
+  --text-p2: 1.0625rem;
+  --text-p2--line-height: 1.6;
+  --text-p3: 0.9375rem;
+  --text-p3--line-height: 1.5;
+  --text-p4: 0.75rem;
+  --text-p4--line-height: 1.4;
+  --text-p4--letter-spacing: 0.06em;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-marquee: marquee var(--marquee-duration, 40s) linear infinite;
+  --animate-pulse-dot: pulse-dot 2s var(--ease-out-expo) infinite;
+  --animate-scroll-cue: scroll-cue 1.8s var(--ease-out-expo) infinite;
+  --animate-spin-slow: spin 22s linear infinite;
+
+  @keyframes marquee {
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+  @keyframes scroll-cue {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(200%);
+    }
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes pulse-dot {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 60%, transparent);
+    }
+    100% {
+      box-shadow: 0 0 0 10px transparent;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Semantic tokens resolve through runtime variables so they follow the theme. */
+@theme inline {
+  --font-display: var(--font-clash), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
+
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-muted: var(--muted);
+  --color-hover: var(--hover);
+  --color-info: var(--info);
+}
+
+/* ---------------------------------------------------------------------------
+ * Theme
+ * ------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: light;
+  --surface: color-mix(in srgb, var(--color-manila-light) 78%, white);
+  --surface-raised: color-mix(in srgb, var(--color-manila-light) 55%, white);
+  --line: var(--color-manila-75);
+  --line-strong: var(--color-manila-dark);
+  --muted: color-mix(in srgb, var(--color-faded-black) 65%, transparent);
+  --hover: var(--color-manila-50);
+  --info: #26769b;
+  --header-h: 4.5rem;
+}
+
+.dark {
+  color-scheme: dark;
+  --surface: var(--color-soot);
+  --surface-raised: var(--color-warm-gray);
+  --line: color-mix(in srgb, var(--color-manila-light) 10%, transparent);
+  --line-strong: color-mix(in srgb, var(--color-manila-light) 18%, transparent);
+  --muted: color-mix(in srgb, var(--color-manila-light) 60%, transparent);
+  --hover: var(--color-warm-gray);
+  --info: #6bb9dc;
+}
+
+html.dark[data-tone="deep"] {
+  --color-faded-black: #151414;
+  --color-soot: #1b1a1a;
+  --color-warm-gray: #242322;
+}
+
+html[data-accent="gold"] {
+  --color-accent: oklch(from var(--color-gold) calc(l - 0.06) c h);
+}
+html[data-accent="magenta"] {
+  --color-accent: var(--color-magenta);
+}
+html[data-accent="red"] {
+  --color-accent: var(--color-red);
+}
+html.dark[data-accent="gold"] {
+  --color-accent: var(--color-gold);
+}
+html.dark[data-accent="magenta"] {
+  --color-accent: oklch(from var(--color-magenta) calc(l + 0.07) c h);
+}
+html.dark[data-accent="red"] {
+  --color-accent: oklch(from var(--color-red) calc(l + 0.03) c h);
+}
+
+/* ---------------------------------------------------------------------------
+ * Utilities
+ * ------------------------------------------------------------------------- */
+
+@utility corner-squircle {
+  corner-shape: squircle;
+}
+
+/* Outlined display type, as on videojs.org. */
+@utility text-stroke-* {
+  color: transparent;
+  -webkit-text-stroke: clamp(1px, 0.035em, 1.5px) --value(--color-*);
+}
+
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 90rem;
+  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
+}
+
+/* ---------------------------------------------------------------------------
+ * Base
+ * ------------------------------------------------------------------------- */
+
+@layer base {
+  html {
+    scroll-padding-top: var(--header-h);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-manila-light font-sans text-p2 text-pretty text-faded-black antialiased selection:bg-gold selection:text-faded-black dark:bg-faded-black dark:text-manila-light;
+    transition: background-color 0.3s ease;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display font-semibold text-balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .dark,
+  .dark * {
+    scrollbar-color: var(--line-strong) transparent;
+  }
+
+  /* Paper grain over the whole page. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .dark body::after {
+    mix-blend-mode: screen;
+    opacity: 0.035;
+  }
+}
+
+/* Hide split-text content until GSAP reveals it, but only when JS motion runs. */
+html.motion-ok [data-reveal] {
+  visibility: hidden;
 }
