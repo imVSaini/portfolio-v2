@@ -1,7 +1,7 @@
 export const site = {
-  name: "Vaibhav Kumar Saini",
+  name: "Vaibhav Saini",
   shortName: "Vaibhav",
-  monogram: "VKS",
+  monogram: "VS",
   role: "Full Stack Developer",
   location: "Bengaluru, India",
   timeZone: "Asia/Kolkata",
