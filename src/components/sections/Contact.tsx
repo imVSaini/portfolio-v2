@@ -1,4 +1,5 @@
 import { RevealText } from "@/components/motion/RevealText";
+import { RollText } from "@/components/motion/RollText";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { contact } from "@/data/contact";
 import { site } from "@/data/site";
@@ -31,19 +32,17 @@ export function Contact() {
         <div className="grid gap-12 md:grid-cols-12 md:items-end">
           <div className="flex flex-col gap-8 md:col-span-7">
             <p className="max-w-xl text-p1 text-manila-light/70">
-              I’m open to new opportunities, from full-time roles to well-scoped contracts. Tell me
-              what’s breaking, or what you wish existed.
+              If you have a project in mind, feel free to reach out — I’d be glad to help bring your
+              vision to life.
             </p>
             <a
               href={`mailto:${contact.email}`}
-              className="group inline-flex w-fit items-center gap-4 font-display text-h3 font-semibold break-all"
+              className="group inline-flex w-fit max-w-full items-center gap-[0.4em] font-display text-[clamp(1.125rem,3.4vw,2.75rem)] leading-tight font-semibold whitespace-nowrap"
             >
-              <span className="bg-linear-to-r from-accent to-accent bg-size-[0%_2px] bg-bottom-left bg-no-repeat pb-1 transition-[background-size] duration-500 ease-out-expo group-hover:bg-size-[100%_2px]">
-                {contact.email}
-              </span>
+              <RollText text={contact.email} />
               <span
                 aria-hidden="true"
-                className="text-accent transition-transform duration-500 ease-out-expo group-hover:translate-x-1 group-hover:-translate-y-1"
+                className="grid size-[2em] shrink-0 place-items-center rounded-full border border-current/25 text-[0.55em] text-accent transition-[rotate,background-color,border-color,color] duration-500 ease-out-expo group-hover:rotate-45 group-hover:border-accent group-hover:bg-accent group-hover:text-faded-black group-focus-visible:rotate-45 group-focus-visible:border-accent group-focus-visible:bg-accent group-focus-visible:text-faded-black motion-reduce:transition-none"
               >
                 ↗
               </span>
