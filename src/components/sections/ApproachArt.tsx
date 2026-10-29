@@ -178,39 +178,45 @@ export function MeasureArt(props: ArtProps) {
   );
 }
 
-/** AI as leverage — a twinkling spark held in two counter-rotating orbits. */
+/** Orbits turn about the art's true centre, not their own (dot-skewed) bounding box. */
+const orbitCentre: CSSProperties = { transformBox: "view-box", transformOrigin: "120px 120px" };
+
+/**
+ * AI as leverage — a twinkling spark held in three orbits, 60° apart like an atom. Each orbit
+ * turns at its own pace and direction so they never move in lockstep; dots sit on their paths.
+ */
+const orbits = [
+  { tilt: -24, dot: [203.2, 66.5], dotR: 6, opacity: 0.45, duration: "22s", reverse: false },
+  { tilt: 36, dot: [49.8, 50.4], dotR: 4, opacity: 0.3, duration: "30s", reverse: true },
+  { tilt: 96, dot: [82.6, 80.3], dotR: 3.5, opacity: 0.22, duration: "40s", reverse: false },
+] as const;
+
 export function OrbitArt(props: ArtProps) {
   return (
     <svg viewBox="0 0 240 240" fill="none" {...props}>
-      <g className={`animate-spin-slow ${LOOP}`} style={centre}>
-        <ellipse
-          cx="120"
-          cy="120"
-          rx="104"
-          ry="44"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          opacity="0.45"
-          transform="rotate(-24 120 120)"
-        />
-        <circle cx="214" cy="80" r="6" fill="currentColor" />
-      </g>
-      <g
-        className={`animate-spin-slow ${LOOP}`}
-        style={{ ...centre, animationDirection: "reverse", animationDuration: "30s" }}
-      >
-        <ellipse
-          cx="120"
-          cy="120"
-          rx="104"
-          ry="44"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          opacity="0.3"
-          transform="rotate(36 120 120)"
-        />
-        <circle cx="40" cy="70" r="4" fill="currentColor" opacity="0.7" />
-      </g>
+      {orbits.map(({ tilt, dot, dotR, opacity, duration, reverse }) => (
+        <g
+          key={tilt}
+          className={`animate-spin-slow ${LOOP}`}
+          style={{
+            ...orbitCentre,
+            animationDuration: duration,
+            animationDirection: reverse ? "reverse" : "normal",
+          }}
+        >
+          <ellipse
+            cx="120"
+            cy="120"
+            rx="104"
+            ry="44"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            opacity={opacity}
+            transform={`rotate(${tilt} 120 120)`}
+          />
+          <circle cx={dot[0]} cy={dot[1]} r={dotR} fill="currentColor" opacity={opacity + 0.45} />
+        </g>
+      ))}
       <g data-art-piece="">
         <path
           d="M120 62 L133 107 L178 120 L133 133 L120 178 L107 133 L62 120 L107 107 Z"
