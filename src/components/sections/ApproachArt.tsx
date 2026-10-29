@@ -1,4 +1,8 @@
+"use client";
+
 import type { CSSProperties, SVGProps } from "react";
+
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 /*
  * Line-art illustrations for the principle cards. Everything draws in currentColor so each
@@ -182,44 +186,60 @@ export function MeasureArt(props: ArtProps) {
 const orbitCentre: CSSProperties = { transformBox: "view-box", transformOrigin: "120px 120px" };
 
 /**
- * AI as leverage — a twinkling spark held in three orbits, 60° apart like an atom. Each orbit
- * turns at its own pace and direction so they never move in lockstep; dots sit on their paths.
+ * AI as leverage — a twinkling spark held in three orbits, 60° apart like an atom. The orbits
+ * turn together as one rigid body (so no two paths ever stack) while each dot travels its own
+ * orbit at its own pace. Orbits are drawn untilted (rx 104, ry 50) inside a rotated group, so
+ * one path string serves every dot. Clearance: the spark reaches r=34; the nearest an orbit
+ * comes is r=50, so even the largest dot (r=6) passes ≥10 units clear of it.
  */
+const ORBIT_RX = 104;
+const ORBIT_RY = 50;
+const orbitPath = `M${120 + ORBIT_RX} 120 A${ORBIT_RX} ${ORBIT_RY} 0 1 1 ${120 - ORBIT_RX} 120 A${ORBIT_RX} ${ORBIT_RY} 0 1 1 ${120 + ORBIT_RX} 120`;
+
 const orbits = [
-  { tilt: -24, dot: [203.2, 66.5], dotR: 6, opacity: 0.45, duration: "22s", reverse: false },
-  { tilt: 36, dot: [49.8, 50.4], dotR: 4, opacity: 0.3, duration: "30s", reverse: true },
-  { tilt: 96, dot: [82.6, 80.3], dotR: 3.5, opacity: 0.22, duration: "40s", reverse: false },
+  { tilt: -24, dotR: 6, opacity: 0.45, dur: 7, phase: 0.1, reverse: false },
+  { tilt: 36, dotR: 4, opacity: 0.3, dur: 10, phase: 0.55, reverse: true },
+  { tilt: 96, dotR: 3.5, opacity: 0.22, dur: 13, phase: 0.8, reverse: false },
 ] as const;
 
+/** Resting spot on the untilted orbit for a fraction (0–1) of the way around. */
+function orbitPoint(phase: number) {
+  const t = phase * 2 * Math.PI;
+  return { cx: 120 + ORBIT_RX * Math.cos(t), cy: 120 + ORBIT_RY * Math.sin(t) };
+}
+
 export function OrbitArt(props: ArtProps) {
+  const reduced = usePrefersReducedMotion();
   return (
     <svg viewBox="0 0 240 240" fill="none" {...props}>
-      {orbits.map(({ tilt, dot, dotR, opacity, duration, reverse }) => (
-        <g
-          key={tilt}
-          className={`animate-spin-slow ${LOOP}`}
-          style={{
-            ...orbitCentre,
-            animationDuration: duration,
-            animationDirection: reverse ? "reverse" : "normal",
-          }}
-        >
-          <ellipse
-            cx="120"
-            cy="120"
-            rx="104"
-            ry="44"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            opacity={opacity}
-            transform={`rotate(${tilt} 120 120)`}
-          />
-          <circle cx={dot[0]} cy={dot[1]} r={dotR} fill="currentColor" opacity={opacity + 0.45} />
-        </g>
-      ))}
+      <g className={`animate-spin-slow ${LOOP}`} style={orbitCentre}>
+        {orbits.map(({ tilt, dotR, opacity, dur, phase, reverse }) => (
+          <g key={tilt} transform={`rotate(${tilt} 120 120)`}>
+            <path d={orbitPath} stroke="currentColor" strokeWidth="1.5" opacity={opacity} />
+            {reduced ? (
+              <circle
+                {...orbitPoint(phase)}
+                r={dotR}
+                fill="currentColor"
+                opacity={opacity + 0.45}
+              />
+            ) : (
+              <circle r={dotR} fill="currentColor" opacity={opacity + 0.45}>
+                <animateMotion
+                  dur={`${dur}s`}
+                  begin={`${-phase * dur}s`}
+                  repeatCount="indefinite"
+                  path={orbitPath}
+                  {...(reverse && { keyPoints: "1;0", keyTimes: "0;1", calcMode: "linear" })}
+                />
+              </circle>
+            )}
+          </g>
+        ))}
+      </g>
       <g data-art-piece="">
         <path
-          d="M120 62 L133 107 L178 120 L133 133 L120 178 L107 133 L62 120 L107 107 Z"
+          d="M120 86 L128 112 L154 120 L128 128 L120 154 L112 128 L86 120 L112 112 Z"
           fill="currentColor"
           className={`animate-twinkle ${LOOP}`}
           style={centre}
