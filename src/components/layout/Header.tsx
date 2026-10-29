@@ -1,6 +1,7 @@
 "use client";
 
 import { AppearanceMenu } from "@/components/appearance/AppearanceMenu";
+import { RollText } from "@/components/motion/RollText";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
 import { socialIcons } from "@/components/ui/SocialIcons";
 import { cn } from "@/lib/cn";
@@ -31,11 +32,11 @@ export function Header() {
           aria-label={`${site.name}, back to top`}
           className="group flex items-center gap-3"
         >
-          <span className="grid size-9 place-items-center rounded-full bg-faded-black font-display text-p4 font-semibold tracking-normal text-manila-light transition-colors duration-300 group-hover:bg-accent dark:bg-manila-light dark:text-faded-black">
-            {site.monogram}
+          <span className="grid size-9 place-items-center rounded-full bg-faded-black font-display text-p4 font-semibold tracking-normal text-manila-light dark:bg-manila-light dark:text-faded-black">
+            <RollText text={site.monogram} />
           </span>
           <span className="hidden font-display text-p3 font-medium uppercase sm:block">
-            {site.name}
+            <RollText text={site.name} />
           </span>
         </ScrollLink>
 
