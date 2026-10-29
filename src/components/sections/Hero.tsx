@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { site } from "@/data/site";
 import { gsap, MOTION_QUERY, useGSAP } from "@/lib/gsap";
 
-const BADGE_TEXT = "Open to lead roles ✦ Based in Bengaluru ✦ ";
+const BADGE_TEXT = "Open to new opportunities ✦ Bengaluru ✦ ";
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -52,21 +52,23 @@ export function Hero() {
       aria-label="Introduction"
       className="relative flex min-h-svh flex-col overflow-hidden pt-(--header-h)"
     >
-      {/* Ambient accent glow — drifts slower than the page. */}
+      {/* Ambient accent glow — drifts slower than the page. Masked off the header band so the
+          header icons sit on the plain page colour and their hover chips read as on videojs.org. */}
       <div
         aria-hidden="true"
-        data-scroll=""
-        data-scroll-speed="-0.25"
-        className="pointer-events-none absolute -top-1/4 -right-1/4 size-[70vw] max-w-240 rounded-full bg-accent opacity-[0.16] blur-[120px] dark:opacity-[0.14]"
-      />
+        className="pointer-events-none absolute inset-0 mask-[linear-gradient(to_bottom,transparent_calc(var(--header-h)+1rem),black_45%)]"
+      >
+        <div
+          data-scroll=""
+          data-scroll-speed="-0.25"
+          className="absolute -top-1/4 -right-1/4 size-[70vw] max-w-240 rounded-full bg-accent opacity-[0.16] blur-[120px] dark:opacity-[0.14]"
+        />
+      </div>
 
       <div className="relative container-page flex flex-1 flex-col justify-center gap-10 py-12 md:py-16">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3" data-hero-fade="">
           <span className="inline-flex items-center gap-2.5 rounded-full border border-line-strong px-3.5 py-1.5 text-p4 font-medium tracking-wide uppercase">
             <span className="size-2 animate-pulse-dot rounded-full bg-accent motion-reduce:animate-none" />
-            {site.availability}
-          </span>
-          <span className="text-p4 tracking-wide text-muted uppercase">
             {site.role} — {site.location}
           </span>
         </div>

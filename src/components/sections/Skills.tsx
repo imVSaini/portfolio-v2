@@ -63,17 +63,12 @@ export function Skills() {
 
       <div className="container-page">
         <ul className="grid gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-2 xl:grid-cols-4">
-          {skillGroups.map((group, i) => (
+          {skillGroups.map((group) => (
             <li
               key={group.name}
               className="group flex flex-col gap-6 bg-manila-light p-7 transition-colors duration-500 hover:bg-surface dark:bg-faded-black dark:hover:bg-soot"
             >
-              <div className="flex items-baseline justify-between gap-4">
-                <h3 className="text-h4 uppercase">{group.name}</h3>
-                <span className="font-display text-p4 text-muted tabular-nums">
-                  {String(i + 1).padStart(2, "0")} · {group.items.length}
-                </span>
-              </div>
+              <h3 className="text-h4 uppercase">{group.name}</h3>
               <p className="text-p3 text-muted">{group.note}</p>
               <ul className="mt-auto flex flex-wrap gap-2">
                 {group.items.map((item) => (

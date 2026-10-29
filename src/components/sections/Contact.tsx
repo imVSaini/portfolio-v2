@@ -31,8 +31,8 @@ export function Contact() {
         <div className="grid gap-12 md:grid-cols-12 md:items-end">
           <div className="flex flex-col gap-8 md:col-span-7">
             <p className="max-w-xl text-p1 text-manila-light/70">
-              I’m open to lead and senior full-stack roles, plus the occasional well-scoped
-              contract. Tell me what’s breaking, or what you wish existed.
+              I’m open to new opportunities, from full-time roles to well-scoped contracts. Tell me
+              what’s breaking, or what you wish existed.
             </p>
             <a
               href={`mailto:${contact.email}`}

@@ -8,7 +8,6 @@ export const site = {
   url: "https://imvsaini.vercel.app",
   description:
     "Vaibhav Kumar Saini is a lead full-stack engineer in Bengaluru building multi-tenant SaaS, AI-powered features and fast, considered interfaces with Python, FastAPI, Node.js, React and Next.js.",
-  availability: "Open to lead & senior roles",
   since: 2019,
 } as const;
 

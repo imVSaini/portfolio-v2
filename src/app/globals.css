@@ -6,7 +6,9 @@
  * ------------------------------------------------------------------------- */
 
 @custom-variant dark (&:where(.dark, .dark *));
-@custom-variant intent (&:hover, &:focus-within);
+/* Hover, or keyboard focus on/within. Plain :focus-within would keep a button lit after a mouse
+   click (Base UI hands focus back to the popover trigger), leaving two highlighted chips. */
+@custom-variant intent (&:hover, &:focus-visible, &:has(:focus-visible));
 @custom-variant starting-style (&[data-starting-style]);
 @custom-variant ending-style (&[data-ending-style]);
 
@@ -200,10 +202,10 @@ html.dark[data-accent="red"] {
     @apply font-display font-semibold text-balance;
   }
 
+  /* Same focus ring as videojs.org. */
   :focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 3px;
-    border-radius: 2px;
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
   }
 
   .dark,
