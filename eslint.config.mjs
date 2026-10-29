@@ -11,7 +11,7 @@ const eslintConfig = defineConfig([
     files: ["**/*.{ts,tsx}"],
     plugins: { "better-tailwindcss": betterTailwind },
     settings: {
-      "better-tailwindcss": { entryPoint: "src/app/globals.css" },
+      "better-tailwindcss": { entryPoint: "src/app/globals.css", rootFontSize: 16 },
     },
     rules: {
       ...betterTailwind.configs.recommended.rules,

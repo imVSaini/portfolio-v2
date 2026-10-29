@@ -40,7 +40,7 @@ function ProjectPanel({ project }: { project: Project }) {
         <div
           data-h-parallax="14"
           aria-hidden="true"
-          className="absolute inset-y-0 -left-1/4 flex w-[150%] items-center justify-center"
+          className="absolute inset-y-0 -left-1/4 flex w-3/2 items-center justify-center"
         >
           <span className="font-display text-[clamp(5rem,16vw,15rem)] leading-none font-semibold whitespace-nowrap uppercase opacity-15">
             {project.title}

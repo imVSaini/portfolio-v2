@@ -79,12 +79,12 @@ export function Experience() {
       <ol data-xp-list="" className="relative mt-20 md:mt-28">
         <span
           aria-hidden="true"
-          className="absolute inset-y-0 left-[5px] w-px bg-line md:left-[calc(25%+5px)]"
+          className="absolute inset-y-0 left-1.25 w-px bg-line md:left-[calc(25%+5px)]"
         />
         <span
           data-xp-line=""
           aria-hidden="true"
-          className="absolute inset-y-0 left-[5px] w-px origin-top bg-accent md:left-[calc(25%+5px)]"
+          className="absolute inset-y-0 left-1.25 w-px origin-top bg-accent md:left-[calc(25%+5px)]"
         />
 
         {experience.map((role) => (
@@ -96,7 +96,7 @@ export function Experience() {
             <span
               data-xp-dot=""
               aria-hidden="true"
-              className="absolute top-2 left-0 size-[11px] rounded-full border-2 border-manila-light bg-line-strong md:left-[25%] dark:border-faded-black"
+              className="absolute top-2 left-0 size-2.75 rounded-full border-2 border-manila-light bg-line-strong md:left-1/4 dark:border-faded-black"
             />
 
             {/* Sticky meta column. */}
@@ -161,7 +161,7 @@ export function Experience() {
           <span
             data-xp-dot=""
             aria-hidden="true"
-            className="absolute top-22 left-0 size-[11px] rounded-full border-2 border-manila-light bg-line-strong md:left-[25%] dark:border-faded-black"
+            className="absolute top-22 left-0 size-2.75 rounded-full border-2 border-manila-light bg-line-strong md:left-1/4 dark:border-faded-black"
           />
           <p className="font-display text-p4 tracking-wide text-muted uppercase md:pr-12">Next</p>
           <div className="flex flex-col items-start gap-5 md:col-span-3 md:pl-16" data-xp-item="">

@@ -61,7 +61,7 @@ export function Hero() {
         <div
           data-scroll=""
           data-scroll-speed="-0.25"
-          className="absolute -top-1/4 -right-1/4 size-[70vw] max-w-240 rounded-full bg-accent opacity-[0.16] blur-[120px] dark:opacity-[0.14]"
+          className="absolute -top-1/4 -right-1/4 size-[70vw] max-w-240 rounded-full bg-accent opacity-16 blur-3xl dark:opacity-14"
         />
       </div>
 
