@@ -15,7 +15,6 @@ export function Footer() {
           <span>
             © {site.name} · {site.since} — Present
           </span>
-          <span>Next.js · Tailwind CSS · GSAP · Locomotive Scroll</span>
           <ScrollLink href="#top" className="inline-flex items-center gap-2 intent:text-accent">
             Back to top <span aria-hidden="true">↑</span>
           </ScrollLink>
