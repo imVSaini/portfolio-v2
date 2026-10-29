@@ -72,6 +72,100 @@
   --animate-marquee: marquee var(--marquee-duration, 40s) linear infinite;
   --animate-pulse-dot: pulse-dot 2s var(--ease-out-expo) infinite;
   --animate-spin-slow: spin 22s linear infinite;
+  --animate-spin-steady: spin 2.4s linear infinite;
+
+  /* Idle loops for the Approach icons. */
+  --animate-cell: cell 3.2s ease-in-out infinite;
+  --animate-dash-flow: dash-flow 1.2s linear infinite;
+  --animate-bar: bar 2.4s ease-in-out infinite;
+  --animate-draw: draw 3.6s ease-in-out infinite;
+  --animate-sonar: sonar 2.4s ease-out infinite;
+  --animate-twinkle: twinkle 3s ease-in-out infinite;
+  --animate-bob: bob 2.4s ease-in-out infinite;
+  --animate-flicker: flicker 2.8s linear infinite;
+
+  @keyframes cell {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    35%,
+    55% {
+      opacity: 0.9;
+    }
+  }
+  @keyframes dash-flow {
+    to {
+      stroke-dashoffset: -20;
+    }
+  }
+  @keyframes bar {
+    0%,
+    100% {
+      transform: scaleY(1);
+    }
+    50% {
+      transform: scaleY(0.7);
+    }
+  }
+  @keyframes draw {
+    0% {
+      stroke-dashoffset: 1;
+      opacity: 1;
+    }
+    45%,
+    80% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+  }
+  @keyframes sonar {
+    from {
+      transform: scale(1);
+      opacity: 0.55;
+    }
+    to {
+      transform: scale(2.4);
+      opacity: 0;
+    }
+  }
+  @keyframes twinkle {
+    0%,
+    100% {
+      transform: scale(1) rotate(0deg);
+    }
+    50% {
+      transform: scale(0.82) rotate(45deg);
+    }
+  }
+  @keyframes bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-14%);
+    }
+  }
+  @keyframes flicker {
+    0%,
+    40%,
+    52%,
+    64%,
+    100% {
+      opacity: 1;
+    }
+    46% {
+      opacity: 0.25;
+    }
+    58% {
+      opacity: 0.4;
+    }
+  }
 
   @keyframes marquee {
     to {
@@ -121,6 +215,8 @@
   --hover: var(--color-manila-50);
   --info: #26769b;
   --header-h: 4.5rem;
+  --card-invert: var(--color-faded-black);
+  --card-soft: var(--color-manila-50);
 }
 
 .dark {
@@ -132,6 +228,8 @@
   --muted: color-mix(in srgb, var(--color-manila-light) 60%, transparent);
   --hover: var(--color-warm-gray);
   --info: #6bb9dc;
+  --card-invert: var(--color-manila-light);
+  --card-soft: var(--color-soot);
 }
 
 html.dark[data-tone="deep"] {

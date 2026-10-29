@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
-import { SmoothScroll } from "@/components/scroll/SmoothScroll";
 import { site } from "@/data/site";
 import { appearanceScript, THEME_COLORS } from "@/lib/appearance";
 
@@ -82,7 +81,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         {children}
-        <SmoothScroll />
       </body>
     </html>
   );
