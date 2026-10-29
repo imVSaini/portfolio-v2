@@ -18,21 +18,13 @@ function hostname(url: string) {
   return new URL(url).hostname.replace(/^www\./, "");
 }
 
-function ProjectPanel({ project, index }: { project: Project; index: number }) {
-  const number = String(index + 1).padStart(2, "0");
-  const total = String(projects.length).padStart(2, "0");
-
+function ProjectPanel({ project }: { project: Project }) {
   return (
     <article
       data-h-panel=""
       className="group flex w-[86vw] shrink-0 snap-center flex-col gap-6 sm:w-[70vw] md:h-[78svh] md:w-[min(64vw,60rem)]"
     >
-      <div className="flex items-center justify-between font-display text-p4 text-muted uppercase">
-        <span>
-          <span className="text-accent">{number}</span> / {total}
-        </span>
-        <span>{project.category}</span>
-      </div>
+      <p className="font-display text-p4 text-muted uppercase">{project.category}</p>
 
       <a
         href={project.url}
@@ -113,7 +105,7 @@ export function Work() {
   return (
     <HorizontalSection id="work" label="Selected work" className="py-24 md:py-0">
       <div className="flex w-[86vw] shrink-0 snap-start flex-col justify-center gap-8 sm:w-[60vw] md:w-[34vw] md:min-w-104">
-        <SectionLabel index="02">Selected work</SectionLabel>
+        <SectionLabel>Selected work</SectionLabel>
         <h2 className="text-h2 uppercase">
           Seven builds,{" "}
           <span className="text-stroke-faded-black dark:text-stroke-manila-light">
@@ -129,8 +121,8 @@ export function Work() {
         </p>
       </div>
 
-      {projects.map((project, index) => (
-        <ProjectPanel key={project.slug} project={project} index={index} />
+      {projects.map((project) => (
+        <ProjectPanel key={project.slug} project={project} />
       ))}
 
       {github && (

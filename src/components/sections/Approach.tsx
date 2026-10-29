@@ -36,7 +36,7 @@ export function Approach() {
     >
       <div className="grid gap-12 md:grid-cols-12">
         <div className="md:col-span-3">
-          <SectionLabel index="01">Approach</SectionLabel>
+          <SectionLabel>Approach</SectionLabel>
         </div>
         <div className="md:col-span-9">
           <h2 id="approach-title" className="sr-only">
@@ -49,15 +49,14 @@ export function Approach() {
         </div>
       </div>
 
-      <ol className="mt-24 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-start">
-        {principles.map((item, i) => (
+      <ul className="mt-24 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-start">
+        {principles.map((item) => (
           <li
             key={item.title}
             data-scroll=""
             data-scroll-speed={item.speed}
-            className="group relative flex min-h-72 flex-col justify-between gap-10 overflow-hidden rounded-2xl border border-line bg-surface p-7 transition-colors duration-500 corner-squircle hover:border-line-strong lg:even:mt-16 dark:bg-soot/60"
+            className="group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-surface p-7 transition-colors duration-500 corner-squircle hover:border-line-strong lg:even:mt-16 dark:bg-soot/60"
           >
-            <span className="font-display text-p4 text-muted">0{i + 1}</span>
             <div className="flex flex-col gap-3">
               <h3 className="text-h4">{item.title}</h3>
               <p className="text-p3 text-muted">{item.body}</p>
@@ -68,7 +67,7 @@ export function Approach() {
             />
           </li>
         ))}
-      </ol>
+      </ul>
     </section>
   );
 }

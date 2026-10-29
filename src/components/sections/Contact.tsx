@@ -20,9 +20,7 @@ export function Contact() {
       />
 
       <div className="relative container-page flex flex-col gap-16">
-        <SectionLabel index="05" className="text-manila-light/60">
-          Contact
-        </SectionLabel>
+        <SectionLabel className="text-manila-light/60">Contact</SectionLabel>
 
         <RevealText as="h2" id="contact-title" className="text-h1 uppercase">
           Have a hard problem? Let’s build the <span className="text-accent">calm version.</span>

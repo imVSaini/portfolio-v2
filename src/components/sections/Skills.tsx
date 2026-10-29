@@ -38,7 +38,7 @@ export function Skills() {
     <section id="skills" aria-labelledby="skills-title" className="relative py-28 md:py-40">
       <div className="container-page grid gap-10 md:grid-cols-12 md:items-end">
         <div className="flex flex-col gap-8 md:col-span-8">
-          <SectionLabel index="04">Skills</SectionLabel>
+          <SectionLabel>Skills</SectionLabel>
           <RevealText as="h2" id="skills-title" className="text-h2 uppercase">
             One toolbox, the whole stack.
           </RevealText>

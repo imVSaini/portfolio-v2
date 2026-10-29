@@ -1,15 +1,7 @@
 import { cn } from "@/lib/cn";
 
-/** Small index + title eyebrow that opens each section, e.g. "(02) Selected work". */
-export function SectionLabel({
-  index,
-  children,
-  className,
-}: {
-  index: string;
-  children: string;
-  className?: string;
-}) {
+/** Small eyebrow that opens each section, e.g. "— Selected work". */
+export function SectionLabel({ children, className }: { children: string; className?: string }) {
   return (
     <p
       className={cn(
@@ -17,8 +9,7 @@ export function SectionLabel({
         className,
       )}
     >
-      <span className="text-accent">({index})</span>
-      <span className="h-px w-8 bg-line-strong" aria-hidden="true" />
+      <span className="h-px w-8 bg-accent" aria-hidden="true" />
       {children}
     </p>
   );

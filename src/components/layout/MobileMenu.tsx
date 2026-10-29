@@ -50,7 +50,7 @@ export function MobileMenu({ className }: { className?: string }) {
           </div>
           <nav aria-label="Mobile">
             <ul className="flex flex-col gap-1">
-              {nav.map((item, i) => (
+              {nav.map((item) => (
                 <li key={item.href}>
                   <ScrollLink
                     href={item.href}
@@ -59,9 +59,8 @@ export function MobileMenu({ className }: { className?: string }) {
                       pendingTarget.current = item.href;
                       setOpen(false);
                     }}
-                    className="flex items-baseline gap-4 py-1 font-display text-h3 font-semibold uppercase intent:text-accent"
+                    className="block py-1 font-display text-h3 font-semibold uppercase intent:text-accent"
                   >
-                    <span className="text-p4 text-muted">0{i + 1}</span>
                     {item.label}
                   </ScrollLink>
                 </li>

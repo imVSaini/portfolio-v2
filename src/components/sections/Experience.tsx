@@ -65,7 +65,7 @@ export function Experience() {
     >
       <div className="grid gap-10 md:grid-cols-12 md:items-end">
         <div className="flex flex-col gap-8 md:col-span-8">
-          <SectionLabel index="03">Experience</SectionLabel>
+          <SectionLabel>Experience</SectionLabel>
           <RevealText as="h2" id="experience-title" className="text-h2 uppercase">
             Seven years of keeping production calm.
           </RevealText>
