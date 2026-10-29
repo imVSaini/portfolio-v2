@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 
 import { AppearanceControls } from "@/components/appearance/AppearanceControls";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
+import { socialIcons } from "@/components/ui/SocialIcons";
 import { cn } from "@/lib/cn";
 import { contact } from "@/data/contact";
 import { nav } from "@/data/site";
@@ -68,12 +69,31 @@ export function MobileMenu({ className }: { className?: string }) {
             </ul>
           </nav>
           <AppearanceControls />
-          <a
-            href={`mailto:${contact.email}`}
-            className="mt-auto text-p3 text-muted underline decoration-line-strong underline-offset-4 intent:text-accent"
-          >
-            {contact.email}
-          </a>
+          <div className="mt-auto flex items-center justify-between gap-4">
+            <a
+              href={`mailto:${contact.email}`}
+              className="text-p3 text-muted underline decoration-line-strong underline-offset-4 intent:text-accent"
+            >
+              {contact.email}
+            </a>
+            <div className="flex">
+              {contact.links.map((link) => {
+                const Icon = socialIcons[link.label];
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={link.label}
+                    className="flex items-center rounded-md px-2.5 py-2 corner-squircle intent:bg-hover"
+                  >
+                    <Icon className="size-6" aria-hidden="true" />
+                  </a>
+                );
+              })}
+            </div>
+          </div>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>

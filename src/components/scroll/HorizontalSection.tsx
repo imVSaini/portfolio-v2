@@ -41,8 +41,11 @@ export function HorizontalSection({ id, label, children, className }: Horizontal
             start: "top top",
             end: () => `+=${distance()}`,
             pin: true,
-            scrub: 1,
-            anticipatePin: 1,
+            // Lenis already smooths the scroll position. Extra scrub lag here would stall the
+            // track when the pin engages and leave it short of the end when the pin releases.
+            // anticipatePin is for scrollers that lag behind the main thread; Lenis scrolls
+            // natively, so it would only pin the section early with a visible snap.
+            scrub: true,
             invalidateOnRefresh: true,
           },
         });

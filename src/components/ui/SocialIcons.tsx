@@ -21,3 +21,5 @@ export function GitHubIcon(props: IconProps) {
     </svg>
   );
 }
+
+export const socialIcons = { LinkedIn: LinkedInIcon, GitHub: GitHubIcon } as const;

@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/Button";
 import { site } from "@/data/site";
 import { gsap, MOTION_QUERY, useGSAP } from "@/lib/gsap";
 
-import { LiveClock } from "./LiveClock";
-
 const BADGE_TEXT = "Open to lead roles ✦ Based in Bengaluru ✦ ";
 
 export function Hero() {
@@ -117,25 +115,6 @@ export function Hero() {
               Start a conversation
             </Button>
           </div>
-        </div>
-      </div>
-
-      <div className="relative border-t border-line">
-        <div
-          className="container-page flex items-center justify-between gap-6 py-5 text-p4 tracking-wide text-muted uppercase"
-          data-hero-fade=""
-        >
-          <span>Shipping since {site.since}</span>
-          <span className="hidden sm:inline">
-            Local time{" "}
-            <LiveClock className="text-faded-black tabular-nums dark:text-manila-light" /> IST
-          </span>
-          <span className="flex items-center gap-2">
-            Scroll
-            <span className="relative h-6 w-px overflow-hidden bg-line-strong">
-              <span className="absolute inset-x-0 top-0 h-1/2 animate-scroll-cue bg-accent motion-reduce:animate-none" />
-            </span>
-          </span>
         </div>
       </div>
 

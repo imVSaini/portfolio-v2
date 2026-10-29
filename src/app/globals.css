@@ -54,32 +54,26 @@
   --text-h4--line-height: 1.15;
   --text-p1: clamp(1.1875rem, 1.6vw, 1.5rem);
   --text-p1--line-height: 1.45;
-  --text-p2: 1.0625rem;
-  --text-p2--line-height: 1.6;
-  --text-p3: 0.9375rem;
+  /* Body sizes and radii match videojs.org's scale so the Appearance controls measure the same. */
+  --text-p2: 1rem;
+  --text-p2--line-height: 1.5;
+  --text-p3: 0.875rem;
   --text-p3--line-height: 1.5;
   --text-p4: 0.75rem;
-  --text-p4--line-height: 1.4;
-  --text-p4--letter-spacing: 0.06em;
+  --text-p4--line-height: 1.5;
+
+  --radius-md: 0.5rem;
+  --radius-lg: 0.7rem;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
   --animate-marquee: marquee var(--marquee-duration, 40s) linear infinite;
   --animate-pulse-dot: pulse-dot 2s var(--ease-out-expo) infinite;
-  --animate-scroll-cue: scroll-cue 1.8s var(--ease-out-expo) infinite;
   --animate-spin-slow: spin 22s linear infinite;
 
   @keyframes marquee {
     to {
       transform: translate3d(-50%, 0, 0);
-    }
-  }
-  @keyframes scroll-cue {
-    0% {
-      transform: translateY(-100%);
-    }
-    100% {
-      transform: translateY(200%);
     }
   }
   @keyframes spin {

@@ -2,7 +2,7 @@
 
 import { AppearanceMenu } from "@/components/appearance/AppearanceMenu";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
-import { GitHubIcon, LinkedInIcon } from "@/components/ui/SocialIcons";
+import { socialIcons } from "@/components/ui/SocialIcons";
 import { cn } from "@/lib/cn";
 import { contact } from "@/data/contact";
 import { nav, site } from "@/data/site";
@@ -10,8 +10,6 @@ import { useScroll } from "@/stores/scroll";
 
 import { MobileMenu } from "./MobileMenu";
 import { ScrollProgress } from "./ScrollProgress";
-
-const socialIcons = { LinkedIn: LinkedInIcon, GitHub: GitHubIcon } as const;
 
 export function Header() {
   const hidden = useScroll((s) => s.scrolled && s.direction === 1 && s.progress > 0.04);
@@ -57,22 +55,25 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-1">
-          <AppearanceMenu />
-          {contact.links.map((link) => {
-            const Icon = socialIcons[link.label];
-            return (
-              <a
-                key={link.label}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={link.label}
-                className="flex items-center rounded-md px-2.5 py-2 corner-squircle intent:bg-hover"
-              >
-                <Icon className="size-6" aria-hidden="true" />
-              </a>
-            );
-          })}
+          {/* Same as videojs.org: edge-to-edge icon row from md up; below that it lives in the menu. */}
+          <div className="hidden md:flex">
+            <AppearanceMenu />
+            {contact.links.map((link) => {
+              const Icon = socialIcons[link.label];
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={link.label}
+                  className="flex items-center rounded-md px-2.5 py-2 corner-squircle intent:bg-hover"
+                >
+                  <Icon className="size-6" aria-hidden="true" />
+                </a>
+              );
+            })}
+          </div>
           <MobileMenu className="lg:hidden" />
         </div>
       </div>
