@@ -104,7 +104,7 @@ function ProjectPanel({ project }: { project: Project }) {
 export function Work() {
   return (
     <HorizontalSection id="work" label="Selected work" className="py-24 md:py-0">
-      <div className="flex w-[86vw] shrink-0 snap-start flex-col justify-center gap-8 sm:w-[60vw] md:w-[34vw] md:min-w-104">
+      <div className="flex w-[86vw] shrink-0 snap-start flex-col justify-center gap-8 sm:w-[60vw] md:w-[calc(var(--text-h2)*6.15)]">
         <div className="flex flex-col gap-5">
           <SectionLabel>Selected work</SectionLabel>
           <h2 className="text-h2 uppercase">
