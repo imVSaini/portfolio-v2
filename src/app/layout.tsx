@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   authors: [{ name: site.name, url: site.url }],
   keywords: [
     "Vaibhav Kumar Saini",
-    "Full-Stack Engineer",
+    "Full Stack Developer",
     "Lead Software Engineer",
     "FastAPI",
     "Next.js",

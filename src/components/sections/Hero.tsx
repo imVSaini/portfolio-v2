@@ -101,7 +101,7 @@ export function Hero() {
             data-scroll=""
             data-scroll-speed="0.04"
           >
-            I’m {site.shortName}, a creative developer, who crafts web and mobile products where
+            I’m {site.shortName}, a full stack developer, who crafts web and mobile products where
             design and code work as one.{" "}
             <span className="text-faded-black dark:text-manila-light">
               I enjoy taking the lead on projects because, honestly, someone has to.
