@@ -1,15 +1,18 @@
 import { cn } from "@/lib/cn";
 
-/** Small eyebrow that opens each section, e.g. "— Selected work". */
+/**
+ * Compact pill that sits directly on top of a section heading — same family as the hero's
+ * role badge. The outline follows the text colour, so it also works on the dark Contact band.
+ */
 export function SectionLabel({ children, className }: { children: string; className?: string }) {
   return (
     <p
       className={cn(
-        "flex items-center gap-3 font-display text-p4 font-medium text-muted uppercase",
+        "inline-flex w-fit items-center gap-2 rounded-full border border-current/20 px-3.5 py-1.5 font-display text-p4 font-medium tracking-wide text-muted uppercase",
         className,
       )}
     >
-      <span className="h-px w-8 bg-accent" aria-hidden="true" />
+      <span className="size-1.5 rounded-full bg-accent" aria-hidden="true" />
       {children}
     </p>
   );

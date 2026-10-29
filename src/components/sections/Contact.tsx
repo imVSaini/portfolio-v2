@@ -20,11 +20,13 @@ export function Contact() {
       />
 
       <div className="relative container-page flex flex-col gap-16">
-        <SectionLabel className="text-manila-light/60">Contact</SectionLabel>
+        <div className="flex flex-col gap-6">
+          <SectionLabel className="text-manila-light/70">Contact</SectionLabel>
 
-        <RevealText as="h2" id="contact-title" className="text-h1 uppercase">
-          Have a hard problem? Let’s build the <span className="text-accent">calm version.</span>
-        </RevealText>
+          <RevealText as="h2" id="contact-title" className="text-h1 uppercase">
+            Have a hard problem? Let’s build the <span className="text-accent">calm version.</span>
+          </RevealText>
+        </div>
 
         <div className="grid gap-12 md:grid-cols-12 md:items-end">
           <div className="flex flex-col gap-8 md:col-span-7">

@@ -80,6 +80,7 @@
   --animate-bar: bar 2.4s ease-in-out infinite;
   --animate-draw: draw 3.6s ease-in-out infinite;
   --animate-sonar: sonar 2.4s ease-out infinite;
+  --animate-ripple: ripple 3.6s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
   --animate-twinkle: twinkle 3s ease-in-out infinite;
   --animate-bob: bob 2.4s ease-in-out infinite;
   --animate-flicker: flicker 2.8s linear infinite;
@@ -120,6 +121,17 @@
     }
     100% {
       stroke-dashoffset: 0;
+      opacity: 0;
+    }
+  }
+  /* Core-to-edge ripple: r 36 → ~95, fading out before the r=104 guard ring. */
+  @keyframes ripple {
+    0% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(2.6);
       opacity: 0;
     }
   }

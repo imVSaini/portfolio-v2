@@ -64,7 +64,7 @@ export function Experience() {
       className="relative container-page py-28 md:py-40"
     >
       <div className="grid gap-10 md:grid-cols-12 md:items-end">
-        <div className="flex flex-col gap-8 md:col-span-8">
+        <div className="flex flex-col gap-5 md:col-span-8">
           <SectionLabel>Experience</SectionLabel>
           <RevealText as="h2" id="experience-title" className="text-h2 uppercase">
             Seven years of keeping production calm.

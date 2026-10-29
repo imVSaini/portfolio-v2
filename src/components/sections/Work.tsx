@@ -105,13 +105,15 @@ export function Work() {
   return (
     <HorizontalSection id="work" label="Selected work" className="py-24 md:py-0">
       <div className="flex w-[86vw] shrink-0 snap-start flex-col justify-center gap-8 sm:w-[60vw] md:w-[34vw] md:min-w-104">
-        <SectionLabel>Selected work</SectionLabel>
-        <h2 className="text-h2 uppercase">
-          Seven builds,{" "}
-          <span className="text-stroke-faded-black dark:text-stroke-manila-light">
-            one standard.
-          </span>
-        </h2>
+        <div className="flex flex-col gap-5">
+          <SectionLabel>Selected work</SectionLabel>
+          <h2 className="text-h2 uppercase">
+            Seven builds,{" "}
+            <span className="text-stroke-faded-black dark:text-stroke-manila-light">
+              one standard.
+            </span>
+          </h2>
+        </div>
         <p className="max-w-sm text-p2 text-muted">
           SaaS, conferences, commerce and studios. Each card opens the live site, so you can judge
           the real thing.

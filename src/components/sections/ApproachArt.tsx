@@ -68,8 +68,13 @@ export function SchemaArt(props: ArtProps) {
   );
 }
 
-/** Make failure boring — guard rings, a sonar pulse, and a check that never flinches. */
+/**
+ * Make failure boring — a spinning guard ring and calm, evenly spaced ripples around a check.
+ * The ripples *are* the rings: no static circles for them to cross, a constant stroke while
+ * they grow, and they fade out before reaching the guard ring.
+ */
 export function ResilienceArt(props: ArtProps) {
+  const ripples = [0, 1.2, 2.4];
   return (
     <svg viewBox="0 0 240 240" fill="none" {...props}>
       <g className={`animate-spin-slow ${LOOP}`} style={centre}>
@@ -84,19 +89,7 @@ export function ResilienceArt(props: ArtProps) {
           opacity="0.5"
         />
       </g>
-      {[80, 58].map((r) => (
-        <circle
-          key={r}
-          data-art-piece=""
-          cx="120"
-          cy="120"
-          r={r}
-          stroke="currentColor"
-          strokeWidth="1.5"
-          opacity={r === 80 ? 0.35 : 0.6}
-        />
-      ))}
-      {[0, 1.2].map((d) => (
+      {ripples.map((d) => (
         <circle
           key={d}
           cx="120"
@@ -104,8 +97,22 @@ export function ResilienceArt(props: ArtProps) {
           r="36"
           stroke="currentColor"
           strokeWidth="1.5"
-          className={`animate-sonar opacity-0 ${LOOP}`}
+          vectorEffect="non-scaling-stroke"
+          className="animate-ripple opacity-0 motion-reduce:hidden"
           style={{ ...centre, ...delay(d) }}
+        />
+      ))}
+      {/* Still frame for reduced motion: the rings the ripples would draw. */}
+      {[62, 86].map((r) => (
+        <circle
+          key={r}
+          cx="120"
+          cy="120"
+          r={r}
+          stroke="currentColor"
+          strokeWidth="1.5"
+          opacity={r === 62 ? 0.5 : 0.3}
+          className="hidden motion-reduce:inline"
         />
       ))}
       <g data-art-piece="">

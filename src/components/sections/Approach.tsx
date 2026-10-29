@@ -234,12 +234,9 @@ export function Approach() {
 
       <div
         data-manifesto=""
-        className="container-page flex flex-col gap-10 md:min-h-svh md:justify-center md:gap-14"
+        className="container-page flex flex-col gap-7 md:min-h-svh md:justify-center md:gap-9"
       >
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <SectionLabel>Approach</SectionLabel>
-          <p className="hidden text-p3 text-muted sm:block">What I optimise for, in one breath.</p>
-        </div>
+        <SectionLabel>Approach</SectionLabel>
         <Manifesto />
       </div>
 
