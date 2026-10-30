@@ -1,6 +1,10 @@
 {
   "explorer.compactFolders": false,
   "json.schemaDownload.enable": true,
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "css.lint.validProperties": ["corner-shape"],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
