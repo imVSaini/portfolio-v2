@@ -56,7 +56,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-1">
-          {/* Same as videojs.org: edge-to-edge icon row from md up; below that it lives in the menu. */}
+          {/* Icon row from md up; below that it lives in the menu. */}
           <div className="hidden md:flex">
             <AppearanceMenu />
             {contact.links.map((link) => {

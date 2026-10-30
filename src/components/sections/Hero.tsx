@@ -53,7 +53,7 @@ export function Hero() {
       className="relative flex min-h-svh flex-col overflow-hidden pt-(--header-h)"
     >
       {/* Ambient accent glow — drifts slower than the page. Masked off the header band so the
-          header icons sit on the plain page colour and their hover chips read as on videojs.org. */}
+          header icons and their hover chips sit on the plain page colour. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 mask-[linear-gradient(to_bottom,transparent_calc(var(--header-h)+1rem),black_45%)]"

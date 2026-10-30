@@ -1,5 +1,6 @@
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { OverscrollReveal } from "@/components/layout/OverscrollReveal";
 import { SmoothScroll } from "@/components/scroll/SmoothScroll";
 import { Approach } from "@/components/sections/Approach";
 import { Contact } from "@/components/sections/Contact";
@@ -12,15 +13,17 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main id="main">
-        <Hero />
-        <Approach />
-        <Work />
-        <Experience />
-        <Skills />
-        <Contact />
-      </main>
-      <Footer />
+      <OverscrollReveal>
+        <main id="main">
+          <Hero />
+          <Approach />
+          <Work />
+          <Experience />
+          <Skills />
+          <Contact />
+        </main>
+        <Footer />
+      </OverscrollReveal>
       {/* Last, so Locomotive starts only after the page it decorates (is-inview) has hydrated. */}
       <SmoothScroll />
     </>
