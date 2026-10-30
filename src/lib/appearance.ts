@@ -12,7 +12,7 @@ export const STORAGE_KEYS = {
   tone: "vks-tone",
 } as const;
 
-export const DEFAULTS = { theme: "system", accent: "orange", tone: "soft" } as const satisfies {
+export const DEFAULTS = { theme: "system", accent: "gold", tone: "deep" } as const satisfies {
   theme: Theme;
   accent: Accent;
   tone: Tone;

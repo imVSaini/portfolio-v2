@@ -51,8 +51,14 @@ export const metadata: Metadata = {
     description: site.description,
     siteName: site.name,
     locale: "en_IN",
+    images: [site.ogImage],
   },
-  twitter: { card: "summary_large_image", title, description: site.description },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description: site.description,
+    images: [site.ogImage],
+  },
   alternates: { canonical: "/" },
 };
 
@@ -65,8 +71,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      data-accent="orange"
-      data-tone="soft"
+      data-accent="gold"
+      data-tone="deep"
       className={`${clash.variable} ${satoshi.variable}`}
       suppressHydrationWarning
     >
