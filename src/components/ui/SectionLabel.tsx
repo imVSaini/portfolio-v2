@@ -2,7 +2,7 @@ import { cn } from "@/lib/cn";
 
 /**
  * Compact pill that sits directly on top of a section heading — same family as the hero's
- * role badge. The outline follows the text colour, so it also works on the dark Contact band.
+ * role badge. The outline follows the text colour, so it works in both themes.
  */
 export function SectionLabel({ children, className }: { children: string; className?: string }) {
   return (

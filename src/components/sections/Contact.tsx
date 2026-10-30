@@ -11,18 +11,18 @@ export function Contact() {
     <section
       id="contact"
       aria-labelledby="contact-title"
-      className="relative overflow-hidden bg-faded-black py-28 text-manila-light md:py-40 dark:bg-soot"
+      className="relative overflow-hidden border-t border-line py-28 md:py-40"
     >
       <div
         aria-hidden="true"
         data-scroll=""
         data-scroll-speed="0.2"
-        className="pointer-events-none absolute -bottom-1/3 -left-1/4 size-[60vw] rounded-full bg-accent opacity-25 blur-[140px]"
+        className="pointer-events-none absolute -bottom-1/3 -left-1/4 size-[60vw] rounded-full bg-accent opacity-15 blur-[140px] dark:opacity-25"
       />
 
       <div className="relative container-page flex flex-col gap-16">
         <div className="flex flex-col gap-6">
-          <SectionLabel className="text-manila-light/70">Contact</SectionLabel>
+          <SectionLabel>Contact</SectionLabel>
 
           <RevealText as="h2" id="contact-title" className="text-h1 uppercase">
             Have a hard problem? Let’s build the <span className="text-accent">calm version.</span>
@@ -31,7 +31,7 @@ export function Contact() {
 
         <div className="grid gap-12 md:grid-cols-12 md:items-end">
           <div className="flex flex-col gap-8 md:col-span-7">
-            <p className="max-w-xl text-p1 text-manila-light/70">
+            <p className="max-w-xl text-p1 text-muted">
               If you have a project in mind, feel free to reach out — I’d be glad to help bring your
               vision to life.
             </p>
@@ -50,17 +50,17 @@ export function Contact() {
           </div>
 
           <div className="flex flex-col gap-6 md:col-span-4 md:col-start-9">
-            <ul className="flex flex-col border-t border-manila-light/15">
+            <ul className="flex flex-col border-t border-line-strong">
               {contact.links.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="group flex items-center justify-between gap-4 border-b border-manila-light/15 py-5 transition-colors duration-300 intent:text-accent"
+                    className="group flex items-center justify-between gap-4 border-b border-line-strong py-5 transition-colors duration-300 intent:text-accent"
                   >
                     <span className="font-display text-h4 font-medium uppercase">{link.label}</span>
-                    <span className="flex items-center gap-3 text-p3 text-manila-light/60">
+                    <span className="flex items-center gap-3 text-p3 text-muted">
                       {link.handle}
                       <span
                         aria-hidden="true"
@@ -73,10 +73,10 @@ export function Contact() {
                 </li>
               ))}
             </ul>
-            <p className="flex items-center justify-between text-p4 tracking-wide text-manila-light/60 uppercase">
+            <p className="flex items-center justify-between text-p4 tracking-wide text-muted uppercase">
               <span>{site.location}</span>
               <span>
-                <LiveClock className="text-manila-light tabular-nums" /> IST
+                <LiveClock className="text-faded-black tabular-nums dark:text-manila-light" /> IST
               </span>
             </p>
           </div>
