@@ -151,13 +151,11 @@ export function Footer() {
               className="size-full"
               discClassName="size-[40%] overflow-hidden transition-transform duration-500 ease-out-expo group-hover:scale-110 group-focus-visible:scale-110 motion-reduce:transition-none"
             >
-              <span className="grid">
-                <span className="col-start-1 row-start-1 transition-transform duration-500 ease-out-expo group-hover:translate-y-[-150%] group-focus-visible:translate-y-[-150%] motion-reduce:transition-none">
-                  ↑
-                </span>
-                <span className="col-start-1 row-start-1 translate-y-[150%] transition-transform duration-500 ease-out-expo group-hover:translate-y-0 group-focus-visible:translate-y-0 motion-reduce:transition-none">
-                  ↑
-                </span>
+              <span className="absolute inset-0 grid place-items-center transition-transform duration-500 ease-out-expo group-hover:-translate-y-full group-focus-visible:-translate-y-full motion-reduce:transition-none">
+                ↑
+              </span>
+              <span className="absolute inset-0 grid translate-y-full place-items-center transition-transform duration-500 ease-out-expo group-hover:translate-y-0 group-focus-visible:translate-y-0 motion-reduce:transition-none">
+                ↑
               </span>
             </Seal>
           </ScrollLink>
