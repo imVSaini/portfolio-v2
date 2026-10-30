@@ -4,6 +4,7 @@ import { useRef } from "react";
 
 import { RevealText } from "@/components/motion/RevealText";
 import { Button } from "@/components/ui/Button";
+import { Seal } from "@/components/ui/Seal";
 import { site } from "@/data/site";
 import { gsap, MOTION_QUERY, useGSAP } from "@/lib/gsap";
 
@@ -126,23 +127,10 @@ export function Hero() {
         data-hero-badge=""
         className="absolute top-[calc(var(--header-h)+2rem)] right-[4vw] hidden size-36 lg:block xl:size-44"
       >
-        <div data-scroll="" data-scroll-speed="0.12" className="relative size-full">
-          <svg
-            viewBox="0 0 200 200"
-            className="size-full animate-spin-slow motion-reduce:animate-none"
-          >
-            <defs>
-              <path id="seal-path" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
-            </defs>
-            <text className="fill-current font-display text-[15px] font-medium tracking-[0.2em] uppercase">
-              <textPath href="#seal-path" textLength="488" lengthAdjust="spacing">
-                {BADGE_TEXT}
-              </textPath>
-            </text>
-          </svg>
-          <span className="absolute inset-0 m-auto grid size-14 place-items-center rounded-full bg-accent font-display text-h4 text-faded-black">
+        <div data-scroll="" data-scroll-speed="0.12" className="size-full">
+          <Seal text={BADGE_TEXT} className="size-full">
             ✳
-          </span>
+          </Seal>
         </div>
       </div>
     </section>
