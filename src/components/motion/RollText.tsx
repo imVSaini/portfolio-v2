@@ -11,11 +11,14 @@ export function RollText({
   text,
   className,
   stagger = 14,
+  accent = true,
 }: {
   text: string;
   className?: string;
   /** Delay between neighbouring characters, in ms. */
   stagger?: number;
+  /** Roll in an accent-coloured copy; off keeps the current colour, e.g. on an accent fill. */
+  accent?: boolean;
 }) {
   const roll =
     "inline-block transition-transform duration-500 ease-out-expo group-hover:-translate-y-full group-focus-visible:-translate-y-full motion-reduce:transition-none";
@@ -31,7 +34,10 @@ export function RollText({
               <span className={roll} style={delay}>
                 {char}
               </span>
-              <span className={cn("absolute inset-x-0 top-full text-accent", roll)} style={delay}>
+              <span
+                className={cn("absolute inset-x-0 top-full", accent && "text-accent", roll)}
+                style={delay}
+              >
                 {char}
               </span>
             </span>

@@ -8,7 +8,17 @@
 @custom-variant dark (&:where(.dark, .dark *));
 /* Hover, or keyboard focus on/within. Plain :focus-within would keep a button lit after a mouse
    click (Base UI hands focus back to the popover trigger), leaving two highlighted chips. */
-@custom-variant intent (&:hover, &:focus-visible, &:has(:focus-visible));
+@custom-variant intent {
+  @media (hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+  &:focus-visible,
+  &:has(:focus-visible) {
+    @slot;
+  }
+}
 @custom-variant starting-style (&[data-starting-style]);
 @custom-variant ending-style (&[data-ending-style]);
 
