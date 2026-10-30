@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { Footer } from "@/components/layout/Footer";
+import { SubpageHeader } from "@/components/layout/SubpageHeader";
 import { RevealText } from "@/components/motion/RevealText";
-import { RollText } from "@/components/motion/RollText";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { contact } from "@/data/contact";
 import { site } from "@/data/site";
@@ -15,10 +14,29 @@ const LAST_UPDATED = "31 October 2026";
 const link =
   "underline decoration-line-strong underline-offset-4 transition-colors duration-300 intent:text-accent intent:decoration-accent";
 
+const title = "Privacy policy";
+const description = `How ${site.name}'s portfolio handles your data: no cookies, no analytics, no tracking.`;
+
+// A page's `openGraph` replaces the layout's wholesale, so the shared fields are repeated here.
 export const metadata: Metadata = {
-  title: "Privacy policy",
-  description: `How ${site.name}'s portfolio handles your data: no cookies, no analytics, no tracking.`,
+  title,
+  description,
   alternates: { canonical: "/privacy" },
+  openGraph: {
+    type: "website",
+    url: "/privacy",
+    title: `${title} — ${site.name}`,
+    description,
+    siteName: site.name,
+    locale: "en_IN",
+    images: [site.ogImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${title} — ${site.name}`,
+    description,
+    images: [site.ogImage],
+  },
 };
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -33,28 +51,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 export default function PrivacyPage() {
   return (
     <>
-      <header className="container-page flex h-(--header-h) items-center justify-between gap-6">
-        <Link href="/" aria-label={`${site.name}, home`} className="group flex items-center gap-3">
-          <span className="grid size-9 place-items-center rounded-full bg-faded-black font-display text-p4 font-semibold text-manila-light dark:bg-manila-light dark:text-faded-black">
-            <RollText text={site.monogram} />
-          </span>
-          <span className="font-display text-p3 font-medium whitespace-nowrap uppercase">
-            <RollText text={site.name} />
-          </span>
-        </Link>
-        <Link
-          href="/"
-          className="group inline-flex items-center gap-2 font-display text-p4 font-medium tracking-wide uppercase"
-        >
-          <span
-            aria-hidden="true"
-            className="transition-transform duration-300 group-hover:-translate-x-1"
-          >
-            ←
-          </span>
-          <RollText text="Back to home" />
-        </Link>
-      </header>
+      <SubpageHeader />
 
       <main id="main" className="container-page flex flex-col gap-16 pt-16 pb-28 md:pt-24 md:pb-40">
         <div className="flex flex-col gap-6">
