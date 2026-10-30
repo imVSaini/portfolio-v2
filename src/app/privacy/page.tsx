@@ -86,19 +86,9 @@ export default function PrivacyPage() {
 
           <Section title="Hosting">
             <p>
-              The site is hosted on Vercel. Like any web host, Vercel processes technical details
-              such as your IP address and browser type to deliver pages and keep the service secure.
-              Their{" "}
-              <a
-                href="https://vercel.com/legal/privacy-policy"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Vercel’s privacy policy (opens in a new tab)"
-                className={link}
-              >
-                privacy policy
-              </a>{" "}
-              covers how they handle it.
+              Like any website, this one is served by a hosting provider. To deliver pages and keep
+              the service secure, it processes technical details such as your IP address and browser
+              type. I don’t use these details to identify you.
             </p>
           </Section>
 
