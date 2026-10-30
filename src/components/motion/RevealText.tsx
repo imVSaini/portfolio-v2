@@ -37,6 +37,7 @@ export function RevealText({
           // Whole lines stay readable in order, so skip the aria-label rewrite: on a span it is
           // ignored and would leave screen readers with an empty heading.
           aria: "none",
+          reduceWhiteSpace: false,
           autoSplit: true,
           onSplit: (self) => {
             gsap.set(el, { visibility: "visible" });

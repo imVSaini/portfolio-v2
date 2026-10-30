@@ -243,7 +243,7 @@ export function Approach() {
       <div className="container-page mt-28 md:mt-16">
         <div className="mb-14 grid gap-6 md:mb-20 md:grid-cols-12 md:items-end">
           <RevealText as="h3" className="text-h2 uppercase md:col-span-8">
-            Four rules I don’t break.
+            Four rules I&nbsp;don’t break.
           </RevealText>
           <p className="max-w-sm text-p2 text-muted md:col-span-4 md:justify-self-end">
             The principles behind every system I’ve shipped, from the first schema to the on-call
