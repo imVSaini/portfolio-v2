@@ -42,20 +42,29 @@ export function SmoothScroll() {
     });
     gsap.ticker.lagSmoothing(0);
 
+    const settle = () => useScroll.setState({ heading: null });
+    window.addEventListener("scrollend", settle);
+
     useScroll.setState({
-      scrollTo: (target, options) =>
+      scrollTo: (target, options) => {
+        const immediate = options?.immediate ?? false;
+        useScroll.setState({ heading: immediate ? null : target });
         locomotive.scrollTo(target, {
           offset: options?.offset ?? (typeof target === "number" ? 0 : HEADER_OFFSET),
           duration: 1.4,
-          immediate: options?.immediate ?? false,
+          immediate,
           easing: (t) => 1 - Math.pow(1 - t, 4),
-        }),
+          onComplete: settle,
+        });
+      },
     });
 
     // Webfonts change line boxes; re-measure every trigger once they land.
     void document.fonts.ready.then(() => ScrollTrigger.refresh());
 
     return () => {
+      window.removeEventListener("scrollend", settle);
+      settle();
       locomotive.destroy();
       gsap.ticker.lagSmoothing(500, 33);
     };

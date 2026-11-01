@@ -4,6 +4,7 @@ import { Dialog } from "@base-ui/react/dialog";
 import { useRef, useState } from "react";
 
 import { AppearanceControls } from "@/components/appearance/AppearanceControls";
+import { RollText } from "@/components/motion/RollText";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
 import { socialIcons } from "@/components/ui/SocialIcons";
 import { cn } from "@/lib/cn";
@@ -11,7 +12,12 @@ import { contact } from "@/data/contact";
 import { nav } from "@/data/site";
 import { useScroll } from "@/stores/scroll";
 
-export function MobileMenu({ className }: { className?: string }) {
+type MobileMenuProps = {
+  active: `#${string}` | null;
+  className?: string;
+};
+
+export function MobileMenu({ active, className }: MobileMenuProps) {
   const [open, setOpen] = useState(false);
   // The dialog locks page scroll while open, so travel only after it has fully closed.
   const pendingTarget = useRef<string | null>(null);
@@ -50,21 +56,34 @@ export function MobileMenu({ className }: { className?: string }) {
           </div>
           <nav aria-label="Mobile">
             <ul className="flex flex-col gap-1">
-              {nav.map((item) => (
-                <li key={item.href}>
-                  <ScrollLink
-                    href={item.href}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      pendingTarget.current = item.href;
-                      setOpen(false);
-                    }}
-                    className="block py-1 font-display text-h3 font-semibold uppercase intent:text-accent"
-                  >
-                    {item.label}
-                  </ScrollLink>
-                </li>
-              ))}
+              {nav.map((item) => {
+                const current = active === item.href;
+                return (
+                  <li key={item.href}>
+                    <ScrollLink
+                      href={item.href}
+                      aria-current={current ? "true" : undefined}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        pendingTarget.current = item.href;
+                        setOpen(false);
+                      }}
+                      className="group block py-1 font-display text-h3 font-semibold uppercase"
+                    >
+                      <span className="relative">
+                        <RollText text={item.label} active={current} />
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            "absolute inset-x-0 bottom-0 h-1 origin-left bg-accent transition-transform duration-500 ease-out-expo motion-reduce:transition-none",
+                            !current && "scale-x-0",
+                          )}
+                        />
+                      </span>
+                    </ScrollLink>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
           <AppearanceControls />
@@ -83,8 +102,8 @@ export function MobileMenu({ className }: { className?: string }) {
                     key={link.label}
                     href={link.href}
                     target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={link.label}
+                    rel="noreferrer"
+                    aria-label={`${link.label} (opens in a new tab)`}
                     className="flex items-center rounded-md px-2.5 py-2 corner-squircle intent:bg-hover"
                   >
                     <Icon className="size-6" aria-hidden="true" />

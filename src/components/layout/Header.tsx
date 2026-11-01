@@ -7,25 +7,28 @@ import { socialIcons } from "@/components/ui/SocialIcons";
 import { cn } from "@/lib/cn";
 import { contact } from "@/data/contact";
 import { nav, site } from "@/data/site";
+import { useActiveSection } from "@/hooks/useActiveSection";
 import { useScroll } from "@/stores/scroll";
 
 import { MobileMenu } from "./MobileMenu";
 import { ScrollProgress } from "./ScrollProgress";
 
+const SECTIONS = nav.map((item) => item.href);
+
 export function Header() {
-  const hidden = useScroll((s) => s.scrolled && s.direction === 1 && s.progress > 0.04);
   const scrolled = useScroll((s) => s.scrolled);
+  const active = useActiveSection(SECTIONS);
 
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-40 transition-[translate,background-color,border-color] duration-500 ease-out-expo",
-        hidden && "-translate-y-full",
+        "fixed inset-x-0 top-0 z-40 border-b transition-[background-color,border-color] duration-500 ease-out-expo",
         scrolled
-          ? "border-b border-line bg-manila-light/80 backdrop-blur-md dark:bg-faded-black/80"
-          : "border-b border-transparent",
+          ? "border-line bg-manila-light/80 backdrop-blur-md dark:bg-faded-black/80"
+          : "border-transparent",
       )}
     >
+      <ScrollProgress />
       <div className="container-page flex h-(--header-h) items-center justify-between gap-6">
         <ScrollLink
           href="#top"
@@ -41,17 +44,30 @@ export function Header() {
         </ScrollLink>
 
         <nav aria-label="Primary" className="hidden lg:block">
-          <ul className="flex items-center gap-1">
-            {nav.map((item) => (
-              <li key={item.href}>
-                <ScrollLink
-                  href={item.href}
-                  className="relative rounded-md px-3 py-2 text-p3 font-medium corner-squircle intent:bg-hover"
-                >
-                  {item.label}
-                </ScrollLink>
-              </li>
-            ))}
+          <ul className="flex items-center gap-2">
+            {nav.map((item) => {
+              const current = active === item.href;
+              return (
+                <li key={item.href}>
+                  <ScrollLink
+                    href={item.href}
+                    aria-current={current ? "true" : undefined}
+                    className="group flex rounded-md px-3 py-2 font-display text-p4 font-medium tracking-wide uppercase"
+                  >
+                    <span className="relative">
+                      <RollText text={item.label} active={current} />
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "absolute inset-x-0 -bottom-1 h-0.5 origin-left bg-accent transition-transform duration-500 ease-out-expo motion-reduce:transition-none",
+                          !current && "scale-x-0",
+                        )}
+                      />
+                    </span>
+                  </ScrollLink>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
@@ -66,8 +82,8 @@ export function Header() {
                   key={link.label}
                   href={link.href}
                   target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={link.label}
+                  rel="noreferrer"
+                  aria-label={`${link.label} (opens in a new tab)`}
                   className="flex items-center rounded-md px-2.5 py-2 corner-squircle intent:bg-hover"
                 >
                   <Icon className="size-6" aria-hidden="true" />
@@ -75,10 +91,9 @@ export function Header() {
               );
             })}
           </div>
-          <MobileMenu className="lg:hidden" />
+          <MobileMenu active={active} className="lg:hidden" />
         </div>
       </div>
-      <ScrollProgress />
     </header>
   );
 }

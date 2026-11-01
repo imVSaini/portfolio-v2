@@ -7,7 +7,7 @@ export function ScrollProgress() {
   return (
     <div
       aria-hidden="true"
-      className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-accent"
+      className="absolute inset-x-0 top-0 h-0.5 origin-left bg-accent"
       style={{ transform: `scaleX(${progress})` }}
     />
   );
