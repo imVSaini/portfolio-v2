@@ -7,17 +7,13 @@ import { socialIcons } from "@/components/ui/SocialIcons";
 import { cn } from "@/lib/cn";
 import { contact } from "@/data/contact";
 import { nav, site } from "@/data/site";
-import { useActiveSection } from "@/hooks/useActiveSection";
 import { useScroll } from "@/stores/scroll";
 
 import { MobileMenu } from "./MobileMenu";
 import { ScrollProgress } from "./ScrollProgress";
 
-const SECTIONS = nav.map((item) => item.href);
-
 export function Header() {
   const scrolled = useScroll((s) => s.scrolled);
-  const active = useActiveSection(SECTIONS);
 
   return (
     <header
@@ -45,29 +41,16 @@ export function Header() {
 
         <nav aria-label="Primary" className="hidden lg:block">
           <ul className="flex items-center gap-2">
-            {nav.map((item) => {
-              const current = active === item.href;
-              return (
-                <li key={item.href}>
-                  <ScrollLink
-                    href={item.href}
-                    aria-current={current ? "true" : undefined}
-                    className="group flex rounded-md px-3 py-2 font-display text-p4 font-medium tracking-wide uppercase"
-                  >
-                    <span className="relative">
-                      <RollText text={item.label} active={current} />
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          "absolute inset-x-0 -bottom-1 h-0.5 origin-left bg-accent transition-transform duration-500 ease-out-expo motion-reduce:transition-none",
-                          !current && "scale-x-0",
-                        )}
-                      />
-                    </span>
-                  </ScrollLink>
-                </li>
-              );
-            })}
+            {nav.map((item) => (
+              <li key={item.href}>
+                <ScrollLink
+                  href={item.href}
+                  className="group flex rounded-md px-3 py-2 font-display text-p4 font-medium tracking-wide uppercase"
+                >
+                  <RollText text={item.label} />
+                </ScrollLink>
+              </li>
+            ))}
           </ul>
         </nav>
 
@@ -91,7 +74,7 @@ export function Header() {
               );
             })}
           </div>
-          <MobileMenu active={active} className="lg:hidden" />
+          <MobileMenu className="lg:hidden" />
         </div>
       </div>
     </header>

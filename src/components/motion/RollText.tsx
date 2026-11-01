@@ -12,7 +12,6 @@ export function RollText({
   className,
   stagger = 14,
   accent = true,
-  active = false,
 }: {
   text: string;
   className?: string;
@@ -20,15 +19,9 @@ export function RollText({
   stagger?: number;
   /** Roll in an accent-coloured copy; off keeps the current colour, e.g. on an accent fill. */
   accent?: boolean;
-  /** Hold the rolled state, e.g. for the current nav item. */
-  active?: boolean;
 }) {
-  const roll = cn(
-    "inline-block transition-transform duration-500 ease-out-expo motion-reduce:transition-none",
-    active
-      ? "-translate-y-full"
-      : "group-hover:-translate-y-full group-focus-visible:-translate-y-full",
-  );
+  const roll =
+    "inline-block transition-transform duration-500 ease-out-expo group-hover:-translate-y-full group-focus-visible:-translate-y-full motion-reduce:transition-none";
 
   return (
     <span className={cn("relative inline-block", className)}>

@@ -9,8 +9,6 @@ type ScrollState = {
   scrolled: boolean;
   /** 0–1 through the whole document. */
   progress: number;
-  /** Target of a smooth programmatic scroll until it settles. */
-  heading: ScrollTarget | null;
   scrollTo: (target: ScrollTarget, options?: { offset?: number; immediate?: boolean }) => void;
   report: (values: { scroll: number; direction: number; progress: number }) => void;
 };
@@ -33,7 +31,6 @@ export const useScroll = create<ScrollState>()((set, get) => ({
   direction: 1,
   scrolled: false,
   progress: 0,
-  heading: null,
   // Replaced by the smooth scroller once it boots; native jump until then (and under reduced motion).
   scrollTo: nativeScrollTo,
   report: ({ scroll, direction, progress }) => {

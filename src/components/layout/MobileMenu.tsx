@@ -12,12 +12,7 @@ import { contact } from "@/data/contact";
 import { nav } from "@/data/site";
 import { useScroll } from "@/stores/scroll";
 
-type MobileMenuProps = {
-  active: `#${string}` | null;
-  className?: string;
-};
-
-export function MobileMenu({ active, className }: MobileMenuProps) {
+export function MobileMenu({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
   // The dialog locks page scroll while open, so travel only after it has fully closed.
   const pendingTarget = useRef<string | null>(null);
@@ -56,34 +51,21 @@ export function MobileMenu({ active, className }: MobileMenuProps) {
           </div>
           <nav aria-label="Mobile">
             <ul className="flex flex-col gap-1">
-              {nav.map((item) => {
-                const current = active === item.href;
-                return (
-                  <li key={item.href}>
-                    <ScrollLink
-                      href={item.href}
-                      aria-current={current ? "true" : undefined}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        pendingTarget.current = item.href;
-                        setOpen(false);
-                      }}
-                      className="group block py-1 font-display text-h3 font-semibold uppercase"
-                    >
-                      <span className="relative">
-                        <RollText text={item.label} active={current} />
-                        <span
-                          aria-hidden="true"
-                          className={cn(
-                            "absolute inset-x-0 bottom-0 h-1 origin-left bg-accent transition-transform duration-500 ease-out-expo motion-reduce:transition-none",
-                            !current && "scale-x-0",
-                          )}
-                        />
-                      </span>
-                    </ScrollLink>
-                  </li>
-                );
-              })}
+              {nav.map((item) => (
+                <li key={item.href}>
+                  <ScrollLink
+                    href={item.href}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      pendingTarget.current = item.href;
+                      setOpen(false);
+                    }}
+                    className="group block py-1 font-display text-h3 font-semibold uppercase"
+                  >
+                    <RollText text={item.label} />
+                  </ScrollLink>
+                </li>
+              ))}
             </ul>
           </nav>
           <AppearanceControls />
