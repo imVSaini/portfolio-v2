@@ -3,6 +3,7 @@
 import { AppearanceMenu } from "@/components/appearance/AppearanceMenu";
 import { RollText } from "@/components/motion/RollText";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
+import { Logo } from "@/components/ui/Logo";
 import { socialIcons } from "@/components/ui/SocialIcons";
 import { cn } from "@/lib/cn";
 import { contact } from "@/data/contact";
@@ -29,14 +30,9 @@ export function Header() {
         <ScrollLink
           href="#top"
           aria-label={`${site.name}, back to top`}
-          className="group flex items-center gap-3"
+          className="group flex items-center rounded-md"
         >
-          <span className="grid size-9 place-items-center rounded-full bg-faded-black font-display text-p4 font-semibold tracking-normal text-manila-light dark:bg-manila-light dark:text-faded-black">
-            <RollText text={site.monogram} />
-          </span>
-          <span className="font-display text-p3 font-medium whitespace-nowrap uppercase">
-            <RollText text={site.name} />
-          </span>
+          <Logo condense className="h-8 w-auto" />
         </ScrollLink>
 
         <nav aria-label="Primary" className="hidden lg:block">
