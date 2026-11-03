@@ -165,7 +165,7 @@ export function Footer() {
           className="flex flex-col justify-between gap-4 text-p4 tracking-wide text-muted uppercase sm:flex-row sm:items-center"
         >
           <span>
-            © {year} {site.name}
+            © {year} {site.fullName}
           </span>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
             <ul className="flex items-center gap-6">

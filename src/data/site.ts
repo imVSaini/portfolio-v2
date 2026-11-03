@@ -1,5 +1,6 @@
 export const site = {
   name: "Vaibhav Saini",
+  fullName: "Vaibhav Kumar Saini",
   shortName: "Vaibhav",
   role: "Full Stack Developer",
   location: "Bengaluru, India",
