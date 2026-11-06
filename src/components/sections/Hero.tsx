@@ -70,7 +70,10 @@ export function Hero() {
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3" data-hero-fade="">
           <span className="inline-flex items-center gap-2.5 rounded-full border border-line-strong px-3.5 py-1.5 text-p4 font-medium tracking-wide uppercase">
             <span className="size-2 animate-pulse-dot rounded-full bg-accent motion-reduce:animate-none" />
-            {site.role} — {site.location}
+            <span>
+              <span className="whitespace-nowrap">{site.role} —</span>{" "}
+              <span className="whitespace-nowrap">{site.location}</span>
+            </span>
           </span>
         </div>
 

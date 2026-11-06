@@ -97,11 +97,11 @@ export function HorizontalSection({ id, label, children, className }: Horizontal
       ref={sectionRef}
       id={id}
       aria-label={label}
-      className={cn("relative overflow-hidden md:h-svh", className)}
+      className={cn("relative overflow-hidden md:tall:motion-safe:h-svh", className)}
     >
       <div
         ref={trackRef}
-        className="flex snap-x snap-mandatory scroll-px-5 scrollbar-none gap-5 overflow-x-auto overscroll-x-contain px-5 pb-6 md:h-full md:w-max md:snap-none md:items-center md:gap-10 md:overflow-visible md:px-14 md:pb-0"
+        className="flex snap-x snap-mandatory scroll-px-5 scrollbar-none gap-5 overflow-x-auto overscroll-x-contain px-5 pb-6 md:scroll-px-14 md:gap-10 md:px-14 md:tall:motion-safe:h-full md:tall:motion-safe:w-max md:tall:motion-safe:snap-none md:tall:motion-safe:items-center md:tall:motion-safe:overflow-visible md:tall:motion-safe:pb-0"
       >
         {children}
       </div>

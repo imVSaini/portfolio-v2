@@ -21,6 +21,7 @@
 }
 @custom-variant starting-style (&[data-starting-style]);
 @custom-variant ending-style (&[data-ending-style]);
+@custom-variant tall (@media (height >= 37.5rem));
 
 /* ---------------------------------------------------------------------------
  * Palette. `faded-black`, `soot` and `warm-gray`

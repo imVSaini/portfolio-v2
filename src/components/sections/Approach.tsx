@@ -256,7 +256,7 @@ export function Approach() {
             <li
               key={title}
               data-stack-card=""
-              className="sticky"
+              className="[@media(height>=32rem)]:sticky"
               style={{ top: `calc(var(--header-h) + ${1 + i * 1.25}rem)` }}
             >
               <article

@@ -152,7 +152,7 @@ export function Footer() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={`${link.label} (opens in a new tab)`}
-                  className="group inline-flex min-h-11 items-center gap-2 md:min-h-0"
+                  className="group inline-flex min-h-11 items-center gap-2 md:min-h-6"
                 >
                   <Icon
                     aria-hidden="true"
@@ -194,7 +194,7 @@ export function Footer() {
           aria-label="Legal"
           className="col-start-2 row-start-3 justify-self-end text-p4 tracking-wide text-muted uppercase md:col-start-3 md:row-start-2"
         >
-          <Link href="/privacy" className="group inline-flex">
+          <Link href="/privacy" className="group inline-flex min-h-6 items-center">
             <RollText text="Privacy policy" />
           </Link>
         </nav>

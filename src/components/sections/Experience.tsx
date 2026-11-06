@@ -79,34 +79,34 @@ export function Experience() {
       <ol data-xp-list="" className="relative mt-20 md:mt-28">
         <span
           aria-hidden="true"
-          className="absolute inset-y-0 left-1.25 w-px bg-line md:left-[calc(25%+5px)]"
+          className="absolute inset-y-0 left-1.25 w-px bg-line lg:left-[calc(25%+5px)]"
         />
         <span
           data-xp-line=""
           aria-hidden="true"
-          className="absolute inset-y-0 left-1.25 w-px origin-top bg-accent md:left-[calc(25%+5px)]"
+          className="absolute inset-y-0 left-1.25 w-px origin-top bg-accent lg:left-[calc(25%+5px)]"
         />
 
         {experience.map((role) => (
           <li
             key={role.company}
             data-xp-role=""
-            className="relative grid gap-8 pb-20 pl-10 last:pb-0 md:grid-cols-4 md:gap-0 md:pl-0"
+            className="relative grid gap-8 pb-20 pl-10 last:pb-0 lg:grid-cols-4 lg:gap-0 lg:pl-0"
           >
             <span
               data-xp-dot=""
               aria-hidden="true"
-              className="absolute top-2 left-0 size-2.75 rounded-full border-2 border-manila-light bg-line-strong md:left-1/4 dark:border-faded-black"
+              className="absolute top-2 left-0 size-2.75 rounded-full border-2 border-manila-light bg-line-strong lg:left-1/4 dark:border-faded-black"
             />
 
             {/* Sticky meta column. */}
-            <div className="md:pr-12">
-              <div className="flex flex-col gap-4 md:sticky md:top-[calc(var(--header-h)+2rem)]">
+            <div className="lg:pr-12">
+              <div className="flex flex-col gap-4 lg:sticky lg:top-[calc(var(--header-h)+2rem)]">
                 <p className="font-display text-p4 tracking-wide text-muted uppercase tabular-nums">
                   {role.start} — {role.end}
                 </p>
                 <p className="text-p3 text-muted">{role.location}</p>
-                <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-5">
+                <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3 lg:grid-cols-1">
                   {role.metrics.map((metric) => (
                     <div key={metric.label} className="flex flex-col-reverse gap-1">
                       <dt className="text-p4 text-muted">{metric.label}</dt>
@@ -119,7 +119,7 @@ export function Experience() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-6 md:col-span-3 md:pl-16">
+            <div className="flex flex-col gap-6 lg:col-span-3 lg:pl-16">
               <div className="flex flex-col gap-2" data-xp-item="">
                 <h3 className="text-h3 uppercase">{role.title}</h3>
                 <p className="font-display text-p1 font-medium">
@@ -157,21 +157,21 @@ export function Experience() {
           </li>
         ))}
 
-        <li data-xp-role="" className="relative grid pt-20 pl-10 md:grid-cols-4 md:pl-0">
+        <li data-xp-role="" className="relative grid pt-20 pl-10 lg:grid-cols-4 lg:pl-0">
           <span
             data-xp-dot=""
             aria-hidden="true"
-            className="absolute top-22 left-0 size-2.75 rounded-full border-2 border-manila-light bg-line-strong md:left-1/4 dark:border-faded-black"
+            className="absolute top-22 left-0 size-2.75 rounded-full border-2 border-manila-light bg-line-strong lg:left-1/4 dark:border-faded-black"
           />
-          <p className="font-display text-p4 tracking-wide text-muted uppercase md:pr-12">Next</p>
-          <div className="flex flex-col items-start gap-5 md:col-span-3 md:pl-16" data-xp-item="">
+          <p className="font-display text-p4 tracking-wide text-muted uppercase lg:pr-12">Next</p>
+          <div className="flex flex-col items-start gap-5 lg:col-span-3 lg:pl-16" data-xp-item="">
             <h3 className="text-h3 uppercase">Your team?</h3>
             <p className="max-w-xl text-p1 text-muted">
               The next chapter is unwritten. Bring the hard problem and I’ll bring the plan.
             </p>
             <ScrollLink
               href="#contact"
-              className="inline-flex items-center gap-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 intent:text-accent intent:decoration-accent"
+              className="inline-flex items-center gap-2 py-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 intent:text-accent intent:decoration-accent"
             >
               Let’s talk <span aria-hidden="true">→</span>
             </ScrollLink>

@@ -22,7 +22,7 @@ function ProjectPanel({ project }: { project: Project }) {
   return (
     <article
       data-h-panel=""
-      className="group flex w-[86vw] shrink-0 snap-center flex-col gap-6 sm:w-[70vw] md:h-[78svh] md:w-[min(64vw,60rem)]"
+      className="group flex w-[86vw] shrink-0 snap-center flex-col gap-6 sm:w-[70vw] md:w-[min(64vw,60rem)] md:tall:motion-safe:h-[min(78svh,calc(48vw+16rem))]"
     >
       <p className="font-display text-p4 text-muted uppercase">{project.category}</p>
 
@@ -32,7 +32,7 @@ function ProjectPanel({ project }: { project: Project }) {
         rel="noreferrer"
         aria-label={`Visit ${project.title} (opens in a new tab)`}
         className={cn(
-          "relative block aspect-4/3 overflow-hidden rounded-2xl corner-squircle md:aspect-auto md:flex-1",
+          "relative block aspect-4/3 max-h-[60svh] overflow-hidden rounded-2xl corner-squircle md:aspect-video md:tall:motion-safe:aspect-auto md:tall:motion-safe:max-h-none md:tall:motion-safe:flex-1",
           tints[project.tint],
         )}
       >
@@ -85,7 +85,7 @@ function ProjectPanel({ project }: { project: Project }) {
           target="_blank"
           rel="noreferrer"
           data-h-reveal=""
-          className="inline-flex items-center gap-2 self-start font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 md:self-end intent:text-accent intent:decoration-accent"
+          className="inline-flex items-center gap-2 self-start justify-self-start py-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 md:self-end intent:text-accent intent:decoration-accent"
         >
           Visit live <span aria-hidden="true">↗</span>
         </a>
@@ -103,8 +103,8 @@ function ProjectPanel({ project }: { project: Project }) {
 
 export function Work() {
   return (
-    <HorizontalSection id="work" label="Selected work" className="py-24 md:py-0">
-      <div className="flex w-[86vw] shrink-0 snap-start flex-col justify-center gap-8 sm:w-[60vw] md:w-[calc(var(--text-h2)*6.15)]">
+    <HorizontalSection id="work" label="Selected work" className="py-24 md:tall:motion-safe:py-0">
+      <div className="flex w-[86vw] shrink-0 snap-start flex-col gap-8 sm:w-[60vw] md:w-[calc(var(--text-h2)*6.15)] md:tall:motion-safe:justify-center">
         <div className="flex flex-col gap-5">
           <SectionLabel>Selected work</SectionLabel>
           <h2 className="text-h2 uppercase">
@@ -118,8 +118,10 @@ export function Work() {
           SaaS, conferences, commerce and studios. Each card opens the live site, so you can judge
           the real thing.
         </p>
-        <p className="hidden items-center gap-3 font-display text-p4 text-muted uppercase md:flex">
-          Keep scrolling <span aria-hidden="true">→</span>
+        <p className="flex items-center gap-3 font-display text-p4 text-muted uppercase">
+          <span className="md:tall:motion-safe:hidden">Swipe for more</span>
+          <span className="hidden md:tall:motion-safe:inline">Keep scrolling</span>
+          <span aria-hidden="true">→</span>
         </p>
       </div>
 
@@ -140,7 +142,7 @@ export function Work() {
             target="_blank"
             rel="noreferrer"
             data-h-reveal=""
-            className="inline-flex items-center gap-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 intent:text-accent intent:decoration-accent"
+            className="inline-flex items-center gap-2 py-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 intent:text-accent intent:decoration-accent"
           >
             GitHub {github.handle} <span aria-hidden="true">↗</span>
           </a>
