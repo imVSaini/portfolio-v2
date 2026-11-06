@@ -7,9 +7,9 @@ import { RevealText } from "@/components/motion/RevealText";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { contact } from "@/data/contact";
 import { site } from "@/data/site";
-import { STORAGE_KEYS } from "@/lib/appearance";
+import { INTRO_KEY, STORAGE_KEYS } from "@/lib/appearance";
 
-const LAST_UPDATED = "31 October 2026";
+const LAST_UPDATED = "7 November 2026";
 
 const link =
   "underline decoration-line-strong underline-offset-4 transition-colors duration-300 intent:text-accent intent:decoration-accent";
@@ -81,6 +81,11 @@ export default function PrivacyPage() {
               <code>{STORAGE_KEYS.accent}</code> and <code>{STORAGE_KEYS.tone}</code>, so it’s still
               set on your next visit. It never leaves your device, and you can remove it at any time
               by clearing this site’s data in your browser.
+            </p>
+            <p>
+              To show the opening animation only once per visit, a single flag,{" "}
+              <code>{INTRO_KEY}</code>, is kept in session storage. Your browser deletes it when you
+              close the tab.
             </p>
           </Section>
 

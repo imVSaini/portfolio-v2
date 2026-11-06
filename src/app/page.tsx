@@ -1,6 +1,7 @@
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { OverscrollReveal } from "@/components/layout/OverscrollReveal";
+import { Preloader } from "@/components/layout/Preloader";
 import { SmoothScroll } from "@/components/scroll/SmoothScroll";
 import { Approach } from "@/components/sections/Approach";
 import { Contact } from "@/components/sections/Contact";
@@ -12,6 +13,7 @@ import { Work } from "@/components/sections/Work";
 export default function Home() {
   return (
     <>
+      <Preloader />
       <Header />
       <OverscrollReveal>
         <main id="main">

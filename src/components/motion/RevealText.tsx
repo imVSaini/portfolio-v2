@@ -3,6 +3,7 @@
 import { useRef, type ElementType, type ReactNode } from "react";
 
 import { gsap, MOTION_QUERY, SplitText, useGSAP } from "@/lib/gsap";
+import { whenIntroDone } from "@/stores/intro";
 
 type RevealTextProps = {
   as?: ElementType;
@@ -31,6 +32,8 @@ export function RevealText({
       if (!el) return;
       const mm = gsap.matchMedia();
       mm.add(MOTION_QUERY, () => {
+        let released = on === "scroll";
+        let reveal: gsap.core.Tween | undefined;
         const split = SplitText.create(el, {
           type: "lines",
           mask: "lines",
@@ -41,20 +44,31 @@ export function RevealText({
           autoSplit: true,
           onSplit: (self) => {
             gsap.set(el, { visibility: "visible" });
-            return gsap.from(self.lines, {
+            reveal = gsap.from(self.lines, {
               yPercent: 110,
               rotate: 2,
               duration: 1.15,
               ease: "expo.out",
               stagger: 0.09,
               delay,
+              paused: !released,
               ...(on === "scroll" && {
                 scrollTrigger: { trigger: el, start: "top 88%", once: true },
               }),
             });
+            return reveal;
           },
         });
-        return () => split.revert();
+        const stopWaiting = released
+          ? () => {}
+          : whenIntroDone(() => {
+              released = true;
+              reveal?.play();
+            });
+        return () => {
+          stopWaiting();
+          split.revert();
+        };
       });
       return () => mm.revert();
     },

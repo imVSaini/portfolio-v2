@@ -4,6 +4,7 @@ import LocomotiveScroll from "locomotive-scroll";
 import { useEffect } from "react";
 
 import { gsap, MOTION_QUERY, ScrollTrigger } from "@/lib/gsap";
+import { whenIntroDone } from "@/stores/intro";
 import { useScroll } from "@/stores/scroll";
 
 const HEADER_OFFSET = -72;
@@ -41,6 +42,8 @@ export function SmoothScroll() {
       destroyCustomTicker: (render) => gsap.ticker.remove(render),
     });
     gsap.ticker.lagSmoothing(0);
+    locomotive.stop();
+    const stopWaiting = whenIntroDone(() => locomotive.start());
 
     useScroll.setState({
       scrollTo: (target, options) =>
@@ -56,6 +59,7 @@ export function SmoothScroll() {
     void document.fonts.ready.then(() => ScrollTrigger.refresh());
 
     return () => {
+      stopWaiting();
       locomotive.destroy();
       gsap.ticker.lagSmoothing(500, 33);
     };

@@ -18,6 +18,9 @@ export const DEFAULTS = { theme: "system", accent: "gold", tone: "deep" } as con
   tone: Tone;
 };
 
+/** Session storage flag: the intro has already played this visit. */
+export const INTRO_KEY = "vks-intro";
+
 /** `<meta name="theme-color">` per resolved surface — the browser chrome follows the page. */
 export const THEME_COLORS = { light: "#ebe4c1", soft: "#1e1d1d", deep: "#151414" } as const;
 
@@ -72,5 +75,6 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
 apply();mq.addEventListener("change",apply);
 var r=document.documentElement;
 if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){r.classList.add("motion-ok");
+try{if(!sessionStorage.getItem("${INTRO_KEY}")){sessionStorage.setItem("${INTRO_KEY}","1");r.dataset.intro="play"}}catch(e){}
 setTimeout(function(){if(!r.hasAttribute("data-motion-ready"))r.classList.remove("motion-ok")},4000)}
 })();`;

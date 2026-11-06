@@ -4,6 +4,7 @@ import { useRef } from "react";
 
 import { cn } from "@/lib/cn";
 import { gsap, MOTION_QUERY, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { whenIntroDone } from "@/stores/intro";
 
 import { wordmark } from "./wordmark";
 
@@ -28,13 +29,15 @@ export function Logo({ condense = false, className }: LogoProps) {
 
       mm.add(MOTION_QUERY, () => {
         gsap.set(svg, { visibility: "visible" });
-        gsap.from(paths, {
+        const rise = gsap.from(paths, {
           y: wordmark.height,
           duration: 1.2,
           ease: "expo.out",
           stagger: 0.04,
           delay: 0.15,
+          paused: true,
         });
+        const stopWaiting = whenIntroDone(() => rise.play());
 
         const fold = gsap.timeline({
           paused: true,
@@ -119,6 +122,7 @@ export function Logo({ condense = false, className }: LogoProps) {
         trigger.addEventListener("focusin", onFocusIn);
         trigger.addEventListener("focusout", leave);
         return () => {
+          stopWaiting();
           intent?.kill();
           trigger.removeEventListener("pointerenter", onPointerEnter);
           trigger.removeEventListener("pointerleave", onPointerLeave);
