@@ -4,7 +4,7 @@ import { useRef } from "react";
 
 import { cn } from "@/lib/cn";
 import { gsap, MOTION_QUERY, ScrollTrigger, useGSAP } from "@/lib/gsap";
-import { whenIntroDone } from "@/stores/intro";
+import { useIntro, whenIntroDone } from "@/stores/intro";
 
 import { wordmark } from "./wordmark";
 
@@ -37,7 +37,10 @@ export function Logo({ condense = false, className }: LogoProps) {
           delay: 0.15,
           paused: true,
         });
-        const stopWaiting = whenIntroDone(() => rise.play());
+        const stopWaiting = whenIntroDone(() => {
+          if (useIntro.getState().handoff) rise.progress(1);
+          else rise.play();
+        });
 
         const fold = gsap.timeline({
           paused: true,
@@ -144,6 +147,7 @@ export function Logo({ condense = false, className }: LogoProps) {
       height={wordmark.height}
       aria-hidden="true"
       data-reveal=""
+      data-logo=""
       className={cn("shrink-0", className)}
     >
       {wordmark.letters.map((letter, i) => (

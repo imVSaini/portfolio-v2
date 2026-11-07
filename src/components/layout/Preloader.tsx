@@ -2,38 +2,48 @@
 
 import { useRef, useState, type ReactNode } from "react";
 
-import { site } from "@/data/site";
+import { wordmark } from "@/components/ui/wordmark";
 import { useIsHydrated } from "@/hooks/useIsHydrated";
 import { cn } from "@/lib/cn";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { useIntro } from "@/stores/intro";
 
-/** Minimum seconds on screen, from navigation start. */
-const MIN_S = 0.5;
+/** Seconds the proof rests in outline after first paint. */
+const HOLD_S = 0.2;
+/** Seconds to ink the wordmark from 000 up to `WAIT_AT`. */
+const COUNT_S = 1;
+/** Where the count waits until fonts and hydration are really done, out of 100. */
+const WAIT_AT = 90;
+/** Seconds to finish the count from `WAIT_AT` to 100 once the page is ready. */
+const FINISH_S = 0.3;
+/** Seconds the inked mark rests before the hand-off. */
+const REST_S = 0.15;
+/** Seconds for the flight into the header logo and the sheet lift. */
+const FLIGHT_S = 1;
 /** Seconds after hydration to hand over even if fonts are still loading. */
 const MAX_S = 2;
-const MILESTONES = { hydrated: 40, fonts: 85 } as const;
+/** How much of the count each letter takes to ink, out of 100. */
+const INK_SPAN = 30;
 const PHASES = ["Setting type", "Ready"] as const;
-const WHEEL = [..."01234567890"];
-const PLACES = [100, 10, 1] as const;
 const INERT_TARGETS = 'a[href="#main"], header, main, footer';
 
-function wheelAt(value: number, place: number) {
-  return (Math.floor(value / place) % 10) + Math.max(0, (value % place) - (place - 1));
-}
-
-/** Once-per-session curtain that counts real load milestones, then lifts away. */
+/** Once-per-session intro: the wordmark inks in, then flies into the header logo. */
 export function Preloader() {
   const ref = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState(0);
+  const [status, setStatus] = useState<"" | "Loading" | "Loaded">("");
   const [fresh] = useState(!useIsHydrated());
 
   useGSAP(
     (_context, contextSafe) => {
       const el = ref.current;
-      const bar = el?.querySelector<HTMLElement>("[data-preloader-bar]");
       const root = document.documentElement;
-      if (!el || !bar || !contextSafe) return;
+      const mark = el?.querySelector<SVGSVGElement>("[data-preloader-mark]");
+      const sheet = el?.querySelector<HTMLElement>("[data-preloader-sheet]");
+      const rule = el?.querySelector<HTMLElement>("[data-preloader-rule]");
+      const bar = el?.querySelector<HTMLElement>("[data-preloader-bar]");
+      const count = el?.querySelector<HTMLElement>("[data-preloader-count]");
+      if (!el || !mark || !sheet || !rule || !bar || !count || !contextSafe) return;
       if (!fresh || !root.classList.contains("motion-ok") || root.dataset.intro !== "play") {
         gsap.set(el, { display: "none" });
         useIntro.getState().finish();
@@ -47,73 +57,120 @@ export function Preloader() {
         });
       };
       setInert(true);
+      setStatus("Loading");
 
-      const counter = { value: 0 };
-      const wheels = gsap.utils
-        .toArray<HTMLElement>("[data-preloader-wheel]", el)
-        .map((wheel) => gsap.quickSetter(wheel, "yPercent"));
+      const letters = gsap.utils.toArray<SVGPathElement>("[data-preloader-letter]", el);
+      const weights = wordmark.letters.flatMap((letter, i) => {
+        const path = letters[i];
+        return path ? gsap.to(path, { morphSVG: letter.bold, ease: "none", paused: true }) : [];
+      });
+      const inks = letters.map((path) => gsap.quickSetter(path, "fillOpacity"));
+      const step = (100 - INK_SPAN) / Math.max(1, letters.length - 1);
       const setBar = gsap.quickSetter(bar, "scaleX");
+      const counter = { value: 0 };
       const render = () => {
-        wheels.forEach((setWheel, i) => {
-          setWheel((-wheelAt(counter.value, PLACES[i] ?? 1) / WHEEL.length) * 100);
+        letters.forEach((_path, i) => {
+          const inked = gsap.utils.clamp(0, 1, (counter.value - i * step) / INK_SPAN);
+          weights[i]?.progress(inked);
+          inks[i]?.(inked);
         });
         setBar(counter.value / 100);
-      };
-      const glide = gsap.quickTo(counter, "value", {
-        duration: 0.6,
-        ease: "power3.out",
-        onUpdate: render,
-      });
-      let target = 0;
-      const reach = (value: number) => {
-        target = Math.max(target, value);
-        glide(target);
+        count.textContent = String(Math.round(counter.value)).padStart(3, "0");
       };
 
       let alive = true;
       let ready = false;
-      let settled = false;
+      let counted = false;
       let leaving = false;
 
+      const handOver = (handoff: boolean) => () => {
+        gsap.set(el, { display: "flex", pointerEvents: "none" });
+        root.removeAttribute("data-intro");
+        setInert(false);
+        setStatus("Loaded");
+        useIntro.getState().finish(handoff);
+      };
+
       const leave = contextSafe(() => {
-        if (!alive || leaving || !ready || !settled) return;
+        if (!alive || leaving || !ready || !counted) return;
         leaving = true;
         setPhase(PHASES.length - 1);
-        gsap.killTweensOf(counter);
-        gsap
+
+        const logo =
+          window.scrollY < 8 ? document.querySelector<SVGSVGElement>("header [data-logo]") : null;
+        const from = mark.getBoundingClientRect();
+        const to = logo?.getBoundingClientRect();
+        const tl = gsap
           .timeline()
-          .to(counter, { value: 100, duration: 0.25, ease: "power2.inOut", onUpdate: render })
+          .to(counter, { value: 100, duration: FINISH_S, ease: "power2.out", onUpdate: render })
+          .addLabel("out", `+=${REST_S}`)
           .to(
             gsap.utils.toArray<HTMLElement>("[data-preloader-out]", el),
-            { yPercent: -110, duration: 0.3, ease: "expo.in", stagger: 0.03 },
-            "<0.1",
+            { yPercent: -110, duration: 0.45, ease: "power2.in", stagger: 0.03 },
+            "out",
           )
-          .to(el, { yPercent: -100, duration: 0.6, ease: "expo.inOut" }, "-=0.15")
-          .add(() => {
-            gsap.set(el, { display: "flex" });
-            root.removeAttribute("data-intro");
-            setInert(false);
-            useIntro.getState().finish();
-          }, "<")
-          .set(el, { display: "none" });
+          .to(
+            rule,
+            { scaleX: 0, transformOrigin: "100% 50%", duration: 0.6, ease: "expo.in" },
+            "out",
+          )
+          .addLabel("flight", "out+=0.3")
+          .to(sheet, { yPercent: -100, duration: FLIGHT_S, ease: "expo.inOut" }, "flight+=0.05");
+
+        if (logo && to?.width) {
+          tl.set(logo, { autoAlpha: 0 }, "out").to(
+            mark,
+            {
+              x: to.left - from.left,
+              y: to.top - from.top,
+              scale: to.width / from.width,
+              transformOrigin: "0 0",
+              duration: FLIGHT_S,
+              ease: "expo.inOut",
+            },
+            "flight",
+          );
+          tl.to(letters, { strokeOpacity: 0, duration: 0.4, ease: "power1.out" }, "flight");
+          weights.forEach((weight, i) => {
+            tl.to(
+              weight,
+              { progress: 0, duration: FLIGHT_S * 0.8, ease: "power2.inOut" },
+              `flight+=${0.1 + i * 0.01}`,
+            );
+          });
+          tl.add(handOver(true), "flight+=0.35").set(logo, { autoAlpha: 1 });
+        } else {
+          tl.to(
+            mark,
+            { yPercent: -40, autoAlpha: 0, duration: 0.5, ease: "power2.in" },
+            "out+=0.1",
+          ).add(handOver(false), "flight+=0.35");
+        }
+        tl.set(el, { display: "none" });
       });
       const markReady = () => {
         ready = true;
         leave();
       };
 
-      reach(MILESTONES.hydrated);
+      const painted = performance.getEntriesByName("first-contentful-paint")[0]?.startTime ?? 0;
+      const startIn = painted / 1000 + HOLD_S - performance.now() / 1000;
+      gsap.to(counter, {
+        value: WAIT_AT,
+        duration: Math.max(COUNT_S / 2, COUNT_S + Math.min(0, startIn)),
+        delay: Math.max(0, startIn),
+        ease: "power2.inOut",
+        onUpdate: render,
+        onComplete: () => {
+          counted = true;
+          leave();
+        },
+      });
       void document.fonts.ready.then(
         contextSafe(() => {
-          if (!alive) return;
-          reach(MILESTONES.fonts);
-          markReady();
+          if (alive) markReady();
         }),
       );
-      gsap.delayedCall(Math.max(0, MIN_S - performance.now() / 1000), () => {
-        settled = true;
-        leave();
-      });
       gsap.delayedCall(MAX_S, markReady);
 
       return () => {
@@ -125,51 +182,64 @@ export function Preloader() {
   );
 
   return (
-    <div
-      ref={ref}
-      data-preloader=""
-      aria-hidden="true"
-      className="fixed inset-0 z-45 hidden touch-none flex-col bg-surface select-none [html.motion-ok[data-intro=play]_&]:flex [html[data-intro=play]_&~*]:[interactivity:inert]"
-    >
-      <div className="container-page flex flex-1 flex-col justify-between pb-8 md:pb-10">
-        <div className="flex h-(--header-h) items-center justify-between gap-6 font-display text-p4 font-medium tracking-wide uppercase">
-          <Lift className="whitespace-nowrap">{site.fullName}</Lift>
-          <Lift className="hidden text-muted sm:block">{site.role}</Lift>
-        </div>
+    <>
+      <p role="status" className="sr-only">
+        {status}
+      </p>
+      <div
+        ref={ref}
+        data-preloader=""
+        aria-hidden="true"
+        className="fixed inset-0 z-45 hidden touch-none select-none [html.motion-ok[data-intro=play]_&]:flex [html.motion-ok[data-intro=play]_&~*]:[interactivity:inert]"
+      >
+        <div data-preloader-sheet="" className="absolute inset-0 bg-surface" />
 
-        <div className="flex items-end justify-between gap-6">
-          <Lift className="text-p4 tracking-wide whitespace-nowrap text-muted uppercase">
-            <span className="flex items-center gap-2">
-              <span className="inline-block animate-spin-steady text-accent">✳</span>
-              {PHASES[phase]}
-            </span>
-          </Lift>
-          <Lift>
-            <span className="flex font-display text-[clamp(5.5rem,24vw,17rem)] leading-[0.8] font-semibold tracking-[-0.03em]">
-              {PLACES.map((place) => (
-                <span key={place} className="h-[0.8em] overflow-y-clip">
-                  <span data-preloader-wheel="" className="flex flex-col items-center">
-                    {WHEEL.map((digit, i) => (
-                      <span key={i} className="h-[0.8em]">
-                        {digit}
-                      </span>
-                    ))}
+        <div className="relative container-page flex flex-1 flex-col">
+          <div className="flex flex-1 items-center justify-center">
+            <div className="w-full max-w-5xl">
+              <svg
+                data-preloader-mark=""
+                viewBox={`0 0 ${wordmark.width} ${wordmark.height}`}
+                className="block h-auto w-full overflow-visible"
+              >
+                {wordmark.letters.map((letter, i) => (
+                  <path
+                    key={i}
+                    data-preloader-letter=""
+                    d={letter.regular}
+                    fill="currentColor"
+                    fillOpacity={0}
+                    stroke="currentColor"
+                    strokeWidth={1}
+                    vectorEffect="non-scaling-stroke"
+                  />
+                ))}
+              </svg>
+
+              <div data-preloader-rule="" className="relative mt-[-5%] h-px bg-line-strong">
+                <span
+                  data-preloader-bar=""
+                  className="absolute inset-0 origin-left scale-x-0 bg-accent"
+                />
+              </div>
+
+              <div className="mt-4 flex items-center justify-between gap-6 text-p4 tracking-wide text-muted uppercase">
+                <Lift className="whitespace-nowrap">
+                  <span className="flex items-center gap-2">
+                    <span className="inline-block animate-spin-steady text-accent">✳</span>
+                    {PHASES[phase]}
                   </span>
-                </span>
-              ))}
-              <span className="pl-[0.04em] text-[0.28em] leading-none tracking-normal text-accent">
-                %
-              </span>
-            </span>
-          </Lift>
+                </Lift>
+                <Lift className="font-display font-medium text-faded-black tabular-nums dark:text-manila-light">
+                  <span data-preloader-count="">000</span>
+                  <span className="text-accent">%</span>
+                </Lift>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <span
-        data-preloader-bar=""
-        className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-accent"
-      />
-    </div>
+    </>
   );
 }
 
