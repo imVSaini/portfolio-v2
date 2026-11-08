@@ -4,6 +4,7 @@ import { useRef } from "react";
 
 import { RevealText } from "@/components/motion/RevealText";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
+import { ArrowIcon } from "@/components/ui/ArrowIcon";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { experience } from "@/data/experience";
 import { gsap, MOTION_QUERY, useGSAP } from "@/lib/gsap";
@@ -173,7 +174,7 @@ export function Experience() {
               href="#contact"
               className="inline-flex items-center gap-2 py-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 intent:text-accent intent:decoration-accent"
             >
-              Let’s talk <span aria-hidden="true">→</span>
+              Let’s talk <ArrowIcon direction="right" />
             </ScrollLink>
           </div>
         </li>

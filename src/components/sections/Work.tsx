@@ -1,4 +1,5 @@
 import { HorizontalSection } from "@/components/scroll/HorizontalSection";
+import { ArrowIcon } from "@/components/ui/ArrowIcon";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { contact } from "@/data/contact";
 import { projects, type Project, type ProjectTint } from "@/data/projects";
@@ -87,7 +88,7 @@ function ProjectPanel({ project }: { project: Project }) {
           data-h-reveal=""
           className="inline-flex items-center gap-2 self-start justify-self-start py-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 md:self-end intent:text-accent intent:decoration-accent"
         >
-          Visit live <span aria-hidden="true">↗</span>
+          Visit live <ArrowIcon />
         </a>
       </div>
       <ul className="flex flex-wrap gap-2" data-h-reveal="">
@@ -121,7 +122,7 @@ export function Work() {
         <p className="flex items-center gap-3 font-display text-p4 text-muted uppercase">
           <span className="md:tall:motion-safe:hidden">Swipe for more</span>
           <span className="hidden md:tall:motion-safe:inline">Keep scrolling</span>
-          <span aria-hidden="true">→</span>
+          <ArrowIcon direction="right" />
         </p>
       </div>
 
@@ -144,7 +145,7 @@ export function Work() {
             data-h-reveal=""
             className="inline-flex items-center gap-2 py-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 intent:text-accent intent:decoration-accent"
           >
-            GitHub {github.handle} <span aria-hidden="true">↗</span>
+            GitHub {github.handle} <ArrowIcon />
           </a>
         </div>
       )}

@@ -1,8 +1,9 @@
 import { RevealText } from "@/components/motion/RevealText";
 import { RollText } from "@/components/motion/RollText";
+import { DayPeriod } from "@/components/sections/contact/DayPeriod";
+import { ArrowSwap } from "@/components/ui/ArrowSwap";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { contact } from "@/data/contact";
-import { site } from "@/data/site";
 
 import { LiveClock } from "./LiveClock";
 
@@ -25,15 +26,14 @@ export function Contact() {
           <SectionLabel>Contact</SectionLabel>
 
           <RevealText as="h2" id="contact-title" className="text-h1 uppercase">
-            Have a&nbsp;hard problem? Let’s build the{" "}
-            <span className="text-accent">calm version.</span>
+            Got an idea? <span className="text-accent">Say hello.</span>
           </RevealText>
         </div>
 
         <div className="grid gap-12 md:grid-cols-12 md:items-end">
-          <div className="flex flex-col gap-8 md:col-span-7">
+          <div className="flex flex-col gap-8 md:col-span-8">
             <p className="max-w-xl text-p1 text-muted">
-              If you have a project in mind, feel free to reach out — I’d be glad to help bring your
+              If you have a project in mind, feel free to reach out — I’d be glad to help bring your
               vision to life.
             </p>
             <a
@@ -43,42 +43,20 @@ export function Contact() {
               <RollText text={contact.email} />
               <span
                 aria-hidden="true"
-                className="grid size-[2em] shrink-0 place-items-center rounded-full border border-current/25 text-[0.55em] text-accent transition-[rotate,background-color,border-color,color] duration-500 ease-out-expo group-hover:rotate-45 group-hover:border-accent group-hover:bg-accent group-hover:text-faded-black group-focus-visible:rotate-45 group-focus-visible:border-accent group-focus-visible:bg-accent group-focus-visible:text-faded-black motion-reduce:transition-none"
+                className="grid size-[2em] shrink-0 place-items-center rounded-full bg-faded-black text-[0.55em] text-manila-light transition-colors duration-300 ease-out-expo corner-squircle dark:bg-manila-light dark:text-faded-black group-intent:bg-accent group-intent:text-faded-black dark:group-intent:bg-accent"
               >
-                ↗
+                <ArrowSwap />
               </span>
             </a>
           </div>
 
-          <div className="flex flex-col gap-6 md:col-span-4 md:col-start-9">
-            <ul className="flex flex-col border-t border-line-strong">
-              {contact.links.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group flex items-center justify-between gap-4 border-b border-line-strong py-5 transition-colors duration-300 intent:text-accent"
-                  >
-                    <span className="font-display text-h4 font-medium uppercase">{link.label}</span>
-                    <span className="flex items-center gap-3 text-p3 text-muted">
-                      {link.handle}
-                      <span
-                        aria-hidden="true"
-                        className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
-                      >
-                        ↗
-                      </span>
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <p className="flex items-center justify-between text-p4 tracking-wide text-muted uppercase">
-              <span>{site.location}</span>
+          <div className="flex flex-col gap-3 md:col-span-4 md:items-end md:text-right">
+            <p className="text-p4 tracking-wide text-muted uppercase">Local time</p>
+            <p className="flex flex-col gap-1 font-display text-h4 font-medium md:items-end">
               <span>
-                <LiveClock className="text-faded-black tabular-nums dark:text-manila-light" /> IST
+                <LiveClock className="tabular-nums" /> IST
               </span>
+              <DayPeriod className="text-muted" />
             </p>
           </div>
         </div>

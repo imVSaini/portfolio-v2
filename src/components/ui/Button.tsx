@@ -1,5 +1,6 @@
 import { RollText } from "@/components/motion/RollText";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
+import { ArrowSwap } from "@/components/ui/ArrowSwap";
 import { cn } from "@/lib/cn";
 
 const base =
@@ -12,21 +13,6 @@ const variants = {
     "border border-line-strong text-faded-black intent:border-accent intent:bg-accent dark:text-manila-light dark:intent:text-faded-black",
 } as const;
 
-const swap = "transition-transform duration-500 ease-out-expo motion-reduce:transition-none";
-
-const arrows = {
-  internal: {
-    glyph: "→",
-    out: "group-hover:translate-x-full group-focus-visible:translate-x-full",
-    in: "-translate-x-full group-hover:translate-x-0 group-focus-visible:translate-x-0",
-  },
-  external: {
-    glyph: "↗",
-    out: "group-hover:translate-x-full group-hover:-translate-y-full group-focus-visible:translate-x-full group-focus-visible:-translate-y-full",
-    in: "-translate-x-full translate-y-full group-hover:translate-0 group-focus-visible:translate-0",
-  },
-} as const;
-
 type ButtonProps = {
   variant?: keyof typeof variants;
   children: string;
@@ -34,14 +20,10 @@ type ButtonProps = {
 } & ({ href: `#${string}`; external?: never } | { href: string; external: true });
 
 export function Button({ variant = "solid", children, className, href, external }: ButtonProps) {
-  const arrow = arrows[external ? "external" : "internal"];
   const content = (
     <>
       <RollText text={children} accent={false} />
-      <span aria-hidden="true" className="relative inline-block overflow-hidden">
-        <span className={cn("inline-block", swap, arrow.out)}>{arrow.glyph}</span>
-        <span className={cn("absolute inset-0", swap, arrow.in)}>{arrow.glyph}</span>
-      </span>
+      <ArrowSwap direction={external ? "up-right" : "right"} />
     </>
   );
 

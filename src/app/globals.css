@@ -19,6 +19,17 @@
     @slot;
   }
 }
+@custom-variant group-intent {
+  @media (hover: hover) {
+    &:is(:where(.group):hover *) {
+      @slot;
+    }
+  }
+  &:is(:where(.group):focus-visible *),
+  &:is(:where(.group):has(:focus-visible) *) {
+    @slot;
+  }
+}
 @custom-variant starting-style (&[data-starting-style]);
 @custom-variant ending-style (&[data-ending-style]);
 @custom-variant tall (@media (height >= 37.5rem));
