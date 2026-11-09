@@ -26,20 +26,43 @@ export const THEME_COLORS = { light: "#ebe4c1", soft: "#1e1d1d", deep: "#151414"
 
 const DARK_QUERY = "(prefers-color-scheme: dark)";
 
+/**
+ * Reads the operating system's colour scheme.
+ *
+ * @returns `true` when the OS prefers dark, `false` on the server.
+ */
 export function prefersDark(): boolean {
   return typeof window !== "undefined" && window.matchMedia(DARK_QUERY).matches;
 }
 
+/**
+ * Listens for changes to the operating system's colour scheme. Client only.
+ *
+ * @param onChange - Called whenever the OS switches between light and dark.
+ * @returns A function that removes the listener.
+ */
 export function subscribePrefersDark(onChange: () => void): () => void {
   const mql = window.matchMedia(DARK_QUERY);
   mql.addEventListener("change", onChange);
   return () => mql.removeEventListener("change", onChange);
 }
 
+/**
+ * Works out whether a theme choice should render dark right now.
+ *
+ * @param theme - The visitor's stored choice; `"system"` defers to the OS.
+ * @returns `true` when the page should use the dark palette.
+ */
 export function resolveDark(theme: Theme): boolean {
   return theme === "dark" || (theme === "system" && prefersDark());
 }
 
+/**
+ * Applies an appearance to the document: the `.dark` class, `data-accent`, `data-tone` and the
+ * browser's `theme-color`. Client only.
+ *
+ * @param appearance - The theme, accent and tone to show.
+ */
 export function applyAppearance({
   theme,
   accent,

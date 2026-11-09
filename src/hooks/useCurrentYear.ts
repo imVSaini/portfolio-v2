@@ -3,7 +3,14 @@ import { useSyncExternalStore } from "react";
 const noop = () => () => {};
 const BUILD_YEAR = Number(process.env.BUILD_YEAR);
 
-/** The visitor's current year; the build year during SSR and hydration, so the two never clash. */
+/**
+ * Returns the visitor's current year.
+ *
+ * During SSR and hydration it returns the build year instead, so server and client markup never
+ * clash.
+ *
+ * @returns A four-digit year.
+ */
 export function useCurrentYear(): number {
   return useSyncExternalStore(
     noop,

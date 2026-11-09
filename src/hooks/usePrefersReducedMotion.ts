@@ -8,7 +8,13 @@ function subscribe(onChange: () => void): () => void {
   return () => mql.removeEventListener("change", onChange);
 }
 
-/** Live `prefers-reduced-motion`, for motion CSS can't switch off (e.g. SVG `<animateMotion>`). */
+/**
+ * Subscribes to `prefers-reduced-motion` and re-renders when it changes.
+ *
+ * Use it for motion that GSAP and CSS can't switch off, such as SVG `<animateMotion>`.
+ *
+ * @returns `true` when the visitor asked for reduced motion; always `false` on the server.
+ */
 export function usePrefersReducedMotion(): boolean {
   return useSyncExternalStore(
     subscribe,

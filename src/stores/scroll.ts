@@ -27,6 +27,17 @@ function nativeScrollTo(target: ScrollTarget, options?: { offset?: number }) {
   window.scrollTo({ top: absolute + offset });
 }
 
+/**
+ * Shared scroll state and the one place to scroll the page from.
+ *
+ * `scrollTo` jumps natively until the smooth scroller boots and replaces it, so always call it
+ * rather than `window.scrollTo`.
+ *
+ * @example
+ * ```ts
+ * useScroll.getState().scrollTo("#work", { offset: -80 });
+ * ```
+ */
 export const useScroll = create<ScrollState>()((set, get) => ({
   direction: 1,
   scrolled: false,

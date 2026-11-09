@@ -57,6 +57,16 @@ const splitStorage: PersistStorage<AppearanceValues> = {
   },
 };
 
+/**
+ * The visitor's theme, accent and tone, saved to `localStorage` and applied to the document on
+ * every change.
+ *
+ * @example
+ * ```ts
+ * const setTheme = useAppearance((state) => state.setTheme);
+ * setTheme("dark");
+ * ```
+ */
 export const useAppearance = create<AppearanceState>()(
   persist(
     (set) => ({
