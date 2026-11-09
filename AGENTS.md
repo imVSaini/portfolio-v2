@@ -80,7 +80,11 @@ The compiler runs `strict` plus `noUncheckedIndexedAccess`, `exactOptionalProper
 
 ### Comments
 
-- Comment why, not what. A one-line `/** ... */` above an export when its purpose or units are
+- Comment why, not what.
+- Every exported function, hook and store in `src/lib`, `src/hooks` and `src/stores` gets a TSDoc
+  block: a summary sentence, then `@param name - ...`, `@returns` and an `@example` taken from
+  real usage (see `getAssetUrl` in `src/lib/asset.ts`). Skip a tag that has nothing to say.
+- Constants, types and object fields keep a one-line `/** ... */` when their purpose or units are
   not obvious (`/** 0–1 through the whole document. */`).
 - No commented-out code and no `TODO` without context.
 
@@ -123,6 +127,10 @@ guide in `node_modules/next/dist/docs/` before using a Next.js API you have not 
 - Use the global route type helpers (`LayoutProps<"/">`, `PageProps<"/...">`) for route props.
 - Metadata goes through the `metadata` and `viewport` exports, built from `src/data/site.ts`.
 - Fonts are self-hosted with `next/font/local`. Do not add Google Fonts links.
+- Remote images live in the Cloudflare R2 bucket at `site.assetsUrl`. Store bucket paths in
+  `src/data` (`"/work/studio.webp"`) and build URLs with `getAssetUrl()` from `@/lib/asset`.
+  Never hard-code the domain; `next.config.ts` allows it in `images.remotePatterns` from the same
+  value.
 
 ### Accessibility
 
