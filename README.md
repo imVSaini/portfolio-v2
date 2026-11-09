@@ -16,6 +16,7 @@ Next.js 16 (App Router, Turbopack), TypeScript (strict), Tailwind CSS v4, Zustan
 
 - `src/data/*` — all content (projects, experience, skills, contact, site meta). Edit copy here.
 - `src/app/globals.css` — palette (from videojs.org), light/dark/deep-tone and accent tokens, type scale, custom variants.
+- `src/lib/asset.ts` — `getAssetUrl()` builds image URLs on the Cloudflare R2 bucket (`site.assetsUrl`), which `next.config.ts` allows in `images.remotePatterns`.
 - `src/lib/appearance.ts` + `src/stores/appearance.ts` — theme/accent/tone model, the pre-paint `<head>` script, and the persisted Zustand store.
 - `src/components/appearance/*` — the Appearance popover (Theme · Dark tone · Accent).
 - `src/components/scroll/*` — Locomotive/Lenis smooth scroll on GSAP's ticker, `ScrollLink`, and the pinned `HorizontalSection`.

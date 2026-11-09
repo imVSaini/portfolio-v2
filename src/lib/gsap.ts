@@ -11,8 +11,9 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(MorphSVGPlugin, Observer, ScrollTrigger, SplitText, useGSAP);
 }
 
-/** Motion runs on md+ widths and only when the visitor hasn't asked for less of it. */
+/** Motion runs only when the visitor hasn't asked for less of it. */
 export const MOTION_QUERY = "(prefers-reduced-motion: no-preference)";
+/** `MOTION_QUERY` limited to md+ widths with enough height for pinned and parallax effects. */
 export const DESKTOP_MOTION_QUERY =
   "(min-width: 768px) and (min-height: 600px) and (prefers-reduced-motion: no-preference)";
 
