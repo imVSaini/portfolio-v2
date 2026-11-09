@@ -6,7 +6,6 @@ export type Role = {
   end: string;
   summary: string;
   highlights: string[];
-  metrics: { value: string; label: string }[];
   stack: string[];
 };
 
@@ -28,11 +27,6 @@ export const experience: Role[] = [
       "Synced a real-estate channel-partner portal with Zoho CRM through a retry-safe outbox that rides out vendor outages.",
       "Backed everything with 325 automated tests, 28 end-to-end tests, and sign-in protected by TOTP MFA and WebAuthn passkeys.",
     ],
-    metrics: [
-      { value: "5", label: "SaaS products live" },
-      { value: "325", label: "automated tests" },
-      { value: "28", label: "E2E journeys" },
-    ],
     stack: ["FastAPI", "SQLAlchemy", "PostgreSQL", "Redis", "Celery", "WebSockets"],
   },
   {
@@ -50,10 +44,6 @@ export const experience: Role[] = [
       "Moved reports and notifications onto Celery background workers.",
       "Profiled and load-tested services to find where the time actually went.",
     ],
-    metrics: [
-      { value: "−20%", label: "API response time" },
-      { value: "−35%", label: "query time" },
-    ],
     stack: ["Node.js", "Express.js", "GraphQL", "PostgreSQL", "Redis", "Celery"],
   },
   {
@@ -68,10 +58,6 @@ export const experience: Role[] = [
       "Improved performance by 20% across client sites built with HTML5, CSS3 and JavaScript.",
       "Made pages load 15% faster through refactoring and asset optimisation.",
       "Tested every build for cross-browser compatibility and accessibility.",
-    ],
-    metrics: [
-      { value: "+20%", label: "site performance" },
-      { value: "−15%", label: "load time" },
     ],
     stack: ["HTML5", "CSS3", "JavaScript (ES6+)"],
   },

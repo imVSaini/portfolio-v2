@@ -107,16 +107,6 @@ export function Experience() {
                   {role.start} — {role.end}
                 </p>
                 <p className="text-p3 text-muted">{role.location}</p>
-                <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3 lg:grid-cols-1">
-                  {role.metrics.map((metric) => (
-                    <div key={metric.label} className="flex flex-col-reverse gap-1">
-                      <dt className="text-p4 text-muted">{metric.label}</dt>
-                      <dd className="font-display text-h3 leading-none font-semibold text-accent">
-                        {metric.value}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
               </div>
             </div>
 
