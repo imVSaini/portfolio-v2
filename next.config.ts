@@ -4,6 +4,16 @@ const nextConfig: NextConfig = {
   /* config options here */
   env: { BUILD_YEAR: String(new Date().getFullYear()) },
   poweredByHeader: false,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "assets.imvaibhav.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
+  },
   async headers() {
     return [
       {
