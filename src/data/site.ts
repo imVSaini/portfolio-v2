@@ -6,6 +6,7 @@ export const site = {
   location: "Bengaluru, India",
   timeZone: "Asia/Kolkata",
   url: "https://www.imvaibhav.com",
+  assetsUrl: "https://assets.imvaibhav.com",
   description:
     "Vaibhav Kumar Saini is a full stack developer in Bengaluru who crafts web and mobile products where design and code work as one, with Python, FastAPI, Node.js, React and Next.js.",
   /** Link-preview card, served from `public/`. */

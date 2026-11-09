@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import { site } from "./src/data/site";
+
 const nextConfig: NextConfig = {
   /* config options here */
   env: { BUILD_YEAR: String(new Date().getFullYear()) },
@@ -8,7 +10,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "assets.imvaibhav.com",
+        hostname: new URL(site.assetsUrl).hostname,
         port: "",
         pathname: "/**",
       },
