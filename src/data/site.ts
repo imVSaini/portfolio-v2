@@ -18,10 +18,15 @@ export const site = {
   },
 } as const;
 
+type NavItem = { label: string } & (
+  { kind: "section"; href: `#${string}` } | { kind: "page"; href: `/${string}` }
+);
+
 export const nav = [
-  { label: "Home", href: "#top" },
-  { label: "Work", href: "#work" },
-  { label: "Experience", href: "#experience" },
-  { label: "Skills", href: "#skills" },
-  { label: "Contact", href: "#contact" },
-] as const satisfies readonly { label: string; href: `#${string}` }[];
+  { kind: "section", label: "Home", href: "#top" },
+  { kind: "section", label: "Work", href: "#work" },
+  { kind: "section", label: "Experience", href: "#experience" },
+  { kind: "section", label: "Skills", href: "#skills" },
+  { kind: "page", label: "Blog", href: "/blog" },
+  { kind: "section", label: "Contact", href: "#contact" },
+] as const satisfies readonly NavItem[];

@@ -17,8 +17,8 @@ for accessible primitives.
 ## Layout
 
 - `src/app`: routes, root layout, `globals.css` (the design system) and self-hosted fonts.
-- `src/components`: `layout`, `sections`, `motion`, `scroll`, `ui`, `appearance`.
-- `src/data`: typed site content (projects, experience, skills, contact, site meta).
+- `src/components`: `layout`, `sections`, `motion`, `scroll`, `ui`, `appearance`, `blog`.
+- `src/data`: typed site content (projects, experience, skills, contact, site meta, blog posts).
 - `src/lib`: shared helpers (`cn`, the `gsap` setup, appearance).
 - `src/hooks`, `src/stores`: React hooks and zustand stores.
 

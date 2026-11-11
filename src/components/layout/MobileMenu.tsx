@@ -1,6 +1,8 @@
 "use client";
 
 import { Dialog } from "@base-ui/react/dialog";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 
 import { AppearanceControls } from "@/components/appearance/AppearanceControls";
@@ -10,12 +12,17 @@ import { socialIcons } from "@/components/ui/SocialIcons";
 import { cn } from "@/lib/cn";
 import { contact } from "@/data/contact";
 import { nav } from "@/data/site";
+import { getHomeHref } from "@/lib/nav";
 import { useScroll } from "@/stores/scroll";
+
+const NAV_LINK_CLASS_NAME = "group block py-1 font-display text-h3 font-semibold uppercase";
 
 export function MobileMenu({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const onHome = pathname === "/";
   // The dialog locks page scroll while open, so travel only after it has fully closed.
-  const pendingTarget = useRef<string | null>(null);
+  const pendingTarget = useRef<`#${string}` | null>(null);
 
   return (
     <Dialog.Root
@@ -23,7 +30,7 @@ export function MobileMenu({ className }: { className?: string }) {
       onOpenChange={setOpen}
       onOpenChangeComplete={(isOpen) => {
         if (isOpen || !pendingTarget.current) return;
-        useScroll.getState().scrollTo(pendingTarget.current);
+        useScroll.getState().scrollTo(pendingTarget.current === "#top" ? 0 : pendingTarget.current);
         pendingTarget.current = null;
       }}
     >
@@ -53,17 +60,41 @@ export function MobileMenu({ className }: { className?: string }) {
             <ul className="flex flex-col gap-1">
               {nav.map((item) => (
                 <li key={item.href}>
-                  <ScrollLink
-                    href={item.href}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      pendingTarget.current = item.href;
-                      setOpen(false);
-                    }}
-                    className="group block py-1 font-display text-h3 font-semibold uppercase"
-                  >
-                    <RollText text={item.label} />
-                  </ScrollLink>
+                  {item.kind === "section" && onHome ? (
+                    <ScrollLink
+                      href={item.href}
+                      onClick={(event) => {
+                        if (
+                          event.defaultPrevented ||
+                          event.button !== 0 ||
+                          event.metaKey ||
+                          event.ctrlKey ||
+                          event.shiftKey ||
+                          event.altKey
+                        ) {
+                          return;
+                        }
+                        event.preventDefault();
+                        pendingTarget.current = item.href;
+                        setOpen(false);
+                      }}
+                      className={NAV_LINK_CLASS_NAME}
+                    >
+                      <RollText text={item.label} />
+                    </ScrollLink>
+                  ) : (
+                    <Link
+                      href={item.kind === "section" ? getHomeHref(item.href) : item.href}
+                      {...(item.href === pathname && { "aria-current": "page" })}
+                      onNavigate={() => {
+                        pendingTarget.current = null;
+                        setOpen(false);
+                      }}
+                      className={NAV_LINK_CLASS_NAME}
+                    >
+                      <RollText text={item.label} />
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

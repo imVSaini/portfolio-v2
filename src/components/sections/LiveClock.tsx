@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { site } from "@/data/site";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
@@ -29,6 +29,15 @@ export function LiveClock({ className }: { className?: string }) {
     tick();
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
+  }, []);
+
+  useLayoutEffect(() => {
+    const clock = ref.current;
+    return () => {
+      clock?.querySelectorAll<HTMLElement>("[data-clock-strip]").forEach((strip) => {
+        delete strip.dataset.shown;
+      });
+    };
   }, []);
 
   useGSAP(

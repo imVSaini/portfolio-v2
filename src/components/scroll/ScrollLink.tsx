@@ -10,7 +10,16 @@ type ScrollLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & { href: `#${str
 export function ScrollLink({ href, onClick, ...props }: ScrollLinkProps) {
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     onClick?.(event);
-    if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey) return;
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
     event.preventDefault();
     useScroll.getState().scrollTo(href === "#top" ? 0 : href);
     history.replaceState(null, "", href === "#top" ? location.pathname : href);

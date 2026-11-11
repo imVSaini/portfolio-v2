@@ -1,0 +1,29 @@
+import Link from "next/link";
+
+import type { Post } from "@/data/posts";
+
+const crumbs = [
+  { label: "Home", href: "/" },
+  { label: "Blog", href: "/blog" },
+] as const;
+
+export function PostBreadcrumbs({ post }: { post: Post }) {
+  return (
+    <nav aria-label="Breadcrumb">
+      <ol className="flex flex-wrap items-center gap-2 font-display text-p4 font-medium tracking-wide text-muted uppercase">
+        {crumbs.map((crumb) => (
+          <li key={crumb.href} className="flex items-center gap-2">
+            <Link
+              href={crumb.href}
+              className="rounded-sm transition-colors duration-300 intent:text-accent"
+            >
+              {crumb.label}
+            </Link>
+            <span aria-hidden="true">/</span>
+          </li>
+        ))}
+        <li className="text-faded-black dark:text-manila-light">{post.topic}</li>
+      </ol>
+    </nav>
+  );
+}

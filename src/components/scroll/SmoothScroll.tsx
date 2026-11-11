@@ -56,9 +56,18 @@ export function SmoothScroll() {
     });
 
     // Webfonts change line boxes; re-measure every trigger once they land.
-    void document.fonts.ready.then(() => ScrollTrigger.refresh());
+    let active = true;
+    void document.fonts.ready.then(() => {
+      if (!active) return;
+      ScrollTrigger.refresh();
+      const target =
+        location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (target)
+        locomotive.scrollTo(target, { offset: HEADER_OFFSET, immediate: true, force: true });
+    });
 
     return () => {
+      active = false;
       stopWaiting();
       locomotive.destroy();
       gsap.ticker.lagSmoothing(500, 33);

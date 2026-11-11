@@ -22,4 +22,20 @@ export function GitHubIcon(props: IconProps) {
   );
 }
 
+export function XIcon(props: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
+    </svg>
+  );
+}
+
+export function RssIcon(props: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M3.43 17.14a3.43 3.43 0 1 1 0 6.86 3.43 3.43 0 0 1 0-6.86ZM0 8.57a15.43 15.43 0 0 1 15.43 15.43h-4.57A10.86 10.86 0 0 0 0 13.14V8.57ZM0 0a24 24 0 0 1 24 24h-4.57A19.43 19.43 0 0 0 0 4.57V0Z" />
+    </svg>
+  );
+}
+
 export const socialIcons = { LinkedIn: LinkedInIcon, GitHub: GitHubIcon } as const;

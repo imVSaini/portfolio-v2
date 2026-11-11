@@ -6,7 +6,8 @@ import { useRef } from "react";
 import { RollText } from "@/components/motion/RollText";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
 import { Seal } from "@/components/ui/Seal";
-import { socialIcons } from "@/components/ui/SocialIcons";
+import { RssIcon, socialIcons } from "@/components/ui/SocialIcons";
+import { blog } from "@/data/blog";
 import { contact } from "@/data/contact";
 import { site } from "@/data/site";
 import { useCurrentYear } from "@/hooks/useCurrentYear";
@@ -21,7 +22,7 @@ const LIFT = 14;
 const REACH = 2.2;
 
 const letters = [...site.shortName];
-const SEAL_TEXT = "Back to top ✦ ".repeat(3);
+const SEAL_ITEMS = ["Back to top", "Back to top", "Back to top"] as const;
 
 /**
  * Scrolling in draws the rule, raises the wordmark letter by letter, then drops the accent dot and
@@ -163,6 +164,20 @@ export function Footer() {
               </li>
             );
           })}
+          <li>
+            <a
+              href={blog.feedPath}
+              type="application/rss+xml"
+              aria-label="RSS feed of the blog"
+              className="group inline-flex min-h-11 items-center gap-2 md:min-h-6"
+            >
+              <RssIcon
+                aria-hidden="true"
+                className="size-3.5 transition-colors duration-300 group-hover:text-accent group-focus-visible:text-accent"
+              />
+              <RollText text="RSS" />
+            </a>
+          </li>
         </ul>
         <ScrollLink
           href="#top"
@@ -171,7 +186,7 @@ export function Footer() {
           className="group col-start-2 row-start-2 block size-24 justify-self-end rounded-full sm:size-28 md:col-start-3 md:row-start-1 md:size-36 xl:size-44"
         >
           <Seal
-            text={SEAL_TEXT}
+            items={SEAL_ITEMS}
             className="size-full"
             discClassName="size-[40%] overflow-hidden transition-transform duration-500 ease-out-expo group-hover:scale-110 group-focus-visible:scale-110 motion-reduce:transition-none"
           >

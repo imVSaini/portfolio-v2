@@ -6,6 +6,7 @@ import { RevealText } from "@/components/motion/RevealText";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
 import { ArrowIcon } from "@/components/ui/ArrowIcon";
 import { SectionLabel } from "@/components/ui/SectionLabel";
+import { SparkIcon } from "@/components/ui/SparkIcon";
 import { experience } from "@/data/experience";
 import { gsap, MOTION_QUERY, useGSAP } from "@/lib/gsap";
 
@@ -127,8 +128,11 @@ export function Experience() {
                     data-xp-item=""
                     className="flex gap-4 border-b border-line py-4 text-p2"
                   >
-                    <span aria-hidden="true" className="mt-1 text-p4 text-accent">
-                      ✦
+                    <span
+                      aria-hidden="true"
+                      className="flex h-lh shrink-0 items-center text-accent"
+                    >
+                      <SparkIcon className="size-[0.7em]" />
                     </span>
                     {highlight}
                   </li>

@@ -84,6 +84,8 @@
   --text-p3--line-height: 1.5;
   --text-p4: 0.75rem;
   --text-p4--line-height: 1.5;
+  --text-prose: 1.125rem;
+  --text-prose--line-height: 1.75;
 
   --radius-md: 0.5rem;
   --radius-lg: 0.7rem;
@@ -232,6 +234,22 @@
   --color-muted: var(--muted);
   --color-hover: var(--hover);
   --color-info: var(--info);
+
+  --color-code-bg: var(--code-bg);
+  --color-code-bar: var(--code-bar);
+  --color-code-line: var(--code-line);
+  --color-code-text: var(--code-text);
+  --color-code-dim: var(--code-dim);
+  --color-code-gutter: var(--code-gutter);
+  --color-code-keyword: var(--code-keyword);
+  --color-code-control: var(--code-control);
+  --color-code-string: var(--code-string);
+  --color-code-number: var(--code-number);
+  --color-code-comment: var(--code-comment);
+  --color-code-function: var(--code-function);
+  --color-code-type: var(--code-type);
+  --color-code-variable: var(--code-variable);
+  --color-code-punctuation: var(--code-punctuation);
 }
 
 /* ---------------------------------------------------------------------------
@@ -250,6 +268,22 @@
   --header-h: 4.5rem;
   --card-invert: var(--color-faded-black);
   --card-soft: var(--color-manila-50);
+
+  --code-bg: var(--surface);
+  --code-bar: var(--color-manila-light);
+  --code-line: var(--line);
+  --code-text: color-mix(in srgb, var(--color-faded-black) 88%, transparent);
+  --code-dim: var(--muted);
+  --code-gutter: color-mix(in srgb, var(--color-faded-black) 40%, transparent);
+  --code-keyword: #0000ff;
+  --code-control: #af00db;
+  --code-string: #a31515;
+  --code-number: #098658;
+  --code-comment: #008000;
+  --code-function: #795e26;
+  --code-type: #267f99;
+  --code-variable: #001080;
+  --code-punctuation: #800000;
 }
 
 .dark {
@@ -263,6 +297,22 @@
   --info: #6bb9dc;
   --card-invert: var(--color-manila-light);
   --card-soft: var(--color-soot);
+
+  --code-bg: #1f1f1f;
+  --code-bar: #181818;
+  --code-line: #2b2b2b;
+  --code-text: #cccccc;
+  --code-dim: #9d9d9d;
+  --code-gutter: #6e7681;
+  --code-keyword: #569cd6;
+  --code-control: #c586c0;
+  --code-string: #ce9178;
+  --code-number: #b5cea8;
+  --code-comment: #6a9955;
+  --code-function: #dcdcaa;
+  --code-type: #4ec9b0;
+  --code-variable: #9cdcfe;
+  --code-punctuation: #808080;
 }
 
 html.dark[data-tone="deep"] {

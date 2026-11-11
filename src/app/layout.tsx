@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
+import { feedAlternates } from "@/data/blog";
 import { site } from "@/data/site";
 import { appearanceScript, THEME_COLORS } from "@/lib/appearance";
 
@@ -59,7 +60,7 @@ export const metadata: Metadata = {
     description: site.description,
     images: [site.ogImage],
   },
-  alternates: { canonical: "/" },
+  alternates: { canonical: "/", types: feedAlternates },
 };
 
 export const viewport: Viewport = {

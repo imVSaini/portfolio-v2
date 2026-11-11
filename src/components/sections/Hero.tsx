@@ -9,7 +9,7 @@ import { site } from "@/data/site";
 import { gsap, MOTION_QUERY, useGSAP } from "@/lib/gsap";
 import { whenIntroDone } from "@/stores/intro";
 
-const BADGE_TEXT = "Open to new opportunities ✦ Bengaluru ✦ ";
+const BADGE_ITEMS = ["Open to new opportunities", "Bengaluru"] as const;
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -130,7 +130,7 @@ export function Hero() {
         className="absolute top-[calc(var(--header-h)+2rem)] right-[4vw] hidden size-36 lg:block xl:size-44"
       >
         <div data-scroll="" data-scroll-speed="0.12" className="size-full">
-          <Seal text={BADGE_TEXT} className="size-full">
+          <Seal items={BADGE_ITEMS} className="size-full">
             ✳
           </Seal>
         </div>
