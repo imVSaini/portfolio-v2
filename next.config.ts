@@ -3,18 +3,22 @@ import type { NextConfig } from "next";
 import { site } from "./src/data/site";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   env: { BUILD_YEAR: String(new Date().getFullYear()) },
   poweredByHeader: false,
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: new URL(site.assetsUrl).hostname,
-        port: "",
-        pathname: "/**",
-      },
-    ],
+    remotePatterns: [new URL(`${site.assetsUrl}/**`)],
+  },
+  async rewrites() {
+    const acceptsMarkdown = [
+      { type: "header" as const, key: "accept", value: "(.*)text/markdown(.*)" },
+    ];
+
+    return {
+      beforeFiles: [
+        { source: "/", destination: "/index.md", has: acceptsMarkdown },
+        { source: "/blog/:slug", destination: "/blog/:slug/index.md", has: acceptsMarkdown },
+      ],
+    };
   },
   async headers() {
     return [

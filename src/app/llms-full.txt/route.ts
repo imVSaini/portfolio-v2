@@ -1,10 +1,6 @@
+import { textResponse } from "@/lib/http";
 import { getLlmsFullTxt } from "@/lib/llms";
 
 export function GET() {
-  return new Response(getLlmsFullTxt(), {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "public, max-age=3600, s-maxage=3600",
-    },
-  });
+  return textResponse(getLlmsFullTxt(), { type: "text" });
 }
