@@ -1,11 +1,10 @@
 import { RevealText } from "@/components/motion/RevealText";
 import { RollText } from "@/components/motion/RollText";
 import { DayPeriod } from "@/components/sections/contact/DayPeriod";
+import { LiveClock } from "@/components/sections/contact/LiveClock";
 import { ArrowSwap } from "@/components/ui/ArrowSwap";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { contact } from "@/data/contact";
-
-import { LiveClock } from "./LiveClock";
 
 export function Contact() {
   return (

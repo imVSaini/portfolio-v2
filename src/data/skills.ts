@@ -117,3 +117,8 @@ export const skillGroups: SkillGroup[] = [
     ],
   },
 ];
+
+export const skillMarquee = {
+  headline: ["Python", "FastAPI", "Node.js", "PostgreSQL", "Redis", "Celery"],
+  counterline: ["Next.js", "React", "TypeScript", "Tailwind CSS", "GSAP", "Zustand"],
+} as const;
