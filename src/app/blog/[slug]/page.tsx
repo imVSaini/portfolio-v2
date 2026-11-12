@@ -83,7 +83,7 @@ export default async function PostPage({ params }: PageProps<"/blog/[slug]">) {
 
   return (
     <PageShell>
-      <main id="main" className="container-page py-28 md:pt-34 md:pb-40">
+      <main id="main" className="container-page pt-28 pb-16 md:pt-34 md:pb-40">
         <div className="mx-auto flex max-w-7xl flex-col gap-20 md:gap-28">
           <PostContent post={post} />
         </div>
@@ -143,7 +143,7 @@ function PostContent({ post }: { post: Post }) {
             </h2>
             <Link
               href="/blog"
-              className="group font-display text-p4 font-medium tracking-wide uppercase"
+              className="group inline-flex min-h-6 items-center font-display text-p4 font-medium tracking-wide uppercase"
             >
               <RollText text="All posts" />
             </Link>

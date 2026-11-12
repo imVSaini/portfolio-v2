@@ -66,7 +66,7 @@ export function Hero() {
       </div>
 
       <div className="relative container-page flex flex-1 flex-col justify-center gap-10 py-12 md:py-16">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3" data-hero-fade="">
+        <div className="hidden flex-wrap items-center gap-x-6 gap-y-3 md:flex" data-hero-fade="">
           <span className="inline-flex items-center gap-2.5 rounded-full border border-line-strong px-3.5 py-1.5 text-p4 font-medium tracking-wide uppercase">
             <span className="size-2 animate-pulse-dot rounded-full bg-accent motion-reduce:animate-none" />
             <span>

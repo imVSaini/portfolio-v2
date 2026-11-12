@@ -57,7 +57,7 @@ export function SegmentedControl<T extends string>({
             value={option.value}
             aria-label={option.label}
             className={cn(
-              "flex min-w-0 items-center justify-center gap-2 rounded-md px-3 py-1.5 text-p3/tight whitespace-nowrap select-none corner-squircle",
+              "flex min-w-0 items-center justify-center gap-1.5 rounded-md p-1.5 text-p3/tight whitespace-nowrap select-none corner-squircle min-[23rem]:gap-2 min-[23rem]:px-3",
               pending ? "cursor-wait" : disabled ? "cursor-not-allowed" : "cursor-pointer",
               selected
                 ? "bg-surface-raised font-semibold text-faded-black shadow-xs ring-1 ring-line dark:text-manila-light"

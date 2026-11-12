@@ -16,7 +16,8 @@ type HorizontalSectionProps = {
  * Pins the section and converts vertical scroll into sideways travel along the track.
  * Inside it, mark panels with `data-h-panel`, layers to drift with `data-h-parallax="<xPercent>"`
  * and pieces to rise in with `data-h-reveal` — they all ride the pinned tween as a
- * `containerAnimation`. Below md (or with reduced motion) the track is a native swipe row.
+ * `containerAnimation`. Below md the track stacks
+ * vertically; from md without the pin (short viewport or reduced motion) it is a two-column grid.
  */
 export function HorizontalSection({ id, label, children, className }: HorizontalSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -101,7 +102,7 @@ export function HorizontalSection({ id, label, children, className }: Horizontal
     >
       <div
         ref={trackRef}
-        className="flex snap-x snap-mandatory scroll-px-5 scrollbar-none gap-5 overflow-x-auto overscroll-x-contain px-5 pb-6 md:scroll-px-14 md:gap-10 md:px-14 md:tall:motion-safe:h-full md:tall:motion-safe:w-max md:tall:motion-safe:snap-none md:tall:motion-safe:items-center md:tall:motion-safe:overflow-visible md:tall:motion-safe:pb-0"
+        className="flex flex-col gap-14 px-[clamp(1rem,4vw,3.5rem)] md:grid md:grid-cols-2 md:gap-x-10 md:gap-y-20 md:tall:motion-safe:flex md:tall:motion-safe:h-full md:tall:motion-safe:w-max md:tall:motion-safe:flex-row md:tall:motion-safe:items-center md:tall:motion-safe:gap-10 md:tall:motion-safe:px-14"
       >
         {children}
       </div>

@@ -15,7 +15,7 @@ export function PostBreadcrumbs({ post }: { post: Post }) {
           <li key={crumb.href} className="flex items-center gap-2">
             <Link
               href={crumb.href}
-              className="rounded-sm transition-colors duration-300 intent:text-accent"
+              className="inline-flex min-h-6 items-center rounded-sm transition-colors duration-300 intent:text-accent"
             >
               {crumb.label}
             </Link>

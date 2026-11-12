@@ -1,79 +1,25 @@
 import { HorizontalSection } from "@/components/scroll/HorizontalSection";
+import { ProjectCover } from "@/components/sections/work/ProjectCover";
+import { ProjectIndex } from "@/components/sections/work/ProjectIndex";
 import { ArrowIcon } from "@/components/ui/ArrowIcon";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { contact } from "@/data/contact";
-import { projects, type Project, type ProjectTint } from "@/data/projects";
-import { cn } from "@/lib/cn";
-
-const tints: Record<ProjectTint, string> = {
-  orange: "bg-orange text-faded-black",
-  gold: "bg-gold text-faded-black",
-  magenta: "bg-magenta text-manila-light",
-  red: "bg-red text-manila-light",
-  soot: "bg-soot text-manila-light",
-};
+import { projects, type Project } from "@/data/projects";
 
 const github = contact.links.find((link) => link.label === "GitHub");
-
-function hostname(url: string) {
-  return new URL(url).hostname.replace(/^www\./, "");
-}
 
 function ProjectPanel({ project }: { project: Project }) {
   return (
     <article
       data-h-panel=""
-      className="group flex w-[86vw] shrink-0 snap-center flex-col gap-6 sm:w-[70vw] md:w-[min(64vw,60rem)] md:tall:motion-safe:h-[min(78svh,calc(48vw+16rem))]"
+      className="group hidden min-w-0 flex-col gap-6 md:flex md:tall:motion-safe:h-[min(78svh,calc(48vw+16rem),50rem)] md:tall:motion-safe:w-[min(64vw,60rem)] md:tall:motion-safe:shrink-0"
     >
       <p className="font-display text-p4 text-muted uppercase">{project.category}</p>
 
-      <a
-        href={project.url}
-        target="_blank"
-        rel="noreferrer"
-        aria-label={`Visit ${project.title} (opens in a new tab)`}
-        className={cn(
-          "relative block aspect-4/3 max-h-[60svh] overflow-hidden rounded-2xl corner-squircle md:aspect-video md:tall:motion-safe:aspect-auto md:tall:motion-safe:max-h-none md:tall:motion-safe:flex-1",
-          tints[project.tint],
-        )}
-      >
-        {/* Oversized title layer drifts against the travel direction. */}
-        <div
-          data-h-parallax="14"
-          aria-hidden="true"
-          className="absolute inset-y-0 -left-1/4 flex w-3/2 items-center justify-center"
-        >
-          <span className="font-display text-[clamp(5rem,16vw,15rem)] leading-none font-semibold whitespace-nowrap uppercase opacity-15">
-            {project.title}
-          </span>
-        </div>
-
-        {/* Faux browser window. */}
-        <div className="absolute inset-x-[8%] top-[14%] bottom-0 flex flex-col overflow-hidden rounded-t-xl bg-manila-light text-faded-black shadow-2xl transition-transform duration-700 ease-out-expo group-hover:-translate-y-3 dark:bg-faded-black dark:text-manila-light">
-          <div className="flex items-center gap-2 border-b border-line px-4 py-3">
-            <span className="size-2.5 rounded-full bg-red" />
-            <span className="size-2.5 rounded-full bg-gold" />
-            <span className="size-2.5 rounded-full bg-manila-dark" />
-            <span className="ml-3 truncate rounded-full bg-surface px-3 py-1 text-p4 text-muted">
-              {hostname(project.url)}
-            </span>
-          </div>
-          <div className="flex flex-1 flex-col justify-between gap-6 p-6 md:p-8">
-            <div className="flex flex-col gap-3">
-              <span className="h-2 w-1/3 rounded-full bg-line-strong" />
-              <span className="h-2 w-1/2 rounded-full bg-line" />
-            </div>
-            <p className="font-display text-h3 leading-none font-semibold uppercase">
-              {project.title}
-            </p>
-            <div className="grid grid-cols-3 gap-3">
-              <span className="h-16 rounded-lg bg-surface" />
-              <span className="h-16 rounded-lg bg-surface" />
-              <span className="h-16 rounded-lg bg-accent/70" />
-            </div>
-          </div>
-        </div>
-      </a>
+      <ProjectCover
+        project={project}
+        className="aspect-video max-h-[60svh] md:tall:motion-safe:aspect-auto md:tall:motion-safe:max-h-none md:tall:motion-safe:flex-1"
+      />
 
       <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
         <div className="flex flex-col gap-2" data-h-reveal="">
@@ -104,8 +50,12 @@ function ProjectPanel({ project }: { project: Project }) {
 
 export function Work() {
   return (
-    <HorizontalSection id="work" label="Selected work" className="py-24 md:tall:motion-safe:py-0">
-      <div className="flex w-[86vw] shrink-0 snap-start flex-col gap-8 sm:w-[60vw] md:w-[calc(var(--text-h2)*6.15)] md:tall:motion-safe:justify-center">
+    <HorizontalSection
+      id="work"
+      label="Selected work"
+      className="py-16 md:py-24 md:tall:motion-safe:py-0"
+    >
+      <div className="flex flex-col gap-10 md:col-span-2 md:tall:motion-safe:w-[calc(var(--text-h2)*6.15)] md:tall:motion-safe:shrink-0 md:tall:motion-safe:justify-center md:tall:motion-safe:gap-8">
         <div className="flex flex-col gap-5">
           <SectionLabel>Selected work</SectionLabel>
           <h2 className="text-h2 uppercase">
@@ -119,12 +69,13 @@ export function Work() {
           SaaS, conferences, commerce and studios. Each card opens the live site, so you can judge
           the real thing.
         </p>
-        <p className="flex items-center gap-3 font-display text-p4 text-muted uppercase">
-          <span className="md:tall:motion-safe:hidden">Swipe for more</span>
-          <span className="hidden md:tall:motion-safe:inline">Keep scrolling</span>
+        <p className="hidden items-center gap-3 font-display text-p4 text-muted uppercase md:tall:motion-safe:flex">
+          Keep scrolling
           <ArrowIcon direction="right" />
         </p>
       </div>
+
+      <ProjectIndex projects={projects} className="md:hidden" />
 
       {projects.map((project) => (
         <ProjectPanel key={project.slug} project={project} />
@@ -133,7 +84,7 @@ export function Work() {
       {github && (
         <div
           data-h-panel=""
-          className="flex w-[70vw] shrink-0 snap-center flex-col items-start justify-center gap-6 sm:w-[40vw] md:w-[28vw]"
+          className="flex flex-col items-start justify-center gap-6 md:tall:motion-safe:w-[28vw] md:tall:motion-safe:shrink-0"
         >
           <p className="font-display text-h3 font-semibold uppercase" data-h-reveal="">
             More in the <span className="text-accent">workshop</span>.

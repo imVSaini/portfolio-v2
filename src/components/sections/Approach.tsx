@@ -226,7 +226,7 @@ export function Approach() {
       ref={ref}
       id="approach"
       aria-labelledby="approach-title"
-      className="relative py-28 md:py-0"
+      className="relative py-16 md:py-0"
     >
       <h2 id="approach-title" className="sr-only">
         How I build
@@ -234,24 +234,24 @@ export function Approach() {
 
       <div
         data-manifesto=""
-        className="container-page flex flex-col gap-7 md:min-h-svh md:justify-center md:gap-9"
+        className="container-page flex flex-col gap-5 md:min-h-svh md:justify-center md:gap-9"
       >
         <SectionLabel>Approach</SectionLabel>
         <Manifesto />
       </div>
 
-      <div className="container-page mt-28 md:mt-16">
-        <div className="mb-14 grid gap-6 md:mb-20 md:grid-cols-12 md:items-end">
-          <RevealText as="h3" className="text-h2 uppercase md:col-span-8">
+      <div className="container-page mt-32 md:mt-16">
+        <div className="mb-14 grid gap-10 md:mb-20 lg:grid-cols-12 lg:items-end">
+          <RevealText as="h3" className="text-h2 uppercase lg:col-span-8">
             Four rules I&nbsp;don’t break.
           </RevealText>
-          <p className="max-w-sm text-p2 text-muted md:col-span-4 md:justify-self-end">
+          <p className="max-w-sm text-p2 text-muted lg:col-span-4 lg:justify-self-end">
             The principles behind every system I’ve shipped, from the first schema to the on-call
             rota.
           </p>
         </div>
 
-        <ul className="flex flex-col gap-[14svh] pb-[8svh] md:pb-[18svh]">
+        <ul className="flex flex-col gap-[14svh] md:pb-[18svh]">
           {principles.map(({ tag, title, body, tone, Art }, i) => (
             <li
               key={title}

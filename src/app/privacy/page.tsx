@@ -54,7 +54,7 @@ export default function PrivacyPage() {
       <PageShell>
         <main
           id="main"
-          className="container-page flex flex-col gap-16 pt-34 pb-28 md:pt-42 md:pb-40"
+          className="container-page flex flex-col gap-16 pt-34 pb-16 md:pt-42 md:pb-40"
         >
           <div className="flex flex-col gap-6">
             <SectionLabel>Privacy</SectionLabel>

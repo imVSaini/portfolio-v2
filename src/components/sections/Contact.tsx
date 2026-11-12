@@ -12,7 +12,7 @@ export function Contact() {
     <section
       id="contact"
       aria-labelledby="contact-title"
-      className="relative overflow-hidden border-t border-line py-28 md:py-40"
+      className="relative overflow-hidden border-t border-line py-16 md:py-40"
     >
       <div
         aria-hidden="true"
@@ -21,8 +21,8 @@ export function Contact() {
         className="pointer-events-none absolute -bottom-1/3 -left-1/4 size-[60vw] rounded-full bg-accent opacity-15 blur-[140px] dark:opacity-25"
       />
 
-      <div className="relative container-page flex flex-col gap-16">
-        <div className="flex flex-col gap-6">
+      <div className="relative container-page flex flex-col gap-10 md:gap-16">
+        <div className="flex flex-col gap-5 md:gap-6">
           <SectionLabel>Contact</SectionLabel>
 
           <RevealText as="h2" id="contact-title" className="text-h1 uppercase">
@@ -38,7 +38,7 @@ export function Contact() {
             </p>
             <a
               href={`mailto:${contact.email}`}
-              className="group inline-flex w-fit max-w-full items-center gap-[0.4em] font-display text-[clamp(1.125rem,3.4vw,2.75rem)] leading-tight font-semibold whitespace-nowrap"
+              className="group inline-flex w-fit max-w-full items-center gap-[0.4em] font-display text-[min(5.8vw,1.75rem)] leading-tight font-semibold whitespace-nowrap md:text-[clamp(1.125rem,3.4vw,2.75rem)]"
             >
               <RollText text={contact.email} />
               <span
