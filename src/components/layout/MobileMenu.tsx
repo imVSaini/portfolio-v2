@@ -13,7 +13,7 @@ import { cn } from "@/lib/cn";
 import { contact } from "@/data/contact";
 import { nav } from "@/data/site";
 import { getHomeHref } from "@/lib/nav";
-import { useScroll } from "@/stores/scroll";
+import { scrollToAnchor } from "@/lib/scrollToAnchor";
 
 const NAV_LINK_CLASS_NAME = "group block py-1 font-display text-h3 font-semibold uppercase";
 
@@ -30,7 +30,7 @@ export function MobileMenu({ className }: { className?: string }) {
       onOpenChange={setOpen}
       onOpenChangeComplete={(isOpen) => {
         if (isOpen || !pendingTarget.current) return;
-        useScroll.getState().scrollTo(pendingTarget.current === "#top" ? 0 : pendingTarget.current);
+        scrollToAnchor(pendingTarget.current);
         pendingTarget.current = null;
       }}
     >

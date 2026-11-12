@@ -2,7 +2,7 @@
 
 import type { AnchorHTMLAttributes, MouseEvent } from "react";
 
-import { useScroll } from "@/stores/scroll";
+import { scrollToAnchor } from "@/lib/scrollToAnchor";
 
 type ScrollLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & { href: `#${string}` };
 
@@ -21,7 +21,7 @@ export function ScrollLink({ href, onClick, ...props }: ScrollLinkProps) {
       return;
     }
     event.preventDefault();
-    useScroll.getState().scrollTo(href === "#top" ? 0 : href);
+    scrollToAnchor(href);
     history.replaceState(null, "", href === "#top" ? location.pathname : href);
   };
 

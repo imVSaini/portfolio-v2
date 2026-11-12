@@ -388,6 +388,10 @@ html.dark[data-accent="red"] {
     outline-offset: 2px;
   }
 
+  [tabindex="-1"]:focus-visible {
+    outline: none;
+  }
+
   .dark,
   .dark * {
     scrollbar-color: var(--line-strong) transparent;
