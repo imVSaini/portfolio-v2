@@ -186,6 +186,45 @@ There is no `tailwind.config`. The design system lives in `src/app/globals.css` 
   `window.scrollTo` directly. The store swaps in the smooth scroller when it boots.
 - Animate `transform` and `opacity`. Avoid animating layout properties.
 
+## End-to-end tests (Playwright)
+
+Tests live in `e2e/` and run against the production build (`next build` then `next start` on port
+3200, started by `playwright.config.ts`). A server already on that port is reused locally, so
+rebuild and restart it after changing app code.
+
+- `npm run test:e2e`: everything. `npm run test:e2e:fast`: `http`, `document` and `chromium` only.
+- `npm run test:e2e:ui`: UI mode. `npm run test:e2e:report`: open the last HTML report.
+- One file or test: `npx playwright test e2e/ui/post.spec.ts --project=chromium -g "contents"`.
+
+### Projects
+
+- `http` (`e2e/http`): status codes, headers, feeds and markdown routes through `request`, no
+  browser.
+- `document` (`e2e/document`): the server-rendered HTML with JavaScript off (metadata, JSON-LD,
+  links, content). This is what crawlers and no-script readers get.
+- `chromium`, `firefox`, `webkit`, `mobile-chrome`, `mobile-safari` (`e2e/ui`): behaviour in a real
+  browser. Every UI spec runs on all five, so branch on the `layout` fixture
+  (`"phone" | "tablet" | "desktop"`) rather than on a project name.
+
+### Writing tests
+
+- Import `test` and `expect` from `e2e/fixtures.ts` in UI specs. Open pages with the `visit`
+  fixture: it waits for `html[data-motion-ready]`, the hydration signal. The intro is skipped
+  unless a spec sets `test.use({ intro: "play" })`.
+- Read expectations from `src/data` and `e2e/routes.ts` instead of repeating copy, slugs or counts.
+- Locate by role and accessible name. `RollText` and `RevealText` split their text into
+  `aria-hidden` glyphs and words, so match headings with `\s*` between words or by accessible name.
+- Use web-first assertions and `expect.poll`. No `waitForTimeout` to wait for an animation, and no
+  pixel snapshots.
+- Next.js keeps visited routes mounted but hidden (`<Activity>`), so after a client-side navigation
+  `page.locator("main")` can match two elements. Use `getByRole` or `.filter({ visible: true })`.
+- Click in-page links that sit below the fold with `clickWhenSettled()`. Playwright's own
+  scroll-into-view races the smooth scroller and the link lands short.
+- A test that documents a known app defect uses `test.fail(condition, reason)`; fixing the defect
+  then fails the test until the marker is removed. Use `test.fixme` only when the defect is
+  timing-dependent. Do not weaken an assertion to make a defect pass.
+- Motion-off behaviour is tested with `test.use({ contextOptions: { reducedMotion: "reduce" } })`.
+
 ## Commit messages
 
 Commit messages must pass commitlint (`.commitlintrc`, Conventional Commits). The `commit-msg`

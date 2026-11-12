@@ -4,13 +4,16 @@ Next.js 16 (App Router, Turbopack), TypeScript (strict), Tailwind CSS v4, Zustan
 
 ## Scripts
 
-| Command            | What it does                                |
-| ------------------ | ------------------------------------------- |
-| `npm run dev`      | Dev server                                  |
-| `npm run build`    | Production build (fully static)             |
-| `npm run check`    | Typecheck + ESLint + Prettier check         |
-| `npm run lint:fix` | ESLint autofix (incl. Tailwind class rules) |
-| `npm run format`   | Prettier write (sorts Tailwind classes)     |
+| Command                 | What it does                                       |
+| ----------------------- | -------------------------------------------------- |
+| `npm run dev`           | Dev server                                         |
+| `npm run build`         | Production build (fully static)                    |
+| `npm run check`         | Typecheck + ESLint + Prettier check                |
+| `npm run lint:fix`      | ESLint autofix (incl. Tailwind class rules)        |
+| `npm run format`        | Prettier write (sorts Tailwind classes)            |
+| `npm run test:e2e`      | Playwright end-to-end tests (all browsers)         |
+| `npm run test:e2e:fast` | Playwright: HTTP, no-JS document and Chromium only |
+| `npm run test:e2e:ui`   | Playwright UI mode                                 |
 
 ## Where things live
 
