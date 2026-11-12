@@ -1,11 +1,12 @@
 import { expect, test } from "@playwright/test";
 
 import { blog } from "@/data/blog";
+import { caseStudies } from "@/data/caseStudies";
 import { contact } from "@/data/contact";
 import { posts } from "@/data/posts";
 import { site } from "@/data/site";
 
-import { getCanonical, PAGE_ROUTES } from "../routes";
+import { getCanonical, getCaseStudyPath, PAGE_ROUTES } from "../routes";
 
 function matchAll(source: string, pattern: RegExp): string[] {
   return [...source.matchAll(pattern)].flatMap((match) => match[1] ?? []);
@@ -130,7 +131,7 @@ test.describe("robots.txt", () => {
 });
 
 test.describe("llms.txt", () => {
-  test("indexes the profile and every post as Markdown", async ({ request }) => {
+  test("indexes the profile, every case study and every post as Markdown", async ({ request }) => {
     const response = await request.get("/llms.txt");
     const text = await response.text();
 
@@ -139,23 +140,37 @@ test.describe("llms.txt", () => {
     expect(text.startsWith(`# ${site.name}\n`)).toBe(true);
     expect(text).toContain("## Profile");
     expect(text).toContain("## Blog");
+    expect(text).toContain("## Case studies");
     expect(text).toContain("## Optional");
     expect(text).toContain(`(${site.url}/index.md)`);
     for (const post of posts) {
       expect(text).toContain(`[${post.title}](${site.url}/blog/${post.slug}/index.md)`);
+    }
+    for (const study of caseStudies) {
+      expect(text).toContain(
+        `[${study.title}](${getCanonical(getCaseStudyPath(study))}/index.md): ${study.headline}`,
+      );
     }
     for (const link of contact.links) {
       expect(text).toContain(link.href);
     }
   });
 
-  test("llms-full.txt carries the profile and the full text of every post", async ({ request }) => {
+  test("llms-full.txt carries the profile and the full text of every study and post", async ({
+    request,
+  }) => {
     const response = await request.get("/llms-full.txt");
     const text = await response.text();
 
     expect(response.status()).toBe(200);
     expect(response.headers()["content-type"]).toBe("text/plain; charset=utf-8");
     expect(text.startsWith(`# ${site.fullName}\n`)).toBe(true);
+    for (const study of caseStudies) {
+      expect(text).toContain(`# ${study.title} case study`);
+      for (const decision of study.decisions) {
+        expect(text).toContain(`### ${decision.title}`);
+      }
+    }
     for (const post of posts) {
       expect(text).toContain(`# ${post.title}`);
       for (const block of post.body) {

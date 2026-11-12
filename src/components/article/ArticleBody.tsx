@@ -1,10 +1,11 @@
-import { CodeBlock } from "@/components/blog/CodeBlock";
-import { PostDiagram } from "@/components/blog/PostDiagram";
-import { QuoteIcon } from "@/components/blog/PostIcons";
+import type { ReactNode } from "react";
+
+import { CodeBlock } from "@/components/article/CodeBlock";
+import { QuoteIcon } from "@/components/article/QuoteIcon";
 import { SparkIcon } from "@/components/ui/SparkIcon";
-import type { PostBlock } from "@/data/posts";
+import type { DiagramBlock, TextBlock } from "@/data/article";
+import { getHeadingId } from "@/lib/article";
 import { cn } from "@/lib/cn";
-import { getHeadingId } from "@/lib/posts";
 
 function Inline({ text }: { text: string }) {
   return (
@@ -25,7 +26,14 @@ function Inline({ text }: { text: string }) {
   );
 }
 
-function Block({ block }: { block: PostBlock }) {
+type DiagramProps<Name extends string> = Omit<DiagramBlock<Name>, "type">;
+
+type BlockProps<Name extends string> = {
+  block: TextBlock | DiagramBlock<Name>;
+  Diagram: (props: DiagramProps<Name>) => ReactNode;
+};
+
+function Block<Name extends string>({ block, Diagram }: BlockProps<Name>) {
   switch (block.type) {
     case "heading":
       return (
@@ -64,20 +72,25 @@ function Block({ block }: { block: PostBlock }) {
     case "code":
       return <CodeBlock language={block.language} code={block.code} />;
     case "diagram":
-      return <PostDiagram name={block.name} caption={block.caption} alt={block.alt} />;
+      return <Diagram name={block.name} caption={block.caption} alt={block.alt} />;
   }
 }
 
-type PostBodyProps = {
-  blocks: PostBlock[];
+type ArticleBodyProps<Name extends string> = {
+  blocks: (TextBlock | DiagramBlock<Name>)[];
+  Diagram: (props: DiagramProps<Name>) => ReactNode;
   className?: string;
 };
 
-export function PostBody({ blocks, className }: PostBodyProps) {
+export function ArticleBody<Name extends string>({
+  blocks,
+  Diagram,
+  className,
+}: ArticleBodyProps<Name>) {
   return (
     <div className={cn("flex min-w-0 flex-col gap-6 text-prose", className)}>
       {blocks.map((block, i) => (
-        <Block key={i} block={block} />
+        <Block key={i} block={block} Diagram={Diagram} />
       ))}
     </div>
   );

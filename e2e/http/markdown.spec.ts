@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test";
 
+import { caseStudies } from "@/data/caseStudies";
 import { posts } from "@/data/posts";
 import { site } from "@/data/site";
 
-import { getFirstPost } from "../routes";
+import { getCanonical, getCaseStudyPath, getFirstCaseStudy, getFirstPost } from "../routes";
 
 const MARKDOWN = "text/markdown; charset=utf-8";
 
@@ -41,19 +42,52 @@ test.describe("markdown twins", () => {
     });
   }
 
-  test("an unknown post has no markdown twin", async ({ request }) => {
-    const response = await request.get("/blog/nope/index.md");
+  for (const study of caseStudies) {
+    const path = getCaseStudyPath(study);
 
-    expect(response.status()).toBe(404);
-    expect(response.headers()["content-type"]).toContain("text/plain");
-  });
+    test(`${path}/index.md serves the case study`, async ({ request }) => {
+      const response = await request.get(`${path}/index.md`);
+      const headers = response.headers();
+      const text = await response.text();
+      const url = getCanonical(path);
+
+      expect(response.status()).toBe(200);
+      expect(headers["content-type"]).toBe(MARKDOWN);
+      expect(headers["vary"]).toContain("Accept");
+      expect(headers["link"]).toBe(`<${url}>; rel="canonical"`);
+      expect(text.startsWith(`# ${study.title} case study\n`)).toBe(true);
+      expect(text).toContain(`> ${study.headline}`);
+      expect(text).toContain(`Canonical: ${url}`);
+      expect(text).toContain(`Stack: ${study.stack.join(", ")}.`);
+      for (const block of [...study.overview, ...study.outcome]) {
+        if (block.type === "heading") expect(text).toContain(`## ${block.text}`);
+        if (block.type === "code") expect(text).toContain("```" + block.language);
+      }
+      for (const decision of study.decisions) {
+        expect(text).toContain(`### ${decision.title}`);
+        expect(text).toContain(`**What I chose.** ${decision.chose}`);
+        expect(text).toContain(`**What it cost.** ${decision.cost}`);
+      }
+    });
+  }
+
+  for (const path of ["/blog/nope/index.md", "/case-studies/nope/index.md"]) {
+    test(`${path} does not exist`, async ({ request }) => {
+      const response = await request.get(path);
+
+      expect(response.status()).toBe(404);
+      expect(response.headers()["content-type"]).toContain("text/plain");
+    });
+  }
 });
 
 test.describe("content negotiation", () => {
   const post = getFirstPost();
+  const study = getCaseStudyPath(getFirstCaseStudy());
   const cases = [
     { path: "/", twin: "/index.md" },
     { path: `/blog/${post.slug}`, twin: `/blog/${post.slug}/index.md` },
+    { path: study, twin: `${study}/index.md` },
   ];
 
   for (const { path, twin } of cases) {

@@ -1,4 +1,5 @@
-import { code, diagram, h2, p, quote, ul, type PostSource } from "@/data/posts/schema";
+import { code, h2, p, quote, ul } from "@/data/article";
+import { diagram, type PostSource } from "@/data/posts/schema";
 
 export const kubernetesFit: PostSource = {
   slug: "do-you-really-need-kubernetes",

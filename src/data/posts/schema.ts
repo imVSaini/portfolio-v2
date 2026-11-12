@@ -1,13 +1,7 @@
+import type { DiagramBlock, TextBlock } from "@/data/article";
 import type { ProjectTint } from "@/data/projects";
 
-/** Paragraph and list text may wrap inline code in backticks. */
-export type PostBlock =
-  | { type: "heading"; text: string }
-  | { type: "paragraph"; text: string }
-  | { type: "list"; items: string[] }
-  | { type: "quote"; text: string }
-  | { type: "code"; language: string; code: string }
-  | { type: "diagram"; name: PostDiagramName; caption: string; alt: string };
+export type PostBlock = TextBlock | DiagramBlock<PostDiagramName>;
 
 /** Line drawing set inside an article; each name maps to a drawing in `PostDiagram`. */
 export type PostDiagramName =
@@ -56,26 +50,6 @@ export type Post = PostSource & {
   /** Derived from the word count of `body`. */
   readMinutes: number;
 };
-
-export function h2(text: string): PostBlock {
-  return { type: "heading", text };
-}
-
-export function p(text: string): PostBlock {
-  return { type: "paragraph", text };
-}
-
-export function ul(...items: string[]): PostBlock {
-  return { type: "list", items };
-}
-
-export function quote(text: string): PostBlock {
-  return { type: "quote", text };
-}
-
-export function code(language: string, source: string): PostBlock {
-  return { type: "code", language, code: source.trim() };
-}
 
 export function diagram(name: PostDiagramName, caption: string, alt: string): PostBlock {
   return { type: "diagram", name, caption, alt };

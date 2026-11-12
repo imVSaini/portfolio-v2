@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 
 import { posts, type Post } from "@/data/posts";
 import { site } from "@/data/site";
-import { getHeadingId } from "@/lib/posts";
+import { getHeadingId } from "@/lib/article";
 
 import {
   clickWhenSettled,

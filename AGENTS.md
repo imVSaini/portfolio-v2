@@ -17,8 +17,10 @@ for accessible primitives.
 ## Layout
 
 - `src/app`: routes, root layout, `globals.css` (the design system) and self-hosted fonts.
-- `src/components`: `layout`, `sections`, `motion`, `scroll`, `ui`, `appearance`, `blog`.
-- `src/data`: typed site content (projects, experience, skills, contact, site meta, blog posts).
+- `src/components`: `layout`, `sections`, `motion`, `scroll`, `ui`, `appearance`, `article`,
+  `blog`, `caseStudies`.
+- `src/data`: typed site content (projects, experience, skills, contact, site meta, blog posts,
+  case studies).
 - `src/lib`: shared helpers (`cn`, the `gsap` setup, appearance).
 - `src/hooks`, `src/stores`: React hooks and zustand stores.
 
@@ -111,7 +113,8 @@ guide in `node_modules/next/dist/docs/` before using a Next.js API you have not 
 - Declare props as `type ThingProps = { ... }` above the component and destructure them in the
   signature, with defaults there (`on = "scroll"`).
 - Folders: `layout/` (page chrome), `sections/` (page sections), `motion/` (reusable animation),
-  `scroll/` (smooth scroll), `ui/` (primitives), `appearance/` (theme controls).
+  `scroll/` (smooth scroll), `ui/` (primitives), `appearance/` (theme controls), `article/`
+  (body, contents, share and diagram pieces shared by blog posts and case studies).
 - Content that repeats or might change (projects, skills, links, site meta) lives in
   `src/data/*.ts` as typed data. Components read it rather than hard-coding it.
 - For accessible primitives (menus, popovers, toggles) use `@base-ui/react` rather than building

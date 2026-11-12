@@ -1,17 +1,20 @@
+import type { DiagramBlock, TextBlock } from "@/data/article";
 import { blog } from "@/data/blog";
+import { caseStudies, type CaseStudy } from "@/data/caseStudies";
 import { contact } from "@/data/contact";
 import { experience } from "@/data/experience";
-import { posts, type Post, type PostBlock } from "@/data/posts";
+import { posts, type Post } from "@/data/posts";
 import { projects } from "@/data/projects";
 import { site } from "@/data/site";
 import { skillGroups } from "@/data/skills";
+import { DECISIONS_HEADING, getCaseStudyPath } from "@/lib/caseStudies";
 import { formatPostDate } from "@/lib/posts";
 
 function absolute(path: `/${string}`) {
   return new URL(path, site.url).href;
 }
 
-function renderBlock(block: PostBlock) {
+function renderBlock(block: TextBlock | DiagramBlock<string>) {
   switch (block.type) {
     case "heading":
       return `## ${block.text}`;
@@ -69,6 +72,61 @@ export function getPostMarkdown(post: Post): string {
     `By ${site.name}, ${site.role}. Published ${formatPostDate(post.date)}${updated}. ${post.topic}, ${post.readMinutes} min read.`,
     `Canonical: ${absolute(`/blog/${post.slug}`)}`,
     ...post.body.map(renderBlock),
+  ].join("\n\n");
+}
+
+/**
+ * Builds the site-relative URL of a case study's Markdown version.
+ *
+ * @param study - The case study to link to.
+ * @returns The `index.md` path that sits under the study's own URL.
+ *
+ * @example
+ * ```ts
+ * getCaseStudyMarkdownPath(study);
+ * // => "/case-studies/workorbit/index.md"
+ * ```
+ */
+export function getCaseStudyMarkdownPath(study: CaseStudy): `/${string}` {
+  return `${getCaseStudyPath(study)}/index.md`;
+}
+
+/**
+ * Renders a case study as standalone Markdown for language models and other plain-text readers.
+ *
+ * @param study - The case study to render.
+ * @returns The title, byline, canonical link, facts, prose and decisions as Markdown.
+ *
+ * @example
+ * ```ts
+ * return textResponse(getCaseStudyMarkdown(study), {
+ *   type: "markdown",
+ *   canonical: getCaseStudyPath(study),
+ * });
+ * ```
+ */
+export function getCaseStudyMarkdown(study: CaseStudy): string {
+  const decisions = study.decisions.map((decision) =>
+    [
+      `### ${decision.title}`,
+      decision.context,
+      `**What I chose.** ${decision.chose}`,
+      `**What it cost.** ${decision.cost}`,
+    ].join("\n\n"),
+  );
+
+  return [
+    `# ${study.title} case study`,
+    `> ${study.headline}`,
+    `By ${site.name}, ${site.role}. Published ${formatPostDate(study.date)}. ${study.category}.`,
+    `Canonical: ${absolute(getCaseStudyPath(study))}`,
+    study.facts.map((fact) => `- **${fact.label}**: ${fact.value}`).join("\n"),
+    study.metrics.map((metric) => `- **${metric.value}**: ${metric.label}`).join("\n"),
+    `Stack: ${study.stack.join(", ")}.`,
+    ...study.overview.map(renderBlock),
+    `## ${DECISIONS_HEADING}`,
+    ...decisions,
+    ...study.outcome.map(renderBlock),
   ].join("\n\n");
 }
 
@@ -143,7 +201,8 @@ export function getLlmsTxt(): string {
       `${site.fullName} is a ${site.role.toLowerCase()} in ${site.location}`,
       current ? `, currently ${current.title} at ${current.company}. ` : ". ",
       "The blog covers backend architecture, performance and frontend craft, written from products ",
-      "running in production. Every link below is Markdown; HTML pages live at the same URL without ",
+      "running in production, and the case studies walk through how individual products were built ",
+      "and what each decision cost. Every link below is Markdown; HTML pages live at the same URL without ",
       "the trailing `index.md`.",
     ].join(""),
     "## Profile",
@@ -152,9 +211,16 @@ export function getLlmsTxt(): string {
     posts
       .map((post) => `- [${post.title}](${absolute(getPostMarkdownPath(post))}): ${post.excerpt}`)
       .join("\n"),
+    "## Case studies",
+    caseStudies
+      .map(
+        (study) =>
+          `- [${study.title}](${absolute(getCaseStudyMarkdownPath(study))}): ${study.headline}`,
+      )
+      .join("\n"),
     "## Optional",
     [
-      `- [Full text](${absolute("/llms-full.txt")}): The profile and every post in one file.`,
+      `- [Full text](${absolute("/llms-full.txt")}): The profile, every case study and every post in one file.`,
       `- [RSS feed](${blog.feedUrl}): ${blog.description}`,
       ...contact.links.map((link) => `- [${link.label}](${link.href}): ${link.handle}`),
     ].join("\n"),
@@ -162,10 +228,10 @@ export function getLlmsTxt(): string {
 }
 
 /**
- * Builds `/llms-full.txt`: the profile followed by every post, so a model can read the whole site
- * in one request.
+ * Builds `/llms-full.txt`: the profile, the case studies and every post, so a model can read the
+ * whole site in one request.
  *
- * @returns The profile and all posts as one Markdown document, newest post first.
+ * @returns The profile, all case studies and all posts as one Markdown document.
  *
  * @example
  * ```ts
@@ -175,5 +241,9 @@ export function getLlmsTxt(): string {
  * ```
  */
 export function getLlmsFullTxt(): string {
-  return [getProfileMarkdown(), ...posts.map(getPostMarkdown)].join("\n\n---\n\n");
+  return [
+    getProfileMarkdown(),
+    ...caseStudies.map(getCaseStudyMarkdown),
+    ...posts.map(getPostMarkdown),
+  ].join("\n\n---\n\n");
 }

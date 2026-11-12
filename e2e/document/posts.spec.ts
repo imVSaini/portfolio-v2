@@ -3,7 +3,8 @@ import { expect, test } from "@playwright/test";
 import { contact } from "@/data/contact";
 import { posts, type Post } from "@/data/posts";
 import { site } from "@/data/site";
-import { formatPostDate, getHeadingId } from "@/lib/posts";
+import { getHeadingId } from "@/lib/article";
+import { formatPostDate } from "@/lib/posts";
 
 import { getCanonical, getPostPath } from "../routes";
 

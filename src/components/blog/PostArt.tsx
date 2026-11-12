@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 
-import { ArrowHead, barPath, Label } from "@/components/blog/PostArtParts";
+import { ArrowHead, barPath, Label } from "@/components/article/ArtParts";
 import type { PostArtName } from "@/data/posts";
 import { cn } from "@/lib/cn";
 

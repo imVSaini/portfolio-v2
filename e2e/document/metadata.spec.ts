@@ -1,10 +1,18 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { blog } from "@/data/blog";
+import { caseStudies, caseStudiesPage } from "@/data/caseStudies";
 import { posts } from "@/data/posts";
 import { site } from "@/data/site";
 
-import { getCanonical, getFirstPost, getPostPath, PAGE_ROUTES, STATIC_ROUTES } from "../routes";
+import {
+  getCanonical,
+  getCaseStudyPath,
+  getFirstPost,
+  getPostPath,
+  PAGE_ROUTES,
+  STATIC_ROUTES,
+} from "../routes";
 
 type PageMeta = {
   path: string;
@@ -16,9 +24,16 @@ type PageMeta = {
 const HOME_TITLE = `${site.name} — ${site.role}`;
 const DEFAULT_CARD = `${site.url}${site.ogImage.url}`;
 const FEED_TITLE = `${blog.title} — ${site.name}`;
+const CASE_STUDIES_TITLE = `${caseStudiesPage.title} — ${site.name}`;
 
 const STATIC_PAGES: PageMeta[] = [
   { path: "/", title: HOME_TITLE, socialTitle: HOME_TITLE, description: site.description },
+  {
+    path: caseStudiesPage.path,
+    title: CASE_STUDIES_TITLE,
+    socialTitle: CASE_STUDIES_TITLE,
+    description: caseStudiesPage.description,
+  },
   { path: "/blog", title: FEED_TITLE, socialTitle: FEED_TITLE, description: blog.description },
   {
     path: "/privacy",
@@ -26,6 +41,13 @@ const STATIC_PAGES: PageMeta[] = [
     socialTitle: `Privacy policy — ${site.name}`,
   },
 ];
+
+const CASE_STUDY_PAGES: PageMeta[] = caseStudies.map((study) => ({
+  path: getCaseStudyPath(study),
+  title: `${study.title} case study — ${site.name}`,
+  socialTitle: `${study.title} case study`,
+  description: study.summary,
+}));
 
 const POST_PAGES: PageMeta[] = posts.map((post) => ({
   path: getPostPath(post),
@@ -44,7 +66,11 @@ async function content(page: Page, key: string): Promise<string> {
 }
 
 test.describe("document metadata", () => {
-  for (const { path, title, socialTitle, description } of [...STATIC_PAGES, ...POST_PAGES]) {
+  for (const { path, title, socialTitle, description } of [
+    ...STATIC_PAGES,
+    ...CASE_STUDY_PAGES,
+    ...POST_PAGES,
+  ]) {
     test.describe(path, () => {
       test.beforeEach(async ({ page }) => {
         await page.goto(path);
@@ -141,13 +167,31 @@ test.describe("document metadata", () => {
     });
   }
 
+  for (const study of caseStudies) {
+    const path = getCaseStudyPath(study);
+
+    test(`${path} is an article with the default preview card`, async ({ page }) => {
+      const url = getCanonical(path);
+      await page.goto(path);
+
+      await expect(meta(page, "og:type")).toHaveAttribute("content", "article");
+      await expect(meta(page, "article:published_time")).toHaveAttribute("content", study.date);
+      await expect(meta(page, "article:author")).toHaveAttribute("content", site.name);
+      await expect(meta(page, "og:image")).toHaveAttribute("content", DEFAULT_CARD);
+      await expect(meta(page, "og:image:alt")).toHaveAttribute("content", site.ogImage.alt);
+      await expect(
+        page.locator('head link[rel="alternate"][type="text/markdown"]'),
+      ).toHaveAttribute("href", `${url}/index.md`);
+    });
+  }
+
   test("only pages with a Markdown twin advertise one", async ({ page }) => {
     const twin = page.locator('head link[rel="alternate"][type="text/markdown"]');
 
     await page.goto("/");
     await expect(twin).toHaveAttribute("href", `${site.url}/index.md`);
 
-    for (const path of ["/blog", "/privacy"]) {
+    for (const path of [caseStudiesPage.path, "/blog", "/privacy"]) {
       await page.goto(path);
       await expect(twin).toHaveCount(0);
     }

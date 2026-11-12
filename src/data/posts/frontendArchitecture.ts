@@ -1,4 +1,5 @@
-import { code, diagram, h2, p, ul, type PostSource } from "@/data/posts/schema";
+import { code, h2, p, ul } from "@/data/article";
+import { diagram, type PostSource } from "@/data/posts/schema";
 
 export const frontendArchitecture: PostSource = {
   slug: "frontend-architecture-that-stays-maintainable",

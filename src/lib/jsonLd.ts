@@ -1,7 +1,9 @@
 import { blog } from "@/data/blog";
+import { caseStudiesPage, type CaseStudy } from "@/data/caseStudies";
 import { contact } from "@/data/contact";
 import type { Post } from "@/data/posts";
 import { site } from "@/data/site";
+import { getCaseStudyPath } from "@/lib/caseStudies";
 import { getPostImageUrl } from "@/lib/posts";
 
 type NodeReference = { "@id": string };
@@ -63,6 +65,21 @@ type BlogPostingNode = NodeReference & {
   isPartOf: NodeReference;
 };
 
+type ArticleNode = NodeReference & {
+  "@type": "Article";
+  headline: string;
+  description: string;
+  image: string;
+  datePublished: CaseStudy["date"];
+  articleSection: string;
+  keywords: string;
+  inLanguage: string;
+  url: string;
+  mainEntityOfPage: NodeReference;
+  author: PersonNode;
+  publisher: NodeReference;
+};
+
 type BreadcrumbNode = NodeReference & {
   "@type": "BreadcrumbList";
   itemListElement: {
@@ -73,9 +90,26 @@ type BreadcrumbNode = NodeReference & {
   }[];
 };
 
+type ItemListNode = NodeReference & {
+  "@type": "ItemList";
+  itemListElement: {
+    "@type": "ListItem";
+    position: number;
+    name: string;
+    url: string;
+  }[];
+};
+
 /** The subset of Schema.org used by this site's page graphs. */
 export type JsonLdNode =
-  PersonNode | WebSiteNode | BlogNode | WebPageNode | BlogPostingNode | BreadcrumbNode;
+  | PersonNode
+  | WebSiteNode
+  | BlogNode
+  | WebPageNode
+  | BlogPostingNode
+  | ArticleNode
+  | BreadcrumbNode
+  | ItemListNode;
 
 type Crumb = {
   name: string;
@@ -315,5 +349,99 @@ export function getPostJsonLd(post: Post): JsonLdNode[] {
       { name: post.title, url },
     ]),
     article,
+  ];
+}
+
+/**
+ * Builds the case studies index graph from the studies listed on that page.
+ *
+ * @param studies - The visible case studies in display order.
+ * @returns The collection page, its breadcrumbs, the ordered list and shared entities.
+ * @example
+ * ```tsx
+ * <JsonLd nodes={getCaseStudiesJsonLd(caseStudies)} />
+ * ```
+ */
+export function getCaseStudiesJsonLd(studies: readonly CaseStudy[]): JsonLdNode[] {
+  const url = `${site.url}${caseStudiesPage.path}`;
+
+  return [
+    ...getSiteNodes(),
+    {
+      "@type": "CollectionPage",
+      "@id": url,
+      url,
+      name: `${caseStudiesPage.title} — ${site.name}`,
+      description: caseStudiesPage.description,
+      inLanguage: "en-IN",
+      isPartOf: { "@id": JSON_LD_IDS.website },
+      mainEntity: { "@id": `${url}#list` },
+      breadcrumb: { "@id": `${url}#breadcrumb` },
+    },
+    getBreadcrumbNode(`${url}#breadcrumb`, [
+      { name: "Home", url: site.url },
+      { name: caseStudiesPage.title, url },
+    ]),
+    {
+      "@type": "ItemList",
+      "@id": `${url}#list`,
+      itemListElement: studies.map((study, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: study.title,
+        url: `${site.url}${getCaseStudyPath(study)}`,
+      })),
+    },
+  ];
+}
+
+/**
+ * Builds a case study's graph from the same data used to render its page.
+ *
+ * @param study - The case study displayed on the current route.
+ * @returns The article, page, breadcrumbs and shared entities.
+ * @example
+ * ```tsx
+ * <JsonLd nodes={getCaseStudyJsonLd(study)} />
+ * ```
+ */
+export function getCaseStudyJsonLd(study: CaseStudy): JsonLdNode[] {
+  const url = `${site.url}${getCaseStudyPath(study)}`;
+  const image = `${site.url}${site.ogImage.url}`;
+
+  return [
+    ...getSiteNodes(),
+    {
+      "@type": "WebPage",
+      "@id": url,
+      url,
+      name: `${study.title} case study`,
+      description: study.summary,
+      inLanguage: "en-IN",
+      isPartOf: { "@id": JSON_LD_IDS.website },
+      mainEntity: { "@id": `${url}#article` },
+      breadcrumb: { "@id": `${url}#breadcrumb` },
+      primaryImageOfPage: { "@type": "ImageObject", url: image },
+    },
+    getBreadcrumbNode(`${url}#breadcrumb`, [
+      { name: "Home", url: site.url },
+      { name: caseStudiesPage.title, url: `${site.url}${caseStudiesPage.path}` },
+      { name: study.title, url },
+    ]),
+    {
+      "@type": "Article",
+      "@id": `${url}#article`,
+      headline: `${study.title} case study`,
+      description: study.summary,
+      image,
+      datePublished: study.date,
+      articleSection: study.category,
+      keywords: study.stack.join(", "),
+      inLanguage: "en-IN",
+      url,
+      mainEntityOfPage: { "@id": url },
+      author: { "@type": "Person", "@id": JSON_LD_IDS.person, name: site.name, url: site.url },
+      publisher: { "@id": JSON_LD_IDS.person },
+    },
   ];
 }

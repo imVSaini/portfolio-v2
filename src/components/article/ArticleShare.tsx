@@ -42,14 +42,14 @@ function CheckIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-type PostShareProps = {
+type ArticleShareProps = {
   url: string;
   title: string;
   label?: string;
   className?: string;
 };
 
-export function PostShare({ url, title, label = "Share", className }: PostShareProps) {
+export function ArticleShare({ url, title, label = "Share", className }: ArticleShareProps) {
   const target = encodeURIComponent(url);
   const networks = [
     {

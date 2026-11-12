@@ -1,4 +1,5 @@
-import { code, diagram, h2, p, ul, type PostSource } from "@/data/posts/schema";
+import { code, h2, p, ul } from "@/data/article";
+import { diagram, type PostSource } from "@/data/posts/schema";
 
 export const databasePerformance: PostSource = {
   slug: "database-performance-beyond-clean-code",

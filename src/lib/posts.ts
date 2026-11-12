@@ -25,25 +25,6 @@ export function formatPostDate(date: Post["date"]): string {
 }
 
 /**
- * Builds the anchor id of a heading inside a post, shared by the body and its table of contents.
- *
- * @param text - The heading text.
- * @returns A lower-case, hyphenated id.
- *
- * @example
- * ```ts
- * getHeadingId("What you actually buy");
- * // => "what-you-actually-buy"
- * ```
- */
-export function getHeadingId(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-/**
  * Builds the absolute URL of a post's own cover image when one is available.
  *
  * @param post - The post to describe.

@@ -27,6 +27,7 @@ export const nav = [
   { kind: "section", label: "Work", href: "#work" },
   { kind: "section", label: "Experience", href: "#experience" },
   { kind: "section", label: "Skills", href: "#skills" },
+  { kind: "page", label: "Case studies", href: "/case-studies" },
   { kind: "page", label: "Blog", href: "/blog" },
   { kind: "section", label: "Contact", href: "#contact" },
 ] as const satisfies readonly NavItem[];

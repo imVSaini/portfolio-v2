@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         { source: "/", destination: "/index.md", has: acceptsMarkdown },
         { source: "/blog/:slug", destination: "/blog/:slug/index.md", has: acceptsMarkdown },
+        {
+          source: "/case-studies/:slug",
+          destination: "/case-studies/:slug/index.md",
+          has: acceptsMarkdown,
+        },
       ],
     };
   },

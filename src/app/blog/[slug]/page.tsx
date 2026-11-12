@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ArticleBody } from "@/components/article/ArticleBody";
+import { ArticleShare } from "@/components/article/ArticleShare";
+import { ArticleToc } from "@/components/article/ArticleToc";
 import { PostAuthor } from "@/components/blog/PostAuthor";
 import { PostAuthorCard } from "@/components/blog/PostAuthorCard";
-import { PostBody } from "@/components/blog/PostBody";
 import { PostBreadcrumbs } from "@/components/blog/PostBreadcrumbs";
 import { PostCard } from "@/components/blog/PostCard";
 import { PostCover } from "@/components/blog/PostCover";
-import { PostShare } from "@/components/blog/PostShare";
-import { PostToc } from "@/components/blog/PostToc";
+import { PostDiagram } from "@/components/blog/PostDiagram";
 import { PageShell } from "@/components/layout/PageShell";
 import { RevealText } from "@/components/motion/RevealText";
 import { RollText } from "@/components/motion/RollText";
@@ -119,8 +120,8 @@ function PostContent({ post }: { post: Post }) {
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
           <aside className="lg:order-2 lg:col-span-3 lg:col-start-10">
             <div className="flex flex-col gap-10 lg:sticky lg:top-[calc(var(--header-h)+2rem)]">
-              {headings.length > 0 && <PostToc headings={headings} />}
-              <PostShare
+              {headings.length > 0 && <ArticleToc headings={headings} />}
+              <ArticleShare
                 url={url}
                 title={post.title}
                 className="flex-col items-start border-t border-line pt-8"
@@ -128,7 +129,7 @@ function PostContent({ post }: { post: Post }) {
             </div>
           </aside>
           <div className="flex max-w-prose flex-col gap-12 text-prose lg:col-span-8">
-            <PostBody blocks={post.body} />
+            <ArticleBody blocks={post.body} Diagram={PostDiagram} />
 
             <PostAuthorCard />
           </div>

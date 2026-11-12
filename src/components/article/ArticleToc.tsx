@@ -3,18 +3,18 @@
 import { useEffect, useState } from "react";
 
 import { ScrollLink } from "@/components/scroll/ScrollLink";
+import { getHeadingId } from "@/lib/article";
 import { cn } from "@/lib/cn";
-import { getHeadingId } from "@/lib/posts";
 
 /** A heading counts as current while it sits in the top third of the viewport. */
 const ACTIVE_BAND = "0px 0px -66% 0px";
 
-type PostTocProps = {
+type ArticleTocProps = {
   headings: string[];
   className?: string;
 };
 
-export function PostToc({ headings, className }: PostTocProps) {
+export function ArticleToc({ headings, className }: ArticleTocProps) {
   const [active, setActive] = useState<string>();
 
   useEffect(() => {
