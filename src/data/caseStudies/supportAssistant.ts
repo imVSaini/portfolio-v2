@@ -8,7 +8,7 @@ export const supportAssistant: CaseStudy = {
   headline:
     "An embeddable AI support chatbot that answers from each business’s own documents, captures leads mid-conversation and accounts for every token it spends.",
   summary:
-    "Building an AI support assistant, a multi-tenant RAG chatbot on FastAPI, pgvector and WebSockets: a deny-by-default domain allow-list, per-call cost accounting, and the limits I would lift next.",
+    "Building a multi-tenant RAG support chatbot on FastAPI, pgvector and WebSockets: a domain allow-list, per-call cost accounting and the limits I would lift next.",
   date: "2026-11-12",
   tint: "magenta",
   art: "chat",

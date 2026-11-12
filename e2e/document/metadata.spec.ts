@@ -8,6 +8,7 @@ import { site } from "@/data/site";
 import {
   getCanonical,
   getCaseStudyPath,
+  getFirstCaseStudy,
   getFirstPost,
   getPostPath,
   PAGE_ROUTES,
@@ -170,15 +171,21 @@ test.describe("document metadata", () => {
   for (const study of caseStudies) {
     const path = getCaseStudyPath(study);
 
-    test(`${path} is an article with the default preview card`, async ({ page }) => {
+    test(`${path} is an article with its own preview card`, async ({ page }) => {
       const url = getCanonical(path);
       await page.goto(path);
 
       await expect(meta(page, "og:type")).toHaveAttribute("content", "article");
       await expect(meta(page, "article:published_time")).toHaveAttribute("content", study.date);
       await expect(meta(page, "article:author")).toHaveAttribute("content", site.name);
-      await expect(meta(page, "og:image")).toHaveAttribute("content", DEFAULT_CARD);
-      await expect(meta(page, "og:image:alt")).toHaveAttribute("content", site.ogImage.alt);
+      await expect(meta(page, "og:image:alt")).toHaveAttribute(
+        "content",
+        `${study.title} case study`,
+      );
+      await expect(meta(page, "og:image:type")).toHaveAttribute("content", "image/png");
+      expect(await content(page, "og:image")).toMatch(
+        new RegExp(`^${url}/opengraph-image/card(\\?\\w+)?$`),
+      );
       await expect(
         page.locator('head link[rel="alternate"][type="text/markdown"]'),
       ).toHaveAttribute("href", `${url}/index.md`);
@@ -212,7 +219,7 @@ test.describe("document metadata", () => {
   });
 
   test("preview cards and icons resolve on this host", async ({ page, request }) => {
-    for (const path of ["/", getPostPath(getFirstPost())]) {
+    for (const path of ["/", getPostPath(getFirstPost()), getCaseStudyPath(getFirstCaseStudy())]) {
       await page.goto(path);
       const card = new URL(await content(page, "og:image"));
       const icon = (await page.locator('head link[rel="icon"]').getAttribute("href")) ?? "";

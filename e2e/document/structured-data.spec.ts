@@ -244,7 +244,7 @@ test.describe("structured data", () => {
 
     test(`${path} describes the article and its breadcrumb`, async ({ page }) => {
       const url = getCanonical(path);
-      const image = `${site.url}${site.ogImage.url}`;
+      const image = `${url}/opengraph-image/card`;
       await page.goto(path);
       const graph = await readGraph(page);
 

@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { caseStudies } from "@/data/caseStudies";
 import { posts } from "@/data/posts";
 import { site } from "@/data/site";
 
@@ -42,6 +43,18 @@ test.describe("generated link-preview cards", () => {
   for (const post of posts) {
     test(`${post.slug} has a 1200×630 card`, async ({ request }) => {
       const response = await request.get(`/blog/${post.slug}/opengraph-image/card`);
+      const body = await response.body();
+
+      expect(response.status()).toBe(200);
+      expect(response.headers()["content-type"]).toBe("image/png");
+      expect(body.subarray(0, 8).toString("hex")).toBe(PNG_SIGNATURE);
+      expect(readPngSize(body)).toEqual({ width: 1200, height: 630 });
+    });
+  }
+
+  for (const study of caseStudies) {
+    test(`${study.slug} has a 1200×630 card`, async ({ request }) => {
+      const response = await request.get(`/case-studies/${study.slug}/opengraph-image/card`);
       const body = await response.body();
 
       expect(response.status()).toBe(200);

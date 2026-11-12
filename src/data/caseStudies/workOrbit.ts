@@ -8,7 +8,7 @@ export const workOrbit: CaseStudy = {
   headline:
     "A multi-tenant lead management CRM: a Postgres schema per workspace, scoped roles, an audit log nobody can edit and leads that flow in from Facebook and Instagram ads.",
   summary:
-    "How I built WorkOrbit, a schema-per-tenant CRM on FastAPI and PostgreSQL with scoped permissions, an append-only audit log and Meta Lead Ads ingestion that survives dropped webhooks, and what each decision cost.",
+    "How I built WorkOrbit, a schema-per-tenant CRM on FastAPI and PostgreSQL: scoped roles, an append-only audit log, Meta Lead Ads ingestion and what each cost.",
   date: "2026-11-12",
   tint: "orange",
   art: "pipeline",

@@ -407,7 +407,7 @@ export function getCaseStudiesJsonLd(studies: readonly CaseStudy[]): JsonLdNode[
  */
 export function getCaseStudyJsonLd(study: CaseStudy): JsonLdNode[] {
   const url = `${site.url}${getCaseStudyPath(study)}`;
-  const image = `${site.url}${site.ogImage.url}`;
+  const image = `${url}/opengraph-image/card`;
 
   return [
     ...getSiteNodes(),

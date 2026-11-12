@@ -61,13 +61,11 @@ export async function generateMetadata({
       locale: "en_IN",
       publishedTime: study.date,
       authors: [site.name],
-      images: [site.ogImage],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description: study.summary,
-      images: [site.ogImage],
     },
   };
 }
