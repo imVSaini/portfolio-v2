@@ -8,9 +8,9 @@ import { RollText } from "@/components/motion/RollText";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
 import { Logo } from "@/components/ui/Logo";
 import { socialIcons } from "@/components/ui/SocialIcons";
-import { cn } from "@/lib/cn";
 import { contact } from "@/data/contact";
 import { nav, site } from "@/data/site";
+import { cn } from "@/lib/cn";
 import { getHomeHref } from "@/lib/nav";
 import { useScroll } from "@/stores/scroll";
 

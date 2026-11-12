@@ -69,7 +69,9 @@ The compiler runs `strict` plus `noUncheckedIndexedAccess`, `exactOptionalProper
 - Use the `@/` alias for anything under `src/`. Relative imports are only for siblings such as
   `./globals.css` or `./fonts/...`.
 - Type-only imports use `import type` or an inline `type` specifier (ESLint enforces this).
-- Order groups with a blank line between them: packages, then `@/` modules, then relative files.
+- Order groups with a blank line between them: `node:` builtins, packages, then `@/` modules, then
+  relative files, alphabetical within a group. ESLint (`import/order`) enforces it and
+  `npm run lint:fix` sorts them.
 
 ### Naming
 

@@ -28,7 +28,31 @@ const eslintConfig = defineConfig([
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
+      "import/first": "error",
+      "import/newline-after-import": "error",
+      "import/no-duplicates": "error",
+      "import/no-useless-path-segments": "error",
+      "import/no-self-import": "error",
+      "import/no-cycle": "error",
+      "import/no-default-export": "error",
+      "import/order": [
+        "error",
+        {
+          groups: ["builtin", "external", "internal", ["parent", "sibling", "index"]],
+          pathGroups: [{ pattern: "@/**", group: "internal" }],
+          "newlines-between": "always",
+          alphabetize: { order: "asc", caseInsensitive: true },
+        },
+      ],
     },
+  },
+  {
+    files: [
+      "*.config.ts",
+      "src/app/**/{page,layout,template,loading,error,global-error,not-found,default}.tsx",
+      "src/app/**/{robots,sitemap,manifest,icon,apple-icon,opengraph-image,twitter-image}.{ts,tsx}",
+    ],
+    rules: { "import/no-default-export": "off" },
   },
   prettier,
   globalIgnores([
