@@ -107,6 +107,11 @@
   --animate-twinkle: twinkle 3s ease-in-out infinite;
   --animate-bob: bob 2.4s ease-in-out infinite;
   --animate-flicker: flicker 2.8s linear infinite;
+  /* A dot running the length of its `offset-path`. */
+  --animate-travel: travel 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  /* A bar filling from its left edge, or a column rising from its base. */
+  --animate-grow-x: grow-x 0.9s var(--ease-out-expo) both;
+  --animate-grow-y: grow-y 0.9s var(--ease-out-expo) both;
 
   @keyframes cell {
     0%,
@@ -199,6 +204,31 @@
     }
     58% {
       opacity: 0.4;
+    }
+  }
+
+  @keyframes grow-x {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  @keyframes grow-y {
+    from {
+      transform: scaleY(0);
+    }
+  }
+  @keyframes travel {
+    0% {
+      offset-distance: var(--travel-from, 0%);
+      opacity: 0;
+    }
+    15%,
+    85% {
+      opacity: 1;
+    }
+    100% {
+      offset-distance: var(--travel-to, 100%);
+      opacity: 0;
     }
   }
 

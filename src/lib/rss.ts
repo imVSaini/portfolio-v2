@@ -64,6 +64,8 @@ function renderBlock(block: PostBlock): string {
       return `<blockquote><p>${escapeXml(block.text)}</p></blockquote>`;
     case "code":
       return `<pre><code>${escapeXml(block.code)}</code></pre>`;
+    case "diagram":
+      return `<figure><p>${escapeXml(block.alt)}</p><figcaption>${escapeXml(block.caption)}</figcaption></figure>`;
   }
 }
 
@@ -107,9 +109,7 @@ function renderItem(post: Post): string {
  * ```
  */
 export function getRssFeed(posts: readonly Post[]): string {
-  const latest = [...posts]
-    .sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug))
-    .slice(0, FEED_ITEM_LIMIT);
+  const latest = [...posts].sort((a, b) => b.date.localeCompare(a.date)).slice(0, FEED_ITEM_LIMIT);
   const lastChange = latest
     .map((post) => post.updatedAt ?? post.date)
     .reduce<Post["date"] | null>((newest, day) => (newest && newest > day ? newest : day), null);

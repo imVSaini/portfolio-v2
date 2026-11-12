@@ -1,22 +1,29 @@
-import { auditTrail } from "@/data/posts/auditTrail";
-import { authRecovery } from "@/data/posts/authRecovery";
-import { cachingConsistency } from "@/data/posts/cachingConsistency";
-import { clientBoundary } from "@/data/posts/clientBoundary";
-import { codeReview } from "@/data/posts/codeReview";
-import { llmGuardrails } from "@/data/posts/llmGuardrails";
-import { publicWidget } from "@/data/posts/publicWidget";
-import type { Post, PostArtName, PostBlock, PostSource } from "@/data/posts/schema";
-import { schemaPerTenant } from "@/data/posts/schemaPerTenant";
-import { testSuiteValue } from "@/data/posts/testSuiteValue";
-import { vendorOutbox } from "@/data/posts/vendorOutbox";
+import { databasePerformance } from "@/data/posts/databasePerformance";
+import { deliveryPipeline } from "@/data/posts/deliveryPipeline";
+import { eventDriven } from "@/data/posts/eventDriven";
+import { frontendArchitecture } from "@/data/posts/frontendArchitecture";
+import { frontendPerformance } from "@/data/posts/frontendPerformance";
+import { kubernetesFit } from "@/data/posts/kubernetesFit";
+import { observability } from "@/data/posts/observability";
+import { productionApis } from "@/data/posts/productionApis";
+import type {
+  Post,
+  PostArtName,
+  PostBlock,
+  PostDiagramName,
+  PostSource,
+} from "@/data/posts/schema";
+import { systemDesignTradeoffs } from "@/data/posts/systemDesignTradeoffs";
+import { technicalDebt } from "@/data/posts/technicalDebt";
 
-export type { Post, PostArtName, PostBlock };
+export type { Post, PostArtName, PostBlock, PostDiagramName };
 
 const WORDS_PER_MINUTE = 220;
 
 function blockText(block: PostBlock) {
   if (block.type === "list") return block.items.join(" ");
   if (block.type === "code") return block.code;
+  if (block.type === "diagram") return block.caption;
   return block.text;
 }
 
@@ -26,16 +33,16 @@ function readMinutes(source: PostSource) {
 }
 
 const sources: PostSource[] = [
-  schemaPerTenant,
-  cachingConsistency,
-  vendorOutbox,
-  llmGuardrails,
-  authRecovery,
-  publicWidget,
-  testSuiteValue,
-  auditTrail,
-  codeReview,
-  clientBoundary,
+  systemDesignTradeoffs,
+  productionApis,
+  deliveryPipeline,
+  frontendArchitecture,
+  kubernetesFit,
+  databasePerformance,
+  frontendPerformance,
+  observability,
+  eventDriven,
+  technicalDebt,
 ];
 
 /** Newest first. The first post is featured on the blog index. */

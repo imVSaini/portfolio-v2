@@ -1,4 +1,6 @@
 import { CodeBlock } from "@/components/blog/CodeBlock";
+import { PostDiagram } from "@/components/blog/PostDiagram";
+import { QuoteIcon } from "@/components/blog/PostIcons";
 import { SparkIcon } from "@/components/ui/SparkIcon";
 import type { PostBlock } from "@/data/posts";
 import { cn } from "@/lib/cn";
@@ -54,12 +56,15 @@ function Block({ block }: { block: PostBlock }) {
       );
     case "quote":
       return (
-        <blockquote className="my-2 border-l-2 border-accent pl-6 font-display text-h4 font-medium">
-          {block.text}
+        <blockquote className="my-2 flex flex-col gap-3 font-display text-h4 font-medium sm:flex-row sm:gap-5">
+          <QuoteIcon aria-hidden="true" className="size-[1.4em] shrink-0 text-accent sm:-mt-0.5" />
+          <p>{block.text}</p>
         </blockquote>
       );
     case "code":
       return <CodeBlock language={block.language} code={block.code} />;
+    case "diagram":
+      return <PostDiagram name={block.name} caption={block.caption} alt={block.alt} />;
   }
 }
 

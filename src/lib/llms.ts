@@ -23,6 +23,8 @@ function renderBlock(block: PostBlock) {
       return `> ${block.text}`;
     case "code":
       return `\`\`\`${block.language}\n${block.code}\n\`\`\``;
+    case "diagram":
+      return `**Figure.** ${block.caption} ${block.alt}`;
   }
 }
 
@@ -35,7 +37,7 @@ function renderBlock(block: PostBlock) {
  * @example
  * ```ts
  * getPostMarkdownPath(post);
- * // => "/blog/schema-per-tenant-trade-offs/index.md"
+ * // => "/blog/system-design-is-trade-offs/index.md"
  * ```
  */
 export function getPostMarkdownPath(post: Post): `/${string}` {

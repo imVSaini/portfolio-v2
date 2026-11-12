@@ -6,20 +6,34 @@ export type PostBlock =
   | { type: "paragraph"; text: string }
   | { type: "list"; items: string[] }
   | { type: "quote"; text: string }
-  | { type: "code"; language: string; code: string };
+  | { type: "code"; language: string; code: string }
+  | { type: "diagram"; name: PostDiagramName; caption: string; alt: string };
+
+/** Line drawing set inside an article; each name maps to a drawing in `PostDiagram`. */
+export type PostDiagramName =
+  | "spectrum"
+  | "gates"
+  | "migration"
+  | "layers"
+  | "hosting"
+  | "queryPlan"
+  | "waterfall"
+  | "signals"
+  | "outboxFlow"
+  | "reversal";
 
 /** Line diagram drawn on the cover; each name maps to a drawing in `PostArt`. */
 export type PostArtName =
-  | "tenants"
-  | "cache"
-  | "outbox"
-  | "proposal"
-  | "factors"
-  | "widget"
-  | "pyramid"
-  | "timeline"
-  | "review"
-  | "tree";
+  | "tradeoffs"
+  | "gates"
+  | "pipeline"
+  | "layers"
+  | "cluster"
+  | "queryPlan"
+  | "vitals"
+  | "signals"
+  | "events"
+  | "debt";
 
 export type PostSource = {
   slug: string;
@@ -61,4 +75,8 @@ export function quote(text: string): PostBlock {
 
 export function code(language: string, source: string): PostBlock {
   return { type: "code", language, code: source.trim() };
+}
+
+export function diagram(name: PostDiagramName, caption: string, alt: string): PostBlock {
+  return { type: "diagram", name, caption, alt };
 }

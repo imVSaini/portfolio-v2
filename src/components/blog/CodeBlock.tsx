@@ -80,6 +80,10 @@ const COLORS = {
 type Color = keyof typeof COLORS;
 
 function classifyWord(word: string, before: string, after: string, language: string): Color | null {
+  if (language === "yaml") {
+    if (/^[\w-]*:(\s|$)/.test(after)) return "keyword";
+    return word === "true" || word === "false" ? "number" : null;
+  }
   if (language === "sql") {
     if (/^[A-Z]+$/.test(word) || SQL_TYPES.has(word)) return "keyword";
     return after.startsWith("(") ? "function" : null;
@@ -103,6 +107,7 @@ function highlight(line: string, language: string) {
     const after = line.slice(match.index + text.length);
     let color: Color | null = null;
 
+    if (comment && language === "yaml" && !comment.startsWith("#")) continue;
     if (comment) color = "comment";
     else if (string) color = "string";
     else if (decorator) color = "function";
