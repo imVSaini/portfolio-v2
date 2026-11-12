@@ -34,6 +34,7 @@ export const systemDesignTradeoffs: PostSource = {
       "Which changes must succeed or fail together in one transaction?",
       "What does the load look like: steady, read-heavy, or bursty from the outside world?",
       "What does an hour of downtime cost, and for which feature?",
+      "What does shipping a quarter later cost the business, and is this design worth that delay?",
       "What can this team operate at three in the morning?",
     ),
     p(
