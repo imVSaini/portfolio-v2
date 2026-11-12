@@ -112,7 +112,7 @@ export function Footer() {
   );
 
   return (
-    <footer ref={ref} className="relative">
+    <footer ref={ref} className="relative overflow-clip">
       <span
         data-footer-rule=""
         aria-hidden="true"

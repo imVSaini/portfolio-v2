@@ -93,14 +93,17 @@ test.describe("page structure", () => {
     });
   }
 
-  test("the primary navigation lists the site in order", async ({ page, visit, layout }) => {
-    test.skip(layout !== "desktop", "smaller screens use the menu, covered in mobile-menu.spec.ts");
-    await visit("/");
+  test(
+    "the primary navigation lists the site in order",
+    { tag: "@desktop" },
+    async ({ page, visit }) => {
+      await visit("/");
 
-    await expect(page.getByRole("navigation", { name: "Primary" })).toMatchAriaSnapshot(
-      ["- list:", ...nav.map((item) => `  - listitem:\n    - link "${item.label}"`)].join("\n"),
-    );
-  });
+      await expect(page.getByRole("navigation", { name: "Primary" })).toMatchAriaSnapshot(
+        ["- list:", ...nav.map((item) => `  - listitem:\n    - link "${item.label}"`)].join("\n"),
+      );
+    },
+  );
 
   test("the appearance controls expose their groups and choices", async ({
     page,
@@ -152,28 +155,22 @@ test.describe("skip link", () => {
     await expect(skip).not.toBeInViewport();
   });
 
-  test("is the first stop on the page", async ({ page, visit, browserName }) => {
-    test.skip(browserName === "webkit", "Safari only tabs to links with Option held");
+  test("is the first stop on the page", async ({ page, visit, tabKey }) => {
     await visit(getPostPath(getFirstPost()));
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey);
 
     await expect(getSkipLink(page)).toBeFocused();
   });
 
   for (const path of getSampleRoutes()) {
-    test(`on ${path} it carries the keyboard past the header`, async ({
-      page,
-      visit,
-      browserName,
-    }) => {
-      test.skip(browserName === "webkit", "Safari only tabs to links with Option held");
+    test(`on ${path} it carries the keyboard past the header`, async ({ page, visit, tabKey }) => {
       await visit(path);
 
       await getSkipLink(page).focus();
       await page.keyboard.press("Enter");
       await expect(page).toHaveURL(/#main$/);
-      await page.keyboard.press("Tab");
+      await page.keyboard.press(tabKey);
 
       await expect
         .poll(() => page.evaluate(() => document.activeElement?.closest("main")?.id ?? ""))
@@ -185,9 +182,8 @@ test.describe("skip link", () => {
     page,
     visit,
     layout,
-    browserName,
+    tabKey,
   }) => {
-    test.skip(browserName === "webkit", "Safari only tabs to links with Option held");
     await visit("/");
     const navigation = await openSiteNav(page, layout);
     await navigation.getByRole("link", { name: "Blog", exact: true }).click();
@@ -196,7 +192,7 @@ test.describe("skip link", () => {
 
     await getSkipLink(page).focus();
     await page.keyboard.press("Enter");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey);
 
     await expect
       .poll(() =>
@@ -210,58 +206,52 @@ test.describe("skip link", () => {
 });
 
 test.describe("keyboard", () => {
-  test("tabs through the header in reading order", async ({ page, visit, layout, browserName }) => {
-    test.skip(browserName === "webkit", "Safari only tabs to links with Option held");
-    test.skip(layout !== "desktop", "smaller screens use the menu, covered in mobile-menu.spec.ts");
-    await visit("/");
-    const stops = [
-      "Skip to content",
-      `${site.name}, back to top`,
-      ...nav.map((item) => item.label),
-      "Appearance",
-      ...contact.links.map((link) => `${link.label} (opens in a new tab)`),
-    ];
+  test(
+    "tabs through the header in reading order",
+    { tag: "@desktop" },
+    async ({ page, visit, tabKey }) => {
+      await visit("/");
+      const stops = [
+        "Skip to content",
+        `${site.name}, back to top`,
+        ...nav.map((item) => item.label),
+        "Appearance",
+        ...contact.links.map((link) => `${link.label} (opens in a new tab)`),
+      ];
 
-    for (const name of stops) {
-      await page.keyboard.press("Tab");
-      await expect(page.locator(":focus")).toHaveAccessibleName(name);
-    }
-    await page.keyboard.press("Tab");
-    await expect
-      .poll(() => page.evaluate(() => document.activeElement?.closest("main") !== null))
-      .toBe(true);
-  });
+      for (const name of stops) {
+        await page.keyboard.press(tabKey);
+        await expect(page.locator(":focus")).toHaveAccessibleName(name);
+      }
+      await page.keyboard.press(tabKey);
+      await expect
+        .poll(() => page.evaluate(() => document.activeElement?.closest("main") !== null))
+        .toBe(true);
+    },
+  );
 
-  test("tabs backwards out of the page content into the header", async ({
-    page,
-    visit,
-    layout,
-    browserName,
-  }) => {
-    test.skip(browserName === "webkit", "Safari only tabs to links with Option held");
-    test.skip(layout !== "desktop", "smaller screens use the menu, covered in mobile-menu.spec.ts");
-    const [last] = contact.links.slice(-1);
-    await visit("/");
+  test(
+    "tabs backwards out of the page content into the header",
+    { tag: "@desktop" },
+    async ({ page, visit, tabKey }) => {
+      const [last] = contact.links.slice(-1);
+      await visit("/");
 
-    await page.getByRole("link", { name: "See selected work" }).focus();
-    await page.keyboard.press("Shift+Tab");
+      await page.getByRole("link", { name: "See selected work" }).focus();
+      await page.keyboard.press(`Shift+${tabKey}`);
 
-    await expect(page.locator(":focus")).toHaveAccessibleName(
-      `${last?.label ?? ""} (opens in a new tab)`,
-    );
-  });
+      await expect(page.locator(":focus")).toHaveAccessibleName(
+        `${last?.label ?? ""} (opens in a new tab)`,
+      );
+    },
+  );
 
-  test("shows a visible focus ring on keyboard focus only", async ({
-    page,
-    visit,
-    browserName,
-  }) => {
-    test.skip(browserName === "webkit", "Safari only tabs to links with Option held");
+  test("shows a visible focus ring on keyboard focus only", async ({ page, visit, tabKey }) => {
     await visit("/privacy");
     const logo = page.getByRole("link", { name: `${site.name}, home` });
 
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey);
+    await page.keyboard.press(tabKey);
     await expect(logo).toBeFocused();
     await expect(logo).toHaveCSS("outline-style", "solid");
     await expect(logo).toHaveCSS("outline-width", "2px");
@@ -282,26 +272,24 @@ test.describe("keyboard", () => {
 });
 
 test.describe("touch targets", () => {
-  test("header, menu and footer controls are large enough to tap", async ({
-    page,
-    visit,
-    layout,
-  }) => {
-    test.skip(layout === "desktop", "pointer targets are measured on touch layouts");
-    await visit("/");
+  test(
+    "header, menu and footer controls are large enough to tap",
+    { tag: "@mobile" },
+    async ({ page, visit }) => {
+      await visit("/");
 
-    expect(await findSmallTargets(page.getByRole("banner"), WCAG_TARGET_PX)).toEqual([]);
-    await scrollThrough(page);
-    expect(await findSmallTargets(page.getByRole("contentinfo"), WCAG_TARGET_PX)).toEqual([]);
+      expect(await findSmallTargets(page.getByRole("banner"), WCAG_TARGET_PX)).toEqual([]);
+      await scrollThrough(page);
+      expect(await findSmallTargets(page.getByRole("contentinfo"), WCAG_TARGET_PX)).toEqual([]);
 
-    await page.evaluate(() => window.scrollTo(0, 0));
-    const menu = await openMenu(page);
-    await expect(menu.getByRole("link", { name: contact.email })).toBeVisible();
-    expect(await findSmallTargets(menu, WCAG_TARGET_PX)).toEqual([]);
-  });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      const menu = await openMenu(page);
+      await expect(menu.getByRole("link", { name: contact.email })).toBeVisible();
+      expect(await findSmallTargets(menu, WCAG_TARGET_PX)).toEqual([]);
+    },
+  );
 
-  test("post controls are large enough to tap", async ({ page, visit, layout }) => {
-    test.skip(layout === "desktop", "pointer targets are measured on touch layouts");
+  test("post controls are large enough to tap", { tag: "@mobile" }, async ({ page, visit }) => {
     await visit(getPostPath(getFirstPost()));
     const controls = page.getByRole("main").locator("nav, figure, aside");
 

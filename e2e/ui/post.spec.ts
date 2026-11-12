@@ -79,8 +79,7 @@ test.describe("post table of contents", () => {
     );
   });
 
-  test("stays beside the article on desktop", async ({ page, visit, layout }) => {
-    test.skip(layout !== "desktop", "the list sits above the article on smaller screens");
+  test("stays beside the article on desktop", { tag: "@desktop" }, async ({ page, visit }) => {
     await visit(PATH);
     const contents = page.getByRole("navigation", { name: "On this page" });
     const last = HEADINGS.at(-1) ?? "";

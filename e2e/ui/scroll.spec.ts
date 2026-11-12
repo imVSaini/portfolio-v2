@@ -6,6 +6,7 @@ import { expect, scrollToEnd, scrollY, test } from "../fixtures";
 import { getFirstPost, getPostPath } from "../routes";
 
 const PINNED = { width: 1280, height: 800 };
+const SHEET = "body > div.isolate";
 
 function getProgressBar(page: Page): Locator {
   return page.locator('header > div[aria-hidden="true"]').first();
@@ -33,6 +34,10 @@ function readLimit(page: Page): Promise<number> {
   return page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight);
 }
 
+async function readDistanceToEnd(page: Page): Promise<number> {
+  return (await readLimit(page)) - (await scrollY(page));
+}
+
 async function jumpTo(page: Page, top: number): Promise<void> {
   await page.evaluate((y) => window.scrollTo(0, y), top);
 }
@@ -55,17 +60,12 @@ test.describe("reading progress", () => {
     await expect.poll(() => readScale(bar)).toBe(0);
   });
 
-  test("the bar is completely full at the end of the page", async ({ page, visit, layout }) => {
-    test.fixme(
-      layout === "desktop",
-      "the smooth scroller can measure the page while the footer's unrevealed letters overhang it",
-    );
+  test("the bar is completely full at the end of the page", async ({ page, visit }) => {
     await visit(getPostPath(getFirstPost()));
 
     await scrollToEnd(page);
-    await page.waitForTimeout(1_500);
 
-    expect(await readScale(getProgressBar(page))).toBeGreaterThan(0.999);
+    await expect.poll(() => readScale(getProgressBar(page))).toBeGreaterThan(0.999);
   });
 
   test("the header gains its backdrop once the page leaves the top", async ({ page, visit }) => {
@@ -99,8 +99,7 @@ test.describe("reading progress", () => {
 });
 
 test.describe("scrolling by hand", () => {
-  test("the wheel moves the page", async ({ page, visit, isMobile }) => {
-    test.skip(isMobile, "wheel input is a desktop gesture");
+  test("the wheel moves the page", { tag: "@desktop" }, async ({ page, visit }) => {
     await visit("/");
 
     await page.mouse.move(300, 300);
@@ -109,16 +108,13 @@ test.describe("scrolling by hand", () => {
     await expect.poll(() => scrollY(page)).toBeGreaterThan(300);
   });
 
-  test("End and Home reach both ends of the page", async ({ page, visit, isMobile }) => {
-    test.skip(isMobile, "phones have no End or Home key");
+  test("End and Home reach both ends of the page", { tag: "@desktop" }, async ({ page, visit }) => {
     await visit("/blog");
 
     await expect(async () => {
       await page.keyboard.press("End");
       await expect.poll(() => scrollY(page), { timeout: 2_000 }).toBeGreaterThan(500);
-      await expect
-        .poll(async () => (await readLimit(page)) - (await scrollY(page)), { timeout: 2_000 })
-        .toBeLessThan(4);
+      await expect.poll(() => readDistanceToEnd(page), { timeout: 2_000 }).toBeLessThan(4);
     }).toPass();
 
     await expect(async () => {
@@ -144,11 +140,10 @@ test.describe("scrolling by hand", () => {
   });
 });
 
-test.describe("work track on a wide screen", () => {
+test.describe("work track on a wide screen", { tag: "@desktop" }, () => {
   test.use({ viewport: PINNED });
 
-  test("pins the section and carries every project across", async ({ page, visit, isMobile }) => {
-    test.skip(isMobile, "the pinned track needs a desktop viewport");
+  test("pins the section and carries every project across", async ({ page, visit }) => {
     await visit("/");
     const work = page.locator("#work");
     const track = work.locator("> div");
@@ -177,12 +172,7 @@ test.describe("work track on a wide screen", () => {
   test.describe("with reduced motion", () => {
     test.use({ contextOptions: { reducedMotion: "reduce" } });
 
-    test("lays the projects out as a grid that scrolls normally", async ({
-      page,
-      visit,
-      isMobile,
-    }) => {
-      test.skip(isMobile, "the pinned track needs a desktop viewport");
+    test("lays the projects out as a grid that scrolls normally", async ({ page, visit }) => {
       await visit("/");
       const work = page.locator("#work");
       const panels = work.locator("article[data-h-panel]");
@@ -203,15 +193,10 @@ test.describe("work track on a wide screen", () => {
   });
 });
 
-test.describe("work track on a short screen", () => {
+test.describe("work track on a short screen", { tag: "@desktop" }, () => {
   test.use({ viewport: { width: 1280, height: 500 } });
 
-  test("does not pin, so nothing is trapped in a cramped viewport", async ({
-    page,
-    visit,
-    isMobile,
-  }) => {
-    test.skip(isMobile, "the pinned track needs a desktop viewport");
+  test("does not pin, so nothing is trapped in a cramped viewport", async ({ page, visit }) => {
     await visit("/");
     const work = page.locator("#work");
 
@@ -239,25 +224,31 @@ test.describe("end of the page", () => {
     await expect(bands).toHaveCSS("visibility", "hidden");
   });
 
-  test("pulling past the end lifts the page, then lets it settle back", async ({
-    page,
-    visit,
-    isMobile,
-  }) => {
-    test.skip(isMobile, "wheel input is a desktop gesture");
-    await visit("/blog");
-    const sheet = page.locator("body > div.isolate");
-    await scrollToEnd(page);
-    await expect(getBands(page)).toHaveAttribute("data-near-end", "");
-    await expect.poll(async () => (await readLimit(page)) - (await scrollY(page))).toBeLessThan(2);
-    await page.waitForTimeout(400);
-    const limit = await readLimit(page);
+  test(
+    "pulling past the end lifts the page, then lets it settle back",
+    { tag: "@desktop" },
+    async ({ page, visit }) => {
+      await visit("/blog");
+      await scrollToEnd(page);
+      await expect(getBands(page)).toHaveAttribute("data-near-end", "");
+      await expect.poll(() => readDistanceToEnd(page)).toBeLessThan(2);
 
-    await page.mouse.move(300, 300);
-    await page.mouse.wheel(0, 240);
+      await page.mouse.move(300, 300);
+      const lifted = page.waitForFunction(
+        (selector) => {
+          const sheet = document.querySelector(selector);
+          return (
+            sheet !== null && new DOMMatrixReadOnly(getComputedStyle(sheet).transform).m42 < -20
+          );
+        },
+        SHEET,
+        { polling: "raf" },
+      );
+      await page.mouse.wheel(0, 240);
+      await lifted;
 
-    await expect.poll(async () => (await readShift(sheet)).y).toBeLessThan(-20);
-    await expect.poll(async () => (await readShift(sheet)).y).toBe(0);
-    expect(await scrollY(page)).toBeGreaterThan(limit - 2);
-  });
+      await expect.poll(async () => (await readShift(page.locator(SHEET))).y).toBe(0);
+      await expect.poll(() => readDistanceToEnd(page)).toBeLessThan(2);
+    },
+  );
 });

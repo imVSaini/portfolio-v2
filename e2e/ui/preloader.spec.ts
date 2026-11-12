@@ -57,8 +57,7 @@ test.describe("intro on the first visit", () => {
     await expect(count).toHaveText("100", HAND_OVER);
   });
 
-  test("holds the page still until it is done", async ({ page, isMobile }) => {
-    test.skip(isMobile, "wheel input is a desktop gesture");
+  test("holds the page still until it is done", { tag: "@desktop" }, async ({ page }) => {
     test.fail(
       true,
       "SmoothScroll stops Locomotive before it auto-starts on the next frame, so the stop is lost",

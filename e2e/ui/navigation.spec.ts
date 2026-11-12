@@ -28,18 +28,21 @@ test.describe("site navigation on the home page", () => {
   }
 
   for (const { label, href } of SECTION_LINKS) {
-    test(`"${label}" records ${href} in the address bar`, async ({ page, visit, layout }) => {
-      test.skip(layout !== "desktop", "the menu's own behaviour is covered in mobile-menu.spec.ts");
-      await visit("/");
+    test(
+      `"${label}" records ${href} in the address bar`,
+      { tag: "@desktop" },
+      async ({ page, visit }) => {
+        await visit("/");
 
-      await page
-        .getByRole("navigation", { name: "Primary" })
-        .getByRole("link", { name: label, exact: true })
-        .click();
+        await page
+          .getByRole("navigation", { name: "Primary" })
+          .getByRole("link", { name: label, exact: true })
+          .click();
 
-      await expect(page).toHaveURL(new RegExp(`/${href}$`));
-      await expect(page.locator(href)).toBeFocused();
-    });
+        await expect(page).toHaveURL(new RegExp(`/${href}$`));
+        await expect(page.locator(href)).toBeFocused();
+      },
+    );
   }
 
   test('"Home" returns to the top and clears the hash', async ({ page, visit, layout }) => {

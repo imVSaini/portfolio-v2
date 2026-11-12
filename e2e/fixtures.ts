@@ -18,7 +18,25 @@ type Fixtures = {
   clipboard: { read: () => Promise<string> };
 };
 
-export const test = base.extend<Options & Fixtures>({
+type TabKey = "Tab" | "Alt+Tab";
+
+type WorkerFixtures = {
+  tabKey: TabKey;
+};
+
+export const test = base.extend<Options & Fixtures, WorkerFixtures>({
+  tabKey: [
+    async ({ browser }, provide) => {
+      const page = await browser.newPage();
+      await page.setContent('<a href="#probe">probe</a>');
+      await page.keyboard.press("Tab");
+      const reachesLinks = await page.evaluate(() => document.activeElement?.tagName === "A");
+      await page.close();
+      await provide(reachesLinks ? "Tab" : "Alt+Tab");
+    },
+    { scope: "worker" },
+  ],
+
   intro: ["skip", { option: true }],
 
   page: async ({ page, intro }, provide) => {

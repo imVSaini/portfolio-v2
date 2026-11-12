@@ -207,6 +207,12 @@ rebuild and restart it after changing app code.
 - `chromium`, `firefox`, `webkit`, `mobile-chrome`, `mobile-safari` (`e2e/ui`): behaviour in a real
   browser. Every UI spec runs on all five, so branch on the `layout` fixture
   (`"phone" | "tablet" | "desktop"`) rather than on a project name.
+- A test that only makes sense on one kind of project carries a tag instead of a runtime skip:
+  `{ tag: "@desktop" }` (wheel, End and Home, resized viewports, desktop-only UI) runs on
+  `chromium`, `firefox` and `webkit`; `{ tag: "@mobile" }` (touch targets, phone-only UI) runs on
+  `mobile-chrome` and `mobile-safari`. The projects filter the other tag out with `grepInvert`, so
+  the report shows no skipped tests. Put the tag on the `test.describe` when the whole group shares
+  it.
 
 ### Writing tests
 
@@ -225,6 +231,9 @@ rebuild and restart it after changing app code.
 - A test that documents a known app defect uses `test.fail(condition, reason)`; fixing the defect
   then fails the test until the marker is removed. Use `test.fixme` only when the defect is
   timing-dependent. Do not weaken an assertion to make a defect pass.
+- No `test.skip` for a browser or layout: tag the test (see Projects) or make it work everywhere.
+- Press Tab through the `tabKey` fixture (`page.keyboard.press(tabKey)`, `` `Shift+${tabKey}` ``).
+  WebKit on macOS only tabs to links with Option held, and the fixture picks the key that does.
 - Motion-off behaviour is tested with `test.use({ contextOptions: { reducedMotion: "reduce" } })`.
 
 ## Commit messages

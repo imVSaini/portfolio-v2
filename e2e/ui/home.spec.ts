@@ -53,31 +53,33 @@ test.describe("hero", () => {
 });
 
 test.describe("selected work", () => {
-  test("shows every project as a panel from tablet width up", async ({ page, visit, layout }) => {
-    test.skip(layout === "phone", "phones get the accordion instead");
-    await visit("/");
-    const work = page.locator("#work");
-    const panels = work.locator("article[data-h-panel]");
+  test(
+    "shows every project as a panel from tablet width up",
+    { tag: "@desktop" },
+    async ({ page, visit }) => {
+      await visit("/");
+      const work = page.locator("#work");
+      const panels = work.locator("article[data-h-panel]");
 
-    await expect(panels).toHaveCount(projects.length);
-    await expect(work.getByRole("button")).toHaveCount(0);
-    for (const [index, project] of projects.entries()) {
-      const panel = panels.nth(index);
+      await expect(panels).toHaveCount(projects.length);
+      await expect(work.getByRole("button")).toHaveCount(0);
+      for (const [index, project] of projects.entries()) {
+        const panel = panels.nth(index);
 
-      await expect(panel.getByRole("heading", { level: 3 })).toHaveText(project.title);
-      await expect(
-        panel.getByRole("link", { name: `Visit ${project.title} (opens in a new tab)` }),
-      ).toHaveAttribute("href", project.url);
-      await expect(panel.getByRole("listitem")).toHaveText(project.stack);
-    }
-    await expect(work.getByRole("link", { name: /GitHub/ })).toHaveAttribute(
-      "href",
-      contact.links[1].href,
-    );
-  });
+        await expect(panel.getByRole("heading", { level: 3 })).toHaveText(project.title);
+        await expect(
+          panel.getByRole("link", { name: `Visit ${project.title} (opens in a new tab)` }),
+        ).toHaveAttribute("href", project.url);
+        await expect(panel.getByRole("listitem")).toHaveText(project.stack);
+      }
+      await expect(work.getByRole("link", { name: /GitHub/ })).toHaveAttribute(
+        "href",
+        contact.links[1].href,
+      );
+    },
+  );
 
-  test("lists projects in an accordion on phones", async ({ page, visit, layout }) => {
-    test.skip(layout !== "phone", "wider screens get the panels instead");
+  test("lists projects in an accordion on phones", { tag: "@mobile" }, async ({ page, visit }) => {
     await visit("/");
     const work = page.locator("#work");
     const triggers = work.getByRole("button");
@@ -94,40 +96,43 @@ test.describe("selected work", () => {
     }
   });
 
-  test("opens one project at a time by tap or keyboard", async ({ page, visit, layout }) => {
-    test.skip(layout !== "phone", "wider screens get the panels instead");
-    const [first, second] = projects;
-    if (!first || !second) throw new Error("the accordion test needs two projects");
-    await visit("/");
-    const work = page.locator("#work");
-    const triggers = work.getByRole("button");
-    const firstLink = work.getByRole("link", {
-      name: `Visit ${first.title} live (opens in a new tab)`,
-    });
-    const secondLink = work.getByRole("link", {
-      name: `Visit ${second.title} live (opens in a new tab)`,
-    });
+  test(
+    "opens one project at a time by tap or keyboard",
+    { tag: "@mobile" },
+    async ({ page, visit }) => {
+      const [first, second] = projects;
+      if (!first || !second) throw new Error("the accordion test needs two projects");
+      await visit("/");
+      const work = page.locator("#work");
+      const triggers = work.getByRole("button");
+      const firstLink = work.getByRole("link", {
+        name: `Visit ${first.title} live (opens in a new tab)`,
+      });
+      const secondLink = work.getByRole("link", {
+        name: `Visit ${second.title} live (opens in a new tab)`,
+      });
 
-    await expect(firstLink).toBeVisible();
-    await expect(firstLink).toHaveAttribute("href", first.url);
-    await expect(secondLink).toBeHidden();
+      await expect(firstLink).toBeVisible();
+      await expect(firstLink).toHaveAttribute("href", first.url);
+      await expect(secondLink).toBeHidden();
 
-    await triggers.nth(1).click();
-    await expect(triggers.nth(1)).toHaveAttribute("aria-expanded", "true");
-    await expect(triggers.nth(0)).toHaveAttribute("aria-expanded", "false");
-    await expect(secondLink).toBeVisible();
-    await expect(secondLink).toHaveAttribute("href", second.url);
-    await expect(firstLink).toBeHidden();
-    await expect(work.getByText(second.blurb).filter({ visible: true })).toHaveCount(1);
+      await triggers.nth(1).click();
+      await expect(triggers.nth(1)).toHaveAttribute("aria-expanded", "true");
+      await expect(triggers.nth(0)).toHaveAttribute("aria-expanded", "false");
+      await expect(secondLink).toBeVisible();
+      await expect(secondLink).toHaveAttribute("href", second.url);
+      await expect(firstLink).toBeHidden();
+      await expect(work.getByText(second.blurb).filter({ visible: true })).toHaveCount(1);
 
-    await triggers.nth(1).press("Enter");
-    await expect(triggers.nth(1)).toHaveAttribute("aria-expanded", "false");
-    await expect(secondLink).toBeHidden();
+      await triggers.nth(1).press("Enter");
+      await expect(triggers.nth(1)).toHaveAttribute("aria-expanded", "false");
+      await expect(secondLink).toBeHidden();
 
-    await triggers.nth(0).press("Space");
-    await expect(triggers.nth(0)).toHaveAttribute("aria-expanded", "true");
-    await expect(firstLink).toBeVisible();
-  });
+      await triggers.nth(0).press("Space");
+      await expect(triggers.nth(0)).toHaveAttribute("aria-expanded", "true");
+      await expect(firstLink).toBeVisible();
+    },
+  );
 });
 
 test.describe("experience and skills", () => {

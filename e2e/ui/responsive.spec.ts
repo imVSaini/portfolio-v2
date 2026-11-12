@@ -34,10 +34,6 @@ test.describe("each page at this device's size", () => {
 
 test.describe("while the footer animates in", () => {
   test("the page never grows wider than the screen", async ({ page, visit }) => {
-    test.fixme(
-      true,
-      "the back-to-top seal overshoots as it pops in and briefly makes phones 3px too wide",
-    );
     await visit("/privacy");
     await scrollThrough(page);
 
@@ -59,14 +55,13 @@ test.describe("while the footer animates in", () => {
   });
 });
 
-test.describe("across screen sizes", () => {
+test.describe("across screen sizes", { tag: "@desktop" }, () => {
   for (const size of SIZES) {
     test.describe(`${size.width}×${size.height}`, () => {
       test.use({ viewport: size });
 
       for (const path of getSampleRoutes()) {
-        test(`${path} fits without sideways scroll`, async ({ page, visit, isMobile }) => {
-          test.skip(isMobile, "device projects keep their own screen size");
+        test(`${path} fits without sideways scroll`, async ({ page, visit }) => {
           await visit(path);
           const heading = page.getByRole("heading", { level: 1 });
 
@@ -81,8 +76,7 @@ test.describe("across screen sizes", () => {
         });
       }
 
-      test("the header keeps its controls on screen", async ({ page, visit, isMobile }) => {
-        test.skip(isMobile, "device projects keep their own screen size");
+      test("the header keeps its controls on screen", async ({ page, visit }) => {
         await visit("/");
         const header = page.getByRole("banner");
 
@@ -106,13 +100,12 @@ test.describe("across screen sizes", () => {
   }
 });
 
-test.describe("header breakpoints", () => {
+test.describe("header breakpoints", { tag: "@desktop" }, () => {
   for (const step of HEADER_STEPS) {
     test.describe(`at ${step.width}px`, () => {
       test.use({ viewport: { width: step.width, height: 800 } });
 
-      test("shows the right controls", async ({ page, visit, isMobile }) => {
-        test.skip(isMobile, "device projects keep their own screen size");
+      test("shows the right controls", async ({ page, visit }) => {
         await visit("/");
         const header = page.getByRole("banner");
 
@@ -130,7 +123,7 @@ test.describe("header breakpoints", () => {
   }
 });
 
-test.describe("work section breakpoints", () => {
+test.describe("work section breakpoints", { tag: "@desktop" }, () => {
   for (const { width, accordion } of [
     { width: 767, accordion: true },
     { width: 768, accordion: false },
@@ -138,12 +131,7 @@ test.describe("work section breakpoints", () => {
     test.describe(`at ${width}px`, () => {
       test.use({ viewport: { width, height: 800 } });
 
-      test(`shows ${accordion ? "the accordion" : "the panels"}`, async ({
-        page,
-        visit,
-        isMobile,
-      }) => {
-        test.skip(isMobile, "device projects keep their own screen size");
+      test(`shows ${accordion ? "the accordion" : "the panels"}`, async ({ page, visit }) => {
         await visit("/");
         const work = page.locator("#work");
 
@@ -156,9 +144,8 @@ test.describe("work section breakpoints", () => {
   }
 });
 
-test.describe("when the window is resized", () => {
-  test("the page adapts from desktop to phone and back", async ({ page, visit, isMobile }) => {
-    test.skip(isMobile, "device projects keep their own screen size");
+test.describe("when the window is resized", { tag: "@desktop" }, () => {
+  test("the page adapts from desktop to phone and back", async ({ page, visit }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await visit("/");
     const header = page.getByRole("banner");
@@ -183,12 +170,7 @@ test.describe("when the window is resized", () => {
     await expect.poll(() => getOverflow(page)).toBe(0);
   });
 
-  test("a menu left open on a widened window can still be dismissed", async ({
-    page,
-    visit,
-    isMobile,
-  }) => {
-    test.skip(isMobile, "device projects keep their own screen size");
+  test("a menu left open on a widened window can still be dismissed", async ({ page, visit }) => {
     await page.setViewportSize({ width: 390, height: 800 });
     await visit("/");
     const menu = await openMenu(page);
@@ -203,11 +185,10 @@ test.describe("when the window is resized", () => {
   });
 });
 
-test.describe("text scaled up by the reader", () => {
+test.describe("text scaled up by the reader", { tag: "@desktop" }, () => {
   test.use({ viewport: { width: 640, height: 800 } });
 
-  test("a 200% root font size still fits a narrow window", async ({ page, visit, isMobile }) => {
-    test.skip(isMobile, "device projects keep their own screen size");
+  test("a 200% root font size still fits a narrow window", async ({ page, visit }) => {
     await page.addInitScript(() => {
       const style = document.createElement("style");
       style.textContent = "html { font-size: 200% !important; }";

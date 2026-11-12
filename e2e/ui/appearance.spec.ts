@@ -357,19 +357,21 @@ test.describe("appearance popover", () => {
     await expect(page.getByRole("group", { name: "Color theme" })).toBeInViewport();
   });
 
-  test("Escape closes it and hands focus back", async ({ page, visit, layout }) => {
-    test.skip(layout === "phone", "phones reach the controls through the menu");
-    await visit("/");
-    const popover = await openAppearance(page, layout);
+  test(
+    "Escape closes it and hands focus back",
+    { tag: "@desktop" },
+    async ({ page, visit, layout }) => {
+      await visit("/");
+      const popover = await openAppearance(page, layout);
 
-    await page.keyboard.press("Escape");
+      await page.keyboard.press("Escape");
 
-    await expect(popover).toBeHidden();
-    await expect(page.getByRole("button", { name: "Appearance" })).toBeFocused();
-  });
+      await expect(popover).toBeHidden();
+      await expect(page.getByRole("button", { name: "Appearance" })).toBeFocused();
+    },
+  );
 
-  test("a click outside closes it", async ({ page, visit, layout }) => {
-    test.skip(layout === "phone", "phones reach the controls through the menu");
+  test("a click outside closes it", { tag: "@desktop" }, async ({ page, visit, layout }) => {
     await visit("/");
     const popover = await openAppearance(page, layout);
 
@@ -378,20 +380,22 @@ test.describe("appearance popover", () => {
     await expect(popover).toBeHidden();
   });
 
-  test("stays open while choices are made", async ({ page, visit, layout }) => {
-    test.skip(layout === "phone", "phones reach the controls through the menu");
-    await visit("/");
-    const popover = await openAppearance(page, layout);
+  test(
+    "stays open while choices are made",
+    { tag: "@desktop" },
+    async ({ page, visit, layout }) => {
+      await visit("/");
+      const popover = await openAppearance(page, layout);
 
-    await themeButton(page, "Dark").click();
-    await accentRadio(page, "Orange").click();
+      await themeButton(page, "Dark").click();
+      await accentRadio(page, "Orange").click();
 
-    await expect(popover).toBeVisible();
-    await expect(page.locator("html")).toHaveAttribute("data-accent", "orange");
-  });
+      await expect(popover).toBeVisible();
+      await expect(page.locator("html")).toHaveAttribute("data-accent", "orange");
+    },
+  );
 
-  test("announces itself with a name", async ({ page, visit, layout }) => {
-    test.skip(layout === "phone", "phones reach the controls through the menu");
+  test("announces itself with a name", { tag: "@desktop" }, async ({ page, visit, layout }) => {
     test.fail(true, "AppearanceMenu's popup is a dialog without a Popover.Title or aria-label");
     await visit("/");
     const popover = await openAppearance(page, layout);

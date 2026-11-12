@@ -52,20 +52,19 @@ test.describe("mobile menu", () => {
     await expect(page.getByRole("button", { name: "Open menu" })).toBeFocused();
   });
 
-  test("keeps keyboard focus inside while open", async ({ page, visit, browserName }) => {
-    test.skip(browserName === "webkit", "Safari only tabs to links with Option held");
+  test("keeps keyboard focus inside while open", async ({ page, visit, tabKey }) => {
     await visit("/");
     const menu = await openMenu(page);
 
     for (let presses = 1; presses <= 24; presses += 1) {
-      await page.keyboard.press("Tab");
+      await page.keyboard.press(tabKey);
       await expect
         .poll(() => menu.evaluate((dialog) => dialog.contains(document.activeElement)), {
           message: `after ${presses} Tab presses`,
         })
         .toBe(true);
     }
-    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press(`Shift+${tabKey}`);
     await expect
       .poll(() => menu.evaluate((dialog) => dialog.contains(document.activeElement)))
       .toBe(true);
@@ -147,21 +146,23 @@ test.describe("mobile menu", () => {
     }
   });
 
-  test("keeps the page behind it still under the wheel", async ({ page, visit, isMobile }) => {
-    test.skip(isMobile, "wheel input is a desktop gesture");
-    test.fail(true, "the smooth scroller keeps answering the wheel while the dialog is open");
-    await visit("/");
-    await openMenu(page);
+  test(
+    "keeps the page behind it still under the wheel",
+    { tag: "@desktop" },
+    async ({ page, visit }) => {
+      test.fail(true, "the smooth scroller keeps answering the wheel while the dialog is open");
+      await visit("/");
+      await openMenu(page);
 
-    await page.mouse.move(200, 400);
-    await page.mouse.wheel(0, 1200);
-    await page.waitForTimeout(1_000);
+      await page.mouse.move(200, 400);
+      await page.mouse.wheel(0, 1200);
+      await page.waitForTimeout(1_000);
 
-    expect(await scrollY(page)).toBe(0);
-  });
+      expect(await scrollY(page)).toBe(0);
+    },
+  );
 
-  test("releases the page once closed", async ({ page, visit, isMobile }) => {
-    test.skip(isMobile, "wheel input is a desktop gesture");
+  test("releases the page once closed", { tag: "@desktop" }, async ({ page, visit }) => {
     await visit("/");
     const menu = await openMenu(page);
 
@@ -176,17 +177,20 @@ test.describe("mobile menu", () => {
   test.describe("with reduced motion", () => {
     test.use({ contextOptions: { reducedMotion: "reduce" } });
 
-    test("keeps the page behind it still under the wheel", async ({ page, visit, isMobile }) => {
-      test.skip(isMobile, "wheel input is a desktop gesture");
-      await visit("/");
-      await openMenu(page);
+    test(
+      "keeps the page behind it still under the wheel",
+      { tag: "@desktop" },
+      async ({ page, visit }) => {
+        await visit("/");
+        await openMenu(page);
 
-      await page.mouse.move(200, 400);
-      await page.mouse.wheel(0, 1200);
-      await page.waitForTimeout(1_000);
+        await page.mouse.move(200, 400);
+        await page.mouse.wheel(0, 1200);
+        await page.waitForTimeout(1_000);
 
-      expect(await scrollY(page)).toBe(0);
-    });
+        expect(await scrollY(page)).toBe(0);
+      },
+    );
   });
 
   test("fits a 320px screen without clipping its controls", async ({ page, visit }) => {

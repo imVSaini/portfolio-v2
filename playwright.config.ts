@@ -4,6 +4,8 @@ const PORT = 3200;
 const IS_CI = Boolean(process.env.CI);
 const EXTERNAL_BASE_URL = process.env.PLAYWRIGHT_BASE_URL;
 const BASE_URL = EXTERNAL_BASE_URL ?? `http://localhost:${PORT}`;
+const DESKTOP_ONLY = /@desktop/;
+const MOBILE_ONLY = /@mobile/;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -19,7 +21,7 @@ export default defineConfig({
     baseURL: BASE_URL,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
-    video: "retain-on-failure",
+    video: "on-first-retry",
     locale: "en-IN",
     timezoneId: "Asia/Kolkata",
     colorScheme: "light",
@@ -31,11 +33,36 @@ export default defineConfig({
       testDir: "./e2e/document",
       use: { ...devices["Desktop Chrome"], javaScriptEnabled: false },
     },
-    { name: "chromium", testDir: "./e2e/ui", use: { ...devices["Desktop Chrome"] } },
-    { name: "firefox", testDir: "./e2e/ui", use: { ...devices["Desktop Firefox"] } },
-    { name: "webkit", testDir: "./e2e/ui", use: { ...devices["Desktop Safari"] } },
-    { name: "mobile-chrome", testDir: "./e2e/ui", use: { ...devices["Pixel 7"] } },
-    { name: "mobile-safari", testDir: "./e2e/ui", use: { ...devices["iPhone 15"] } },
+    {
+      name: "chromium",
+      testDir: "./e2e/ui",
+      grepInvert: MOBILE_ONLY,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "firefox",
+      testDir: "./e2e/ui",
+      grepInvert: MOBILE_ONLY,
+      use: { ...devices["Desktop Firefox"] },
+    },
+    {
+      name: "webkit",
+      testDir: "./e2e/ui",
+      grepInvert: MOBILE_ONLY,
+      use: { ...devices["Desktop Safari"] },
+    },
+    {
+      name: "mobile-chrome",
+      testDir: "./e2e/ui",
+      grepInvert: DESKTOP_ONLY,
+      use: { ...devices["Pixel 7"] },
+    },
+    {
+      name: "mobile-safari",
+      testDir: "./e2e/ui",
+      grepInvert: DESKTOP_ONLY,
+      use: { ...devices["iPhone 15"] },
+    },
   ],
   ...(!EXTERNAL_BASE_URL && {
     webServer: {
