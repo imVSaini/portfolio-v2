@@ -40,7 +40,6 @@ export function MobileMenu({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const onHome = pathname === "/";
-  // The dialog locks page scroll while open, so travel only after it has fully closed.
   const pendingTarget = useRef<`#${string}` | null>(null);
 
   useEffect(() => {
@@ -82,7 +81,7 @@ export function MobileMenu({ className }: { className?: string }) {
         />
         <Dialog.Popup
           data-lenis-prevent=""
-          className="group/menu fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col gap-10 overflow-y-auto overscroll-contain bg-manila-light px-(--page-gutter) pb-6 transition-[clip-path] duration-900 ease-out-expo [--menu-origin:calc(100%-var(--page-gutter)-1.375rem)_calc(var(--header-h)/2)] [clip-path:circle(150%_at_var(--menu-origin))] motion-reduce:transition-none dark:bg-faded-black starting-style:[clip-path:circle(0px_at_var(--menu-origin))] ending-style:duration-500 ending-style:[clip-path:circle(0px_at_var(--menu-origin))]"
+          className="group/menu fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col gap-4 overflow-y-auto overscroll-contain bg-manila-light px-(--page-gutter) pb-6 transition-[clip-path] duration-900 ease-out-expo [--menu-origin:calc(100%-var(--page-gutter)-1.375rem)_calc(var(--header-h)/2)] [clip-path:circle(150%_at_var(--menu-origin))] motion-reduce:transition-none dark:bg-faded-black starting-style:[clip-path:circle(0px_at_var(--menu-origin))] ending-style:duration-500 ending-style:[clip-path:circle(0px_at_var(--menu-origin))] [@media(height>=47rem)]:gap-6 [@media(height>=51rem)]:gap-10"
         >
           <div className="sticky top-0 z-10 -mx-(--page-gutter) flex h-(--header-h) shrink-0 items-center justify-between bg-manila-light px-(--page-gutter) dark:bg-faded-black">
             <Dialog.Title
@@ -165,7 +164,7 @@ export function MobileMenu({ className }: { className?: string }) {
             </ul>
           </nav>
           <div className={FADE_CLASS_NAME} style={delay(STAGGER_START + nav.length * STAGGER_STEP)}>
-            <AppearanceControls />
+            <AppearanceControls className="gap-3" />
           </div>
           <div
             className={cn("mt-auto flex items-center justify-between gap-4", FADE_CLASS_NAME)}

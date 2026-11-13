@@ -311,6 +311,30 @@ test.describe("mobile menu", () => {
   });
 });
 
+test.describe("mobile menu on common phones", () => {
+  const PHONES = [
+    { name: "iPhone Pro Max in Safari", width: 430, height: 739 },
+    { name: "Galaxy S", width: 360, height: 780 },
+    { name: "iPhone", width: 390, height: 844 },
+    { name: "Pixel", width: 412, height: 839 },
+  ] as const;
+
+  for (const phone of PHONES) {
+    test.describe(`${phone.name} (${phone.width}×${phone.height})`, () => {
+      test.use({ viewport: { width: phone.width, height: phone.height } });
+
+      test("fits on one screen without scrolling", async ({ page, visit }) => {
+        await visit("/");
+        const menu = await openMenu(page);
+        await expect.poll(() => getHiddenLinks(menu)).toEqual([]);
+
+        expect(await menu.evaluate((panel) => panel.scrollHeight - panel.clientHeight)).toBe(0);
+        await expect(menu.getByRole("link", { name: contact.email })).toBeInViewport({ ratio: 1 });
+      });
+    });
+  }
+});
+
 test.describe("mobile menu motion", () => {
   test.use({ viewport: { width: 390, height: 800 } });
 
