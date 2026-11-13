@@ -134,7 +134,6 @@ test.describe("mobile menu", () => {
   });
 
   test("a section link records its target in the address bar", async ({ page, visit }) => {
-    test.fail(true, "MobileMenu prevents the click, so ScrollLink never updates the URL hash");
     await visit("/");
     const menu = await openMenu(page);
 
@@ -194,7 +193,6 @@ test.describe("mobile menu", () => {
     "keeps the page behind it still under the wheel",
     { tag: "@desktop" },
     async ({ page, visit }) => {
-      test.fail(true, "the smooth scroller keeps answering the wheel while the dialog is open");
       await visit("/");
       await openMenu(page);
 
@@ -216,6 +214,61 @@ test.describe("mobile menu", () => {
     await page.mouse.wheel(0, 1200);
 
     await expect.poll(() => scrollY(page)).toBeGreaterThan(0);
+  });
+
+  test(
+    "scrolls a menu taller than the window under the wheel, not the page",
+    { tag: "@desktop" },
+    async ({ page, visit }) => {
+      await page.setViewportSize({ width: 390, height: 420 });
+      await visit("/");
+      const menu = await openMenu(page);
+      await expect.poll(() => getHiddenLinks(menu)).toEqual([]);
+
+      await page.mouse.move(200, 300);
+      await page.mouse.wheel(0, 600);
+
+      await expect.poll(() => menu.evaluate((panel) => panel.scrollTop)).toBeGreaterThan(0);
+      expect(await scrollY(page)).toBe(0);
+    },
+  );
+
+  test(
+    "closes once the window widens to the desktop navigation",
+    { tag: "@desktop" },
+    async ({ page, visit }) => {
+      await visit("/");
+      const menu = await openMenu(page);
+
+      await page.setViewportSize({ width: 1280, height: 800 });
+
+      await expect(menu).toBeHidden();
+      await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
+    },
+  );
+
+  test("gives its own controls a 44px touch target", async ({ page, visit }) => {
+    await visit("/");
+    const trigger = await page.getByRole("button", { name: "Open menu" }).boundingBox();
+    expect(trigger?.width).toBeGreaterThanOrEqual(44);
+    expect(trigger?.height).toBeGreaterThanOrEqual(44);
+    const menu = await openMenu(page);
+    const outside = contact.links.map((link) => `${link.label} (opens in a new tab)`);
+    const targets: [string, Locator][] = [
+      ["Close menu", menu.getByRole("button", { name: "Close menu" })],
+      ...nav.map((item): [string, Locator] => [
+        item.label,
+        menu.getByRole("link", { name: item.label, exact: true }),
+      ]),
+      [contact.email, menu.getByRole("link", { name: contact.email })],
+      ...outside.map((name): [string, Locator] => [name, menu.getByRole("link", { name })]),
+    ];
+
+    for (const [name, target] of targets) {
+      const box = await target.boundingBox();
+      expect.soft(box?.width, `${name} width`).toBeGreaterThanOrEqual(44);
+      expect.soft(box?.height, `${name} height`).toBeGreaterThanOrEqual(44);
+    }
   });
 
   test.describe("with reduced motion", () => {
