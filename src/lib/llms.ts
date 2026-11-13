@@ -84,7 +84,7 @@ export function getPostMarkdown(post: Post): string {
  * @example
  * ```ts
  * getCaseStudyMarkdownPath(study);
- * // => "/case-studies/workorbit/index.md"
+ * // => "/case-studies/lead-management-crm/index.md"
  * ```
  */
 export function getCaseStudyMarkdownPath(study: CaseStudy): `/${string}` {

@@ -57,7 +57,7 @@ export default function CaseStudiesPage() {
           <ol className="flex flex-col gap-16 md:gap-24">
             {caseStudies.map((study, i) => (
               <li key={study.slug} className="border-t border-line pt-10 md:pt-14">
-                <CaseStudyEntry study={study} position={i + 1} flipped={i % 2 === 1} />
+                <CaseStudyEntry study={study} flipped={i % 2 === 1} />
               </li>
             ))}
           </ol>

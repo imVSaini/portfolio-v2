@@ -10,31 +10,29 @@ const FACT_COUNT = 2;
 
 type CaseStudyEntryProps = {
   study: CaseStudy;
-  position: number;
   as?: "h2" | "h3";
   flipped?: boolean;
 };
 
 export function CaseStudyEntry({
   study,
-  position,
   as: Heading = "h2",
   flipped = false,
 }: CaseStudyEntryProps) {
   return (
-    <article className="group relative grid gap-8 lg:grid-cols-12 lg:gap-12">
+    <article className="group @container relative grid gap-8 lg:grid-cols-12 lg:gap-12">
       <CaseStudyCover study={study} className={cn("lg:col-span-7", flipped && "lg:order-2")} />
 
       <div className="flex min-w-0 flex-col gap-6 lg:col-span-5 lg:self-center">
-        <p className="flex items-center gap-3 font-display text-p4 font-medium tracking-wide text-muted uppercase">
-          <span aria-hidden="true" className="text-accent tabular-nums">
-            {String(position).padStart(2, "0")}
-          </span>
-          <span aria-hidden="true" className="h-px w-8 bg-line-strong" />
+        <p className="flex items-center gap-2.5 font-display text-p4 font-medium tracking-wide uppercase">
+          <span
+            aria-hidden="true"
+            className="size-1.5 bg-accent transition-transform duration-500 ease-out-expo motion-reduce:transition-none group-intent:rotate-45"
+          />
           {study.category}
         </p>
 
-        <Heading className="text-[clamp(2.25rem,5vw,4.5rem)] leading-none uppercase">
+        <Heading className="text-[clamp(1.5rem,9.4cqw,2.25rem)] leading-none wrap-break-word uppercase lg:text-[3.7cqw]">
           <Link
             href={getCaseStudyPath(study)}
             className="rounded-md transition-colors duration-300 after:absolute after:inset-0 group-intent:text-accent"

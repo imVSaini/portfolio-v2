@@ -1,14 +1,14 @@
 import { code, h2, p, ul } from "@/data/article";
 import { diagram, type CaseStudy } from "@/data/caseStudies/schema";
 
-export const workOrbit: CaseStudy = {
-  slug: "workorbit",
-  title: "WorkOrbit",
+export const leadCrm: CaseStudy = {
+  slug: "lead-management-crm",
+  title: "Lead Management CRM",
   category: "B2B SaaS",
   headline:
     "A multi-tenant lead management CRM: a Postgres schema per workspace, scoped roles, an audit log nobody can edit and leads that flow in from Facebook and Instagram ads.",
   summary:
-    "How I built WorkOrbit, a schema-per-tenant CRM on FastAPI and PostgreSQL: scoped roles, an append-only audit log, Meta Lead Ads ingestion and what each cost.",
+    "Building a schema-per-tenant lead management CRM on FastAPI and PostgreSQL: scoped roles, an append-only audit log, Meta Lead Ads ingestion and what each cost.",
   date: "2026-11-12",
   tint: "orange",
   art: "pipeline",
@@ -43,7 +43,7 @@ export const workOrbit: CaseStudy = {
   overview: [
     h2("The problem"),
     p(
-      "WorkOrbit is a lead management system for B2B sales teams: leads, a drag-and-drop pipeline, notes, an activity timeline, a dashboard, and stages, sources and custom fields that each workspace defines for itself. A platform admin creates every workspace. There is no public sign-up.",
+      "The CRM is a lead management system for B2B sales teams: leads, a drag-and-drop pipeline, notes, an activity timeline, a dashboard, and stages, sources and custom fields that each workspace defines for itself. A platform admin creates every workspace. There is no public sign-up.",
     ),
     p(
       "Leads are not only typed in. A workspace connects its Facebook Pages once, maps each lead-ad form to a product, an owner and a starting stage, and submissions from Facebook and Instagram land in the pipeline on their own.",
@@ -177,7 +177,7 @@ def tenant_session(tenant_schema: str) -> Iterator[Session]:
   outcome: [
     h2("Where it stands"),
     p(
-      "The API exposes 80 endpoints over 22 tables, shipped through 8 migrations. 135 API tests run against the live stack over HTTP instead of mocks, and 126 Playwright tests drive the browser. Sign-in supports TOTP with recovery codes and WebAuthn passkeys, sessions can be listed and revoked, and a superadmin entering a workspace is logged on every request. WorkOrbit is in production. Leads from Facebook and Instagram ads reach each workspace’s pipeline already assigned by their form’s mapping, and an expired Page token marks its connection for reconnecting instead of failing quietly.",
+      "The API exposes 80 endpoints over 22 tables, shipped through 8 migrations. 135 API tests run against the live stack over HTTP instead of mocks, and 126 Playwright tests drive the browser. Sign-in supports TOTP with recovery codes and WebAuthn passkeys, sessions can be listed and revoked, and a superadmin entering a workspace is logged on every request. The CRM is in production. Leads from Facebook and Instagram ads reach each workspace’s pipeline already assigned by their form’s mapping, and an expired Page token marks its connection for reconnecting instead of failing quietly.",
     ),
     h2("What I would change"),
     ul(

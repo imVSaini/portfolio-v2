@@ -95,7 +95,7 @@ function CaseStudyContent({ study }: { study: CaseStudy }) {
       <article className="flex flex-col gap-10 md:gap-14">
         <header className="flex flex-col gap-6">
           <CaseStudyBreadcrumbs study={study} />
-          <RevealText as="h1" on="load" className="text-h2 uppercase">
+          <RevealText as="h1" on="load" className="text-h2 uppercase max-[24rem]:text-[11.5vw]">
             {study.title}
           </RevealText>
           <p className="max-w-3xl text-p1 text-muted">{study.headline}</p>
@@ -159,7 +159,7 @@ function CaseStudyContent({ study }: { study: CaseStudy }) {
               <RollText text="All case studies" />
             </Link>
           </div>
-          <CaseStudyEntry study={next} position={caseStudies.indexOf(next) + 1} as="h3" />
+          <CaseStudyEntry study={next} as="h3" />
         </section>
       )}
     </>

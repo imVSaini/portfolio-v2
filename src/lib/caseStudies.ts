@@ -12,7 +12,7 @@ export const DECISIONS_HEADING = "Decisions and trade-offs";
  * @example
  * ```ts
  * getCaseStudyPath(study);
- * // => "/case-studies/workorbit"
+ * // => "/case-studies/lead-management-crm"
  * ```
  */
 export function getCaseStudyPath(study: CaseStudy): `/case-studies/${string}` {

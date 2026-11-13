@@ -1,3 +1,4 @@
+import { leadCrm } from "@/data/caseStudies/leadCrm";
 import type {
   CaseStudy,
   CaseStudyArtName,
@@ -8,7 +9,6 @@ import type {
   CaseStudyMetric,
 } from "@/data/caseStudies/schema";
 import { supportAssistant } from "@/data/caseStudies/supportAssistant";
-import { workOrbit } from "@/data/caseStudies/workOrbit";
 import { site } from "@/data/site";
 
 export type {
@@ -28,4 +28,4 @@ export const caseStudiesPage = {
 } as const;
 
 /** In display order. Each study links on to the one after it. */
-export const caseStudies: CaseStudy[] = [workOrbit, supportAssistant];
+export const caseStudies: CaseStudy[] = [leadCrm, supportAssistant];
