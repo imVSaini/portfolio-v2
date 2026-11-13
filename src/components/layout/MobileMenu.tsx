@@ -8,6 +8,7 @@ import { useRef, useState } from "react";
 import { AppearanceControls } from "@/components/appearance/AppearanceControls";
 import { RollText } from "@/components/motion/RollText";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
+import { CloseIcon } from "@/components/ui/CloseIcon";
 import { socialIcons } from "@/components/ui/SocialIcons";
 import { contact } from "@/data/contact";
 import { nav } from "@/data/site";
@@ -46,14 +47,14 @@ export function MobileMenu({ className }: { className?: string }) {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-faded-black/40 backdrop-blur-sm transition-opacity duration-300 starting-style:opacity-0 ending-style:opacity-0" />
-        <Dialog.Popup className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col gap-10 overflow-y-auto bg-manila-light p-6 transition-transform duration-500 ease-out-expo dark:bg-faded-black starting-style:translate-x-full ending-style:translate-x-full">
-          <div className="flex items-center justify-between">
+        <Dialog.Popup className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col gap-10 overflow-y-auto bg-manila-light px-(--page-gutter) pb-6 transition-transform duration-500 ease-out-expo dark:bg-faded-black starting-style:translate-x-full ending-style:translate-x-full">
+          <div className="flex h-(--header-h) shrink-0 items-center justify-between">
             <Dialog.Title className="font-display text-p4 text-muted uppercase">Menu</Dialog.Title>
             <Dialog.Close
               aria-label="Close menu"
-              className="flex size-10 cursor-pointer items-center justify-center rounded-md text-h4 corner-squircle intent:bg-hover"
+              className="flex size-10 cursor-pointer items-center justify-center rounded-md corner-squircle intent:bg-hover"
             >
-              ×
+              <CloseIcon className="size-6" />
             </Dialog.Close>
           </div>
           <nav aria-label="Mobile">

@@ -296,6 +296,7 @@
   --hover: var(--color-manila-50);
   --info: #26769b;
   --header-h: 4.5rem;
+  --page-gutter: clamp(1rem, 4vw, 3.5rem);
   --card-invert: var(--color-faded-black);
   --card-soft: var(--color-manila-50);
 
@@ -388,7 +389,7 @@ html.dark[data-accent="red"] {
   margin-inline: auto;
   width: 100%;
   max-width: 90rem;
-  padding-inline: clamp(1rem, 4vw, 3.5rem);
+  padding-inline: var(--page-gutter);
 }
 
 /* ---------------------------------------------------------------------------
