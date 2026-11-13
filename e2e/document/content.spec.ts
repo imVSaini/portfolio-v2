@@ -260,10 +260,6 @@ test.describe("site chrome without JavaScript", () => {
         await expect(anchor).toHaveAttribute("target", "_blank");
         await expect(anchor).toHaveAttribute("rel", /noreferrer/);
       }
-      await expect(footer.getByRole("link", { name: "RSS feed of the blog" })).toHaveAttribute(
-        "href",
-        "/rss.xml",
-      );
       await expect(footer.getByRole("link", { name: "Back to top" })).toHaveAttribute(
         "href",
         "#top",

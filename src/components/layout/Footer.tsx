@@ -6,8 +6,7 @@ import { useRef } from "react";
 import { RollText } from "@/components/motion/RollText";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
 import { Seal } from "@/components/ui/Seal";
-import { RssIcon, socialIcons } from "@/components/ui/SocialIcons";
-import { blog } from "@/data/blog";
+import { socialIcons } from "@/components/ui/SocialIcons";
 import { contact } from "@/data/contact";
 import { site } from "@/data/site";
 import { useCurrentYear } from "@/hooks/useCurrentYear";
@@ -164,20 +163,6 @@ export function Footer() {
               </li>
             );
           })}
-          <li>
-            <a
-              href={blog.feedPath}
-              type="application/rss+xml"
-              aria-label="RSS feed of the blog"
-              className="group inline-flex min-h-11 items-center gap-2 md:min-h-6"
-            >
-              <RssIcon
-                aria-hidden="true"
-                className="size-3.5 transition-colors duration-300 group-hover:text-accent group-focus-visible:text-accent"
-              />
-              <RollText text="RSS" />
-            </a>
-          </li>
         </ul>
         <ScrollLink
           href="#top"

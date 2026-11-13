@@ -30,12 +30,4 @@ export function XIcon(props: IconProps) {
   );
 }
 
-export function RssIcon(props: IconProps) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
-      <path d="M3.43 17.14a3.43 3.43 0 1 1 0 6.86 3.43 3.43 0 0 1 0-6.86ZM0 8.57a15.43 15.43 0 0 1 15.43 15.43h-4.57A10.86 10.86 0 0 0 0 13.14V8.57ZM0 0a24 24 0 0 1 24 24h-4.57A19.43 19.43 0 0 0 0 4.57V0Z" />
-    </svg>
-  );
-}
-
 export const socialIcons = { LinkedIn: LinkedInIcon, GitHub: GitHubIcon } as const;

@@ -237,7 +237,6 @@ test.describe("footer", () => {
         footer.getByRole("link", { name: `${link.label} (opens in a new tab)` }),
       ).toBeVisible();
     }
-    await expect(footer.getByRole("link", { name: "RSS feed of the blog" })).toBeVisible();
     await expect(footer.getByRole("link", { name: "Back to top" })).toBeVisible();
     await expect(footer.getByRole("link", { name: "Privacy policy" })).toBeVisible();
     await expect(footer).toContainText(`© ${new Date().getFullYear()} ${site.fullName}`);
