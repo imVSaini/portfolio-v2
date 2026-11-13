@@ -20,8 +20,10 @@ async function getHiddenLinks(menu: Locator) {
   return menu.getByRole("navigation", { name: "Mobile" }).evaluate((nav) =>
     [...nav.querySelectorAll("a")].flatMap((link) => {
       const mask = link.getBoundingClientRect();
-      const text = link.firstElementChild?.getBoundingClientRect();
-      const shown = text && text.top >= mask.top - 0.5 && text.bottom <= mask.bottom + 0.5;
+      const shown = [...link.children].every((part) => {
+        const box = part.getBoundingClientRect();
+        return box.top >= mask.top - 0.5 && box.bottom <= mask.bottom + 0.5;
+      });
       return shown ? [] : [link.textContent ?? ""];
     }),
   );
@@ -346,6 +348,74 @@ test.describe("mobile menu motion", () => {
     const menu = await openMenu(page);
 
     await expect.poll(() => getHiddenLinks(menu)).toEqual([]);
+  });
+
+  test("grows out of the close button", async ({ page, visit }) => {
+    await visit("/");
+    await page.evaluate(() => {
+      const root = document.documentElement;
+      const observer = new MutationObserver(() => {
+        const menu = document.querySelector('[role="dialog"]');
+        const close = menu?.querySelector('[aria-label="Close menu"]');
+        if (!menu || !close) return;
+        observer.disconnect();
+        const started = performance.now();
+        const frames: string[] = [];
+        const sample = () => {
+          const button = close.getBoundingClientRect();
+          const atButton = document.elementFromPoint(
+            button.left + button.width / 2,
+            button.top + button.height / 2,
+          );
+          const atCorner = document.elementFromPoint(window.innerWidth - 2, window.innerHeight - 2);
+          frames.push(`${menu.contains(atButton)}/${menu.contains(atCorner)}`);
+          if (performance.now() - started < 1500) requestAnimationFrame(sample);
+          else root.dataset.menuReveal = frames.join(",");
+        };
+        requestAnimationFrame(sample);
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    });
+    await openMenu(page);
+
+    await expect.poll(() => page.locator("html").getAttribute("data-menu-reveal")).not.toBeNull();
+    const frames = (await page.locator("html").getAttribute("data-menu-reveal"))?.split(",") ?? [];
+    expect(frames).toContain("true/false");
+    expect(frames).not.toContain("false/true");
+    expect(frames.at(-1)).toBe("true/true");
+  });
+
+  test("sets the current page apart", async ({ page, visit }) => {
+    await visit("/blog");
+    const menu = await openMenu(page);
+    const links = menu.getByRole("navigation", { name: "Mobile" }).getByRole("link");
+
+    await expect(links.filter({ hasText: "Blog" })).toHaveAttribute("aria-current", "page");
+    const colors = await menu.getByRole("navigation", { name: "Mobile" }).evaluate((nav) =>
+      [...nav.querySelectorAll("a")].map((link) => ({
+        current: link.getAttribute("aria-current") === "page",
+        color: getComputedStyle(link).color,
+      })),
+    );
+    const current = colors.filter((link) => link.current);
+    const others = new Set(colors.filter((link) => !link.current).map((link) => link.color));
+    expect(current).toHaveLength(1);
+    expect(others.size).toBe(1);
+    expect(others.has(current[0]?.color ?? "")).toBe(false);
+  });
+
+  test("keeps the close button in reach while the panel scrolls", async ({ page, visit }) => {
+    await page.setViewportSize({ width: 390, height: 500 });
+    await visit("/");
+    const menu = await openMenu(page);
+    await expect.poll(() => getHiddenLinks(menu)).toEqual([]);
+
+    await menu.evaluate((panel) => panel.scrollTo({ top: panel.scrollHeight }));
+
+    await expect(menu.getByRole("link", { name: contact.email })).toBeInViewport();
+    await expect(menu.getByRole("button", { name: "Close menu" })).toBeInViewport({ ratio: 1 });
+    await menu.getByRole("button", { name: "Close menu" }).click();
+    await expect(menu).toBeHidden();
   });
 
   test("animates open rather than snapping", async ({ page, visit }) => {

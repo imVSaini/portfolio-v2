@@ -18,10 +18,10 @@ import { scrollToAnchor } from "@/lib/scrollToAnchor";
 const DESKTOP_NAV_QUERY = "(min-width: 64rem)";
 
 const NAV_LINK_CLASS_NAME =
-  "group block overflow-hidden font-display text-h3 font-semibold uppercase";
+  "group block overflow-hidden font-display uppercase aria-[current=page]:text-accent";
 
 const RISE_CLASS_NAME =
-  "flex min-h-11 items-center py-1 transition-transform delay-(--delay) duration-700 ease-out-expo group-starting-style/menu:translate-y-full group-ending-style/menu:-translate-y-full group-ending-style/menu:delay-0 group-ending-style/menu:duration-300 motion-reduce:transition-none";
+  "flex min-h-11 items-center py-1 text-h3 font-semibold transition-transform delay-(--delay) duration-700 ease-out-expo group-starting-style/menu:translate-y-full group-ending-style/menu:-translate-y-full group-ending-style/menu:delay-0 group-ending-style/menu:duration-300 motion-reduce:transition-none";
 
 const FADE_CLASS_NAME =
   "transition-[translate,opacity] delay-(--delay) duration-700 ease-out-expo group-starting-style/menu:translate-y-4 group-starting-style/menu:opacity-0 group-ending-style/menu:opacity-0 group-ending-style/menu:delay-0 group-ending-style/menu:duration-300 motion-reduce:transition-none";
@@ -82,9 +82,9 @@ export function MobileMenu({ className }: { className?: string }) {
         />
         <Dialog.Popup
           data-lenis-prevent=""
-          className="group/menu fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col gap-10 overflow-y-auto overscroll-contain bg-manila-light px-(--page-gutter) pb-6 transition-[clip-path] duration-700 ease-out-expo [clip-path:inset(0)] motion-reduce:transition-none dark:bg-faded-black starting-style:[clip-path:inset(0_0_0_100%)] ending-style:duration-500 ending-style:[clip-path:inset(0_0_0_100%)]"
+          className="group/menu fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col gap-10 overflow-y-auto overscroll-contain bg-manila-light px-(--page-gutter) pb-6 transition-[clip-path] duration-900 ease-out-expo [--menu-origin:calc(100%-var(--page-gutter)-1.375rem)_calc(var(--header-h)/2)] [clip-path:circle(150%_at_var(--menu-origin))] motion-reduce:transition-none dark:bg-faded-black starting-style:[clip-path:circle(0px_at_var(--menu-origin))] ending-style:duration-500 ending-style:[clip-path:circle(0px_at_var(--menu-origin))]"
         >
-          <div className="flex h-(--header-h) shrink-0 items-center justify-between">
+          <div className="sticky top-0 z-10 -mx-(--page-gutter) flex h-(--header-h) shrink-0 items-center justify-between bg-manila-light px-(--page-gutter) dark:bg-faded-black">
             <Dialog.Title
               className={cn("font-display text-p4 text-muted uppercase", FADE_CLASS_NAME)}
               style={delay(STAGGER_START - STAGGER_STEP)}
@@ -112,7 +112,7 @@ export function MobileMenu({ className }: { className?: string }) {
             </Dialog.Close>
           </div>
           <nav aria-label="Mobile">
-            <ul className="flex flex-col gap-1">
+            <ul className="flex flex-col">
               {nav.map((item, i) => (
                 <li key={item.href}>
                   {item.kind === "section" && onHome ? (
