@@ -13,6 +13,8 @@ const tints: Record<ProjectTint, string> = {
 const WINDOW_LABELS: Record<CaseStudyArtName, string> = {
   pipeline: "Pipeline",
   chat: "Support chat",
+  ledger: "Journal entry",
+  parking: "Reservation",
 };
 
 const STAGES = [
@@ -25,6 +27,20 @@ const STAGES = [
 const DRAGGED_CARD = { column: 2, card: 0 } as const;
 
 const SOURCES = ["pricing.pdf", "faq.md"] as const;
+
+const LEDGER_LINES: { account: string; debit?: string; credit?: string }[] = [
+  { account: "Bank account", debit: "1,130.00" },
+  { account: "Sales revenue", credit: "1,000.00" },
+  { account: "Sales tax payable", credit: "130.00" },
+  { account: "Office rent", debit: "800.00" },
+  { account: "Bank account", credit: "800.00" },
+];
+
+const LEDGER_TOTAL = "1,930.00";
+
+const BAY_COUNT = 16;
+const TAKEN_BAYS: readonly number[] = [0, 1, 3, 6, 7, 8, 10, 12, 13, 15];
+const RESERVED_BAY = 4;
 
 const bar = "h-[0.9cqw] rounded-full";
 const bubble = "rounded-[2cqw] px-[2.6cqw] py-[1.8cqw]";
@@ -126,7 +142,99 @@ function ChatArt() {
   );
 }
 
-const art = { pipeline: PipelineArt, chat: ChatArt } as const;
+const ledgerRow = "grid grid-cols-[1fr_24%_24%] items-center gap-[2cqw]";
+
+function LedgerArt() {
+  return (
+    <div className="flex flex-1 flex-col p-[3cqw] text-[clamp(0.5rem,1.7cqw,0.875rem)] leading-snug">
+      <p
+        className={cn(
+          ledgerRow,
+          "pb-[1.3cqw] font-display font-medium tracking-wide text-muted uppercase",
+        )}
+      >
+        <span>Account</span>
+        <span className="text-right">Debit</span>
+        <span className="text-right">Credit</span>
+      </p>
+      {LEDGER_LINES.map((line, i) => (
+        <p key={i} className={cn(ledgerRow, "border-t border-line py-[1.3cqw] tabular-nums")}>
+          <span className="flex min-w-0 items-center gap-[1.2cqw]">
+            <span
+              className={cn("size-[1cqw] shrink-0", line.debit ? "bg-accent" : "bg-line-strong")}
+            />
+            <span className="truncate">{line.account}</span>
+          </span>
+          <span className="text-right">{line.debit}</span>
+          <span className="text-right text-muted">{line.credit}</span>
+        </p>
+      ))}
+      <p
+        className={cn(
+          ledgerRow,
+          "mt-[1cqw] rounded-[1.4cqw] bg-accent px-[1.6cqw] py-[1.3cqw] font-medium text-faded-black tabular-nums shadow-xl",
+        )}
+      >
+        <span className="font-display tracking-wide uppercase">Balanced</span>
+        <span className="text-right">{LEDGER_TOTAL}</span>
+        <span className="text-right">{LEDGER_TOTAL}</span>
+      </p>
+    </div>
+  );
+}
+
+function ParkingArt() {
+  return (
+    <div className="flex flex-1 flex-col gap-[2.2cqw] p-[3cqw] text-[clamp(0.5rem,1.7cqw,0.875rem)] leading-snug">
+      <p className="flex items-center justify-between gap-[2cqw] font-display font-medium tracking-wide uppercase">
+        <span className="flex min-w-0 items-center gap-[1cqw]">
+          <span className="size-[1cqw] shrink-0 bg-accent" />
+          <span className="truncate">Terminal lot</span>
+        </span>
+        <span className="shrink-0 text-muted tabular-nums">
+          {BAY_COUNT - TAKEN_BAYS.length - 1} of {BAY_COUNT} free
+        </span>
+      </p>
+      <div className="grid grid-cols-8 gap-[1.4cqw]">
+        {Array.from({ length: BAY_COUNT }, (_, bay) => {
+          const reserved = bay === RESERVED_BAY;
+          const taken = TAKEN_BAYS.includes(bay);
+          return (
+            <span
+              key={bay}
+              className={cn(
+                "flex aspect-3/4 items-center justify-center rounded-[1.2cqw] border",
+                reserved && "translate-y-[-0.8cqw] -rotate-3 border-accent bg-accent shadow-xl",
+                taken && "border-line bg-surface",
+                !reserved && !taken && "border-dashed border-line-strong",
+              )}
+            >
+              {(reserved || taken) && (
+                <span
+                  className={cn(
+                    "h-3/5 w-1/2 rounded-[0.9cqw]",
+                    reserved ? "bg-faded-black/70" : "bg-line-strong",
+                  )}
+                />
+              )}
+            </span>
+          );
+        })}
+      </div>
+      <p className="flex items-center justify-between gap-[2cqw] rounded-[1.4cqw] border border-line bg-surface px-[2cqw] py-[1.4cqw] tabular-nums">
+        <span className="truncate text-muted">4 days, deposit paid online</span>
+        <span className="shrink-0 font-medium">$58.00</span>
+      </p>
+    </div>
+  );
+}
+
+const art = {
+  pipeline: PipelineArt,
+  chat: ChatArt,
+  ledger: LedgerArt,
+  parking: ParkingArt,
+} as const;
 
 type CaseStudyCoverProps = {
   study: CaseStudy;

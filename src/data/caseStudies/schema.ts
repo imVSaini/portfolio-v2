@@ -2,11 +2,21 @@ import type { DiagramBlock, TextBlock } from "@/data/article";
 import type { ProjectTint } from "@/data/projects";
 
 /** Product mock-up drawn on the cover; each name maps to a drawing in `CaseStudyCover`. */
-export type CaseStudyArtName = "pipeline" | "chat";
+export type CaseStudyArtName = "pipeline" | "chat" | "ledger" | "parking";
 
 /** Line drawing set inside a case study; each name maps to a drawing in `CaseStudyDiagram`. */
 export type CaseStudyDiagramName =
-  "tenantRequest" | "answerPath" | "metaLeads" | "leadCapture" | "knowledgeBase";
+  | "tenantRequest"
+  | "answerPath"
+  | "metaLeads"
+  | "leadCapture"
+  | "knowledgeBase"
+  | "bookingHold"
+  | "paymentPaths"
+  | "priceBuild"
+  | "statementImport"
+  | "documentBill"
+  | "magicLink";
 
 export type CaseStudyBlock = TextBlock | DiagramBlock<CaseStudyDiagramName>;
 

@@ -1,4 +1,6 @@
+import { bookkeepingPlatform } from "@/data/caseStudies/bookkeepingPlatform";
 import { leadCrm } from "@/data/caseStudies/leadCrm";
+import { parkingMarketplace } from "@/data/caseStudies/parkingMarketplace";
 import type {
   CaseStudy,
   CaseStudyArtName,
@@ -28,4 +30,9 @@ export const caseStudiesPage = {
 } as const;
 
 /** In display order. Each study links on to the one after it. */
-export const caseStudies: CaseStudy[] = [leadCrm, supportAssistant];
+export const caseStudies: CaseStudy[] = [
+  supportAssistant,
+  leadCrm,
+  bookkeepingPlatform,
+  parkingMarketplace,
+];

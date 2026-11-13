@@ -8,6 +8,12 @@ const TITLES: Record<CaseStudyDiagramName, string> = {
   metaLeads: "Two signals, one lead",
   leadCapture: "Website lead capture",
   knowledgeBase: "From document to chunks",
+  bookingHold: "Holding a space",
+  paymentPaths: "Three ways to confirm",
+  priceBuild: "How a price is built",
+  statementImport: "From statement to ledger",
+  documentBill: "From document to bill",
+  magicLink: "A link that works once",
 };
 
 type CaseStudyDiagramProps = {

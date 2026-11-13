@@ -1,8 +1,19 @@
 import type { ReactNode } from "react";
 
 import { Label } from "@/components/article/ArtParts";
-import { DiagramCanvas, Graph, type NodeSpec } from "@/components/article/DiagramParts";
+import { DiagramCanvas, Graph, Sub, type NodeSpec } from "@/components/article/DiagramParts";
 import type { CaseStudyDiagramName } from "@/data/caseStudies";
+
+function LaterKey() {
+  return (
+    <g data-d="fade">
+      <path d="M16 207.5 H41" strokeWidth={1.5} strokeDasharray="5 5" />
+      <Sub x={49} y={211}>
+        Runs later
+      </Sub>
+    </g>
+  );
+}
 
 const CHAIN: Pick<NodeSpec, "id" | "label" | "icon" | "accent">[] = [
   { id: "jwt", label: "JWT", icon: "key" },
@@ -61,7 +72,7 @@ function TenantRequest() {
           { from: "membership", to: "session" },
           { from: "session", to: "permission" },
           { from: "permission", to: "handler" },
-          { from: "membership", to: "public", dashed: true },
+          { from: "membership", to: "public" },
           { from: "session", to: "acme" },
         ]}
       />
@@ -221,11 +232,11 @@ function MetaLeads() {
       <Graph
         nodes={META_NODES}
         links={[
-          { from: "webhook", to: "claim", fromX: 88, toX: 88 },
+          { from: "webhook", to: "claim", dashed: true, fromX: 88, toX: 88 },
           { from: "sweep", to: "claim", toX: 160 },
           { from: "claim", to: "fetch" },
           { from: "fetch", to: "lead" },
-          { from: "mapping", to: "lead", dashed: true },
+          { from: "mapping", to: "lead" },
         ]}
       />
       <g data-d="fade">
@@ -233,6 +244,7 @@ function MetaLeads() {
           A lead id that is already claimed stops there
         </Label>
       </g>
+      <LaterKey />
     </>
   );
 }
@@ -395,6 +407,495 @@ function KnowledgeBase() {
           A sync replaces every chunk of the document
         </Label>
       </g>
+      <LaterKey />
+    </>
+  );
+}
+
+const BOOKING_NODES: NodeSpec[] = [
+  {
+    id: "reprice",
+    x: 16,
+    y: 16,
+    w: 208,
+    label: "Reprice",
+    sub: "Server-side, from rates",
+    icon: "list",
+  },
+  {
+    id: "lock",
+    x: 256,
+    y: 16,
+    w: 208,
+    label: "Lot lock",
+    sub: "FOR UPDATE on the lot row",
+    icon: "key",
+    accent: true,
+  },
+  {
+    id: "count",
+    x: 496,
+    y: 16,
+    w: 208,
+    label: "Overlap count",
+    sub: "Paid, parked or held",
+    icon: "layers",
+  },
+  {
+    id: "hold",
+    x: 16,
+    y: 128,
+    w: 208,
+    label: "Reservation",
+    sub: "Pending, 10-minute hold",
+    icon: "db",
+    accent: true,
+  },
+  {
+    id: "intent",
+    x: 256,
+    y: 128,
+    w: 208,
+    label: "PaymentIntent",
+    sub: "Created after commit",
+    icon: "card",
+  },
+  {
+    id: "expiry",
+    x: 496,
+    y: 128,
+    w: 208,
+    label: "Expiry job",
+    sub: "Delayed by 10 minutes",
+    icon: "refresh",
+  },
+];
+
+function BookingHold() {
+  return (
+    <>
+      <Graph
+        nodes={BOOKING_NODES}
+        links={[
+          { from: "reprice", to: "lock" },
+          { from: "lock", to: "count" },
+          { from: "count", to: "hold" },
+          { from: "hold", to: "intent" },
+          { from: "intent", to: "expiry", dashed: true },
+        ]}
+      />
+      <g data-d="fade">
+        <Label x={360} y={211} anchor="middle" size={10}>
+          Stripe is never called while the lot is locked
+        </Label>
+      </g>
+      <LaterKey />
+    </>
+  );
+}
+
+const PAYMENT_NODES: NodeSpec[] = [
+  {
+    id: "expiry",
+    x: 16,
+    y: 16,
+    w: 208,
+    label: "Expiry job",
+    sub: "When the hold ends",
+    icon: "refresh",
+  },
+  {
+    id: "sweep",
+    x: 256,
+    y: 16,
+    w: 208,
+    label: "Sweep",
+    sub: "Every 6 hours",
+    icon: "list",
+  },
+  {
+    id: "webhook",
+    x: 496,
+    y: 16,
+    w: 208,
+    label: "Webhook",
+    sub: "Signed, deduped by id",
+    icon: "shield",
+  },
+  {
+    id: "stripe",
+    x: 16,
+    y: 128,
+    w: 208,
+    label: "Stripe",
+    sub: "Asked before cancelling",
+    icon: "globe",
+  },
+  {
+    id: "reservation",
+    x: 256,
+    y: 128,
+    w: 208,
+    label: "Reservation",
+    sub: "Confirmed or cancelled",
+    icon: "db",
+    accent: true,
+  },
+  {
+    id: "refund",
+    x: 496,
+    y: 128,
+    w: 208,
+    label: "Refund",
+    sub: "Paid after the hold",
+    icon: "card",
+  },
+];
+
+function PaymentPaths() {
+  return (
+    <>
+      <Graph
+        nodes={PAYMENT_NODES}
+        links={[
+          { from: "expiry", to: "stripe", fromX: 88, toX: 88 },
+          { from: "sweep", to: "stripe", fromX: 320, toX: 160 },
+          { from: "stripe", to: "reservation" },
+          { from: "webhook", to: "reservation", toX: 400 },
+          { from: "reservation", to: "refund" },
+        ]}
+      />
+      <g data-d="fade">
+        <Label x={360} y={211} anchor="middle" size={10}>
+          Whichever signal arrives first does the work
+        </Label>
+      </g>
+    </>
+  );
+}
+
+const PRICE_NODES: NodeSpec[] = [
+  {
+    id: "period",
+    x: 16,
+    y: 16,
+    w: 208,
+    label: "Rate period",
+    sub: "Chosen by arrival date",
+    icon: "list",
+  },
+  {
+    id: "tier",
+    x: 256,
+    y: 16,
+    w: 208,
+    label: "Length tier",
+    sub: "Daily, weekly, monthly",
+    icon: "layers",
+  },
+  {
+    id: "taxes",
+    x: 496,
+    y: 16,
+    w: 208,
+    label: "Taxes",
+    sub: "Per component, compound",
+    icon: "chart",
+  },
+  {
+    id: "deposit",
+    x: 16,
+    y: 128,
+    w: 208,
+    label: "Deposit",
+    sub: "Total × commission rate",
+    icon: "card",
+    accent: true,
+  },
+  {
+    id: "coupon",
+    x: 256,
+    y: 128,
+    w: 208,
+    label: "Coupon",
+    sub: "Off the total or deposit",
+    icon: "bolt",
+  },
+  {
+    id: "snapshot",
+    x: 496,
+    y: 128,
+    w: 208,
+    label: "Snapshot",
+    sub: "Stored on the reservation",
+    icon: "db",
+    accent: true,
+  },
+];
+
+function PriceBuild() {
+  return (
+    <>
+      <Graph
+        nodes={PRICE_NODES}
+        links={[
+          { from: "period", to: "tier" },
+          { from: "tier", to: "taxes" },
+          { from: "taxes", to: "deposit" },
+          { from: "deposit", to: "coupon" },
+          { from: "coupon", to: "snapshot" },
+        ]}
+      />
+      <g data-d="fade">
+        <Label x={360} y={211} anchor="middle" size={10}>
+          The client sends dates and choices, never amounts
+        </Label>
+      </g>
+    </>
+  );
+}
+
+const STATEMENT_NODES: NodeSpec[] = [
+  {
+    id: "statement",
+    x: 16,
+    y: 16,
+    w: 208,
+    label: "Statement",
+    sub: "CSV or spreadsheet",
+    icon: "box",
+  },
+  {
+    id: "fingerprint",
+    x: 256,
+    y: 16,
+    w: 208,
+    label: "Fingerprint",
+    sub: "SHA-256, unique index",
+    icon: "key",
+    accent: true,
+  },
+  {
+    id: "drafts",
+    x: 496,
+    y: 16,
+    w: 208,
+    label: "Drafts",
+    sub: "Batches of 100",
+    icon: "layers",
+  },
+  {
+    id: "rules",
+    x: 16,
+    y: 128,
+    w: 208,
+    label: "Rules",
+    sub: "Run in priority order",
+    icon: "list",
+  },
+  {
+    id: "model",
+    x: 256,
+    y: 128,
+    w: 208,
+    label: "Model",
+    sub: "Suggests a known account",
+    icon: "bolt",
+  },
+  {
+    id: "journal",
+    x: 496,
+    y: 128,
+    w: 208,
+    label: "Journal entry",
+    sub: "Written on posting",
+    icon: "db",
+    accent: true,
+  },
+];
+
+function StatementImport() {
+  return (
+    <>
+      <Graph
+        nodes={STATEMENT_NODES}
+        links={[
+          { from: "statement", to: "fingerprint", dashed: true },
+          { from: "fingerprint", to: "drafts" },
+          { from: "drafts", to: "rules" },
+          { from: "rules", to: "model", dashed: true },
+          { from: "model", to: "journal", dashed: true },
+        ]}
+      />
+      <g data-d="fade">
+        <Label x={360} y={211} anchor="middle" size={10}>
+          A row seen before is skipped, not imported twice
+        </Label>
+      </g>
+      <LaterKey />
+    </>
+  );
+}
+
+const DOCUMENT_NODES: NodeSpec[] = [
+  {
+    id: "document",
+    x: 16,
+    y: 16,
+    w: 208,
+    label: "Document",
+    sub: "PDF or photo, queued",
+    icon: "box",
+  },
+  {
+    id: "ocr",
+    x: 256,
+    y: 16,
+    w: 208,
+    label: "OCR",
+    sub: "Several Tesseract passes",
+    icon: "layers",
+  },
+  {
+    id: "extract",
+    x: 496,
+    y: 16,
+    w: 208,
+    label: "Extract",
+    sub: "Label and pattern rules",
+    icon: "list",
+  },
+  {
+    id: "supplier",
+    x: 16,
+    y: 128,
+    w: 208,
+    label: "Supplier",
+    sub: "Matched by name",
+    icon: "route",
+  },
+  {
+    id: "review",
+    x: 256,
+    y: 128,
+    w: 208,
+    label: "Review",
+    sub: "A person approves",
+    icon: "monitor",
+    accent: true,
+  },
+  {
+    id: "bill",
+    x: 496,
+    y: 128,
+    w: 208,
+    label: "Bill",
+    sub: "Dr expense, Cr payables",
+    icon: "db",
+    accent: true,
+  },
+];
+
+function DocumentBill() {
+  return (
+    <>
+      <Graph
+        nodes={DOCUMENT_NODES}
+        links={[
+          { from: "document", to: "ocr", dashed: true },
+          { from: "ocr", to: "extract" },
+          { from: "extract", to: "supplier" },
+          { from: "supplier", to: "review", dashed: true },
+          { from: "review", to: "bill" },
+        ]}
+      />
+      <g data-d="fade">
+        <Label x={360} y={211} anchor="middle" size={10}>
+          Nothing is posted until someone approves it
+        </Label>
+      </g>
+      <LaterKey />
+    </>
+  );
+}
+
+const MAGIC_LINK_NODES: NodeSpec[] = [
+  {
+    id: "request",
+    x: 16,
+    y: 16,
+    w: 208,
+    label: "Request",
+    sub: "Same reply either way",
+    icon: "mail",
+  },
+  {
+    id: "token",
+    x: 256,
+    y: 16,
+    w: 208,
+    label: "Token",
+    sub: "Signed, purpose and id",
+    icon: "key",
+  },
+  {
+    id: "hash",
+    x: 496,
+    y: 16,
+    w: 208,
+    label: "Stored hash",
+    sub: "SHA-256 of the id only",
+    icon: "layers",
+  },
+  {
+    id: "verify",
+    x: 16,
+    y: 128,
+    w: 208,
+    label: "Verify",
+    sub: "Signature and purpose",
+    icon: "shield",
+  },
+  {
+    id: "claim",
+    x: 256,
+    y: 128,
+    w: 208,
+    label: "Claim",
+    sub: "Row lock, marked used",
+    icon: "db",
+    accent: true,
+  },
+  {
+    id: "session",
+    x: 496,
+    y: 128,
+    w: 208,
+    label: "Session",
+    sub: "Tokens for one tenant",
+    icon: "monitor",
+  },
+];
+
+function MagicLink() {
+  return (
+    <>
+      <Graph
+        nodes={MAGIC_LINK_NODES}
+        links={[
+          { from: "request", to: "token" },
+          { from: "token", to: "hash" },
+          { from: "hash", to: "verify", dashed: true },
+          { from: "verify", to: "claim" },
+          { from: "claim", to: "session" },
+        ]}
+      />
+      <g data-d="fade">
+        <Label x={360} y={211} anchor="middle" size={10}>
+          A second click finds no unused row
+        </Label>
+      </g>
+      <LaterKey />
     </>
   );
 }
@@ -405,6 +906,12 @@ const diagrams: Record<CaseStudyDiagramName, { height: number; Art: () => ReactN
   metaLeads: { height: 226, Art: MetaLeads },
   leadCapture: { height: 226, Art: LeadCapture },
   knowledgeBase: { height: 226, Art: KnowledgeBase },
+  bookingHold: { height: 226, Art: BookingHold },
+  paymentPaths: { height: 226, Art: PaymentPaths },
+  priceBuild: { height: 226, Art: PriceBuild },
+  statementImport: { height: 226, Art: StatementImport },
+  documentBill: { height: 226, Art: DocumentBill },
+  magicLink: { height: 226, Art: MagicLink },
 };
 
 type CaseStudyDiagramArtProps = {

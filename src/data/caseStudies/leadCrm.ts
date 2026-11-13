@@ -21,7 +21,7 @@ export const leadCrm: CaseStudy = {
   metrics: [
     { value: "80", label: "API endpoints" },
     { value: "22", label: "Tables: 9 shared, 13 in every tenant schema" },
-    { value: "261", label: "Automated tests: 135 API, 126 in the browser" },
+    { value: "5m", label: "Maximum wait time before retrying a failed ad lead webhook" },
     { value: "60s", label: "Between dashboard cache refreshes" },
   ],
   stack: [
@@ -177,7 +177,7 @@ def tenant_session(tenant_schema: str) -> Iterator[Session]:
   outcome: [
     h2("Where it stands"),
     p(
-      "The API exposes 80 endpoints over 22 tables, shipped through 8 migrations. 135 API tests run against the live stack over HTTP instead of mocks, and 126 Playwright tests drive the browser. Sign-in supports TOTP with recovery codes and WebAuthn passkeys, sessions can be listed and revoked, and a superadmin entering a workspace is logged on every request. The CRM is in production. Leads from Facebook and Instagram ads reach each workspace’s pipeline already assigned by their form’s mapping, and an expired Page token marks its connection for reconnecting instead of failing quietly.",
+      "The API exposes 80 endpoints over 22 tables, shipped through 8 migrations. 162 API tests run against the live stack over HTTP instead of mocks, and 130 Playwright tests drive the browser. Sign-in supports TOTP with recovery codes and WebAuthn passkeys, sessions can be listed and revoked, and a superadmin entering a workspace is logged on every request. The CRM is in production. Leads from Facebook and Instagram ads reach each workspace’s pipeline already assigned by their form’s mapping, and an expired Page token marks its connection for reconnecting instead of failing quietly.",
     ),
     h2("What I would change"),
     ul(

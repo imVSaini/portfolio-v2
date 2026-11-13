@@ -24,11 +24,7 @@ export function CaseStudyEntry({
       <CaseStudyCover study={study} className={cn("lg:col-span-7", flipped && "lg:order-2")} />
 
       <div className="flex min-w-0 flex-col gap-6 lg:col-span-5 lg:self-center">
-        <p className="flex items-center gap-2.5 font-display text-p4 font-medium tracking-wide uppercase">
-          <span
-            aria-hidden="true"
-            className="size-1.5 bg-accent transition-transform duration-500 ease-out-expo motion-reduce:transition-none group-intent:rotate-45"
-          />
+        <p className="w-fit rounded-full border border-line-strong px-3 py-1 font-display text-p4 font-medium tracking-wide text-muted uppercase">
           {study.category}
         </p>
 
