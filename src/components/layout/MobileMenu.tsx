@@ -3,12 +3,11 @@
 import { Dialog } from "@base-ui/react/dialog";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 
 import { AppearanceControls } from "@/components/appearance/AppearanceControls";
 import { RollText } from "@/components/motion/RollText";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
-import { CloseIcon } from "@/components/ui/CloseIcon";
 import { socialIcons } from "@/components/ui/SocialIcons";
 import { contact } from "@/data/contact";
 import { nav } from "@/data/site";
@@ -16,7 +15,24 @@ import { cn } from "@/lib/cn";
 import { getHomeHref } from "@/lib/nav";
 import { scrollToAnchor } from "@/lib/scrollToAnchor";
 
-const NAV_LINK_CLASS_NAME = "group block py-1 font-display text-h3 font-semibold uppercase";
+const NAV_LINK_CLASS_NAME =
+  "group block overflow-hidden font-display text-h3 font-semibold uppercase";
+
+const RISE_CLASS_NAME =
+  "block py-1 transition-transform delay-(--delay) duration-700 ease-out-expo group-starting-style/menu:translate-y-full group-ending-style/menu:-translate-y-full group-ending-style/menu:delay-0 group-ending-style/menu:duration-300 motion-reduce:transition-none";
+
+const FADE_CLASS_NAME =
+  "transition-[translate,opacity] delay-(--delay) duration-700 ease-out-expo group-starting-style/menu:translate-y-4 group-starting-style/menu:opacity-0 group-ending-style/menu:opacity-0 group-ending-style/menu:delay-0 group-ending-style/menu:duration-300 motion-reduce:transition-none";
+
+const BAR_CLASS_NAME =
+  "absolute inset-0 m-auto h-0.5 w-5 bg-current transition-[translate,rotate] delay-150 duration-500 ease-out-expo group-starting-style/menu:rotate-0 group-ending-style/menu:rotate-0 group-ending-style/menu:delay-0 group-ending-style/menu:duration-300 motion-reduce:transition-none";
+
+const STAGGER_START = 200;
+const STAGGER_STEP = 50;
+
+function delay(ms: number) {
+  return { "--delay": `${ms}ms` } as CSSProperties;
+}
 
 export function MobileMenu({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
@@ -46,20 +62,38 @@ export function MobileMenu({ className }: { className?: string }) {
         <span className="h-0.5 w-5 bg-current" />
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-50 bg-faded-black/40 backdrop-blur-sm transition-opacity duration-300 starting-style:opacity-0 ending-style:opacity-0" />
-        <Dialog.Popup className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col gap-10 overflow-y-auto bg-manila-light px-(--page-gutter) pb-6 transition-transform duration-500 ease-out-expo dark:bg-faded-black starting-style:translate-x-full ending-style:translate-x-full">
+        <Dialog.Backdrop className="fixed inset-0 z-50 bg-faded-black/40 backdrop-blur-sm transition-opacity duration-700 ease-out-expo motion-reduce:transition-none starting-style:opacity-0 ending-style:opacity-0 ending-style:duration-500" />
+        <Dialog.Popup className="group/menu fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col gap-10 overflow-y-auto bg-manila-light px-(--page-gutter) pb-6 transition-[clip-path] duration-700 ease-out-expo [clip-path:inset(0)] motion-reduce:transition-none dark:bg-faded-black starting-style:[clip-path:inset(0_0_0_100%)] ending-style:duration-500 ending-style:[clip-path:inset(0_0_0_100%)]">
           <div className="flex h-(--header-h) shrink-0 items-center justify-between">
-            <Dialog.Title className="font-display text-p4 text-muted uppercase">Menu</Dialog.Title>
+            <Dialog.Title
+              className={cn("font-display text-p4 text-muted uppercase", FADE_CLASS_NAME)}
+              style={delay(STAGGER_START - STAGGER_STEP)}
+            >
+              Menu
+            </Dialog.Title>
             <Dialog.Close
               aria-label="Close menu"
-              className="flex size-10 cursor-pointer items-center justify-center rounded-md corner-squircle intent:bg-hover"
+              className="relative size-10 cursor-pointer rounded-md corner-squircle intent:bg-hover"
             >
-              <CloseIcon className="size-6" />
+              <span
+                aria-hidden="true"
+                className={cn(
+                  BAR_CLASS_NAME,
+                  "rotate-45 group-starting-style/menu:-translate-y-1 group-ending-style/menu:-translate-y-1",
+                )}
+              />
+              <span
+                aria-hidden="true"
+                className={cn(
+                  BAR_CLASS_NAME,
+                  "-rotate-45 group-starting-style/menu:translate-y-1 group-ending-style/menu:translate-y-1",
+                )}
+              />
             </Dialog.Close>
           </div>
           <nav aria-label="Mobile">
             <ul className="flex flex-col gap-1">
-              {nav.map((item) => (
+              {nav.map((item, i) => (
                 <li key={item.href}>
                   {item.kind === "section" && onHome ? (
                     <ScrollLink
@@ -81,7 +115,12 @@ export function MobileMenu({ className }: { className?: string }) {
                       }}
                       className={NAV_LINK_CLASS_NAME}
                     >
-                      <RollText text={item.label} />
+                      <span
+                        className={RISE_CLASS_NAME}
+                        style={delay(STAGGER_START + i * STAGGER_STEP)}
+                      >
+                        <RollText text={item.label} />
+                      </span>
                     </ScrollLink>
                   ) : (
                     <Link
@@ -93,15 +132,25 @@ export function MobileMenu({ className }: { className?: string }) {
                       }}
                       className={NAV_LINK_CLASS_NAME}
                     >
-                      <RollText text={item.label} />
+                      <span
+                        className={RISE_CLASS_NAME}
+                        style={delay(STAGGER_START + i * STAGGER_STEP)}
+                      >
+                        <RollText text={item.label} />
+                      </span>
                     </Link>
                   )}
                 </li>
               ))}
             </ul>
           </nav>
-          <AppearanceControls />
-          <div className="mt-auto flex items-center justify-between gap-4">
+          <div className={FADE_CLASS_NAME} style={delay(STAGGER_START + nav.length * STAGGER_STEP)}>
+            <AppearanceControls />
+          </div>
+          <div
+            className={cn("mt-auto flex items-center justify-between gap-4", FADE_CLASS_NAME)}
+            style={delay(STAGGER_START + (nav.length + 1) * STAGGER_STEP)}
+          >
             <a
               href={`mailto:${contact.email}`}
               className="text-p3 text-muted underline decoration-line-strong underline-offset-4 intent:text-accent"

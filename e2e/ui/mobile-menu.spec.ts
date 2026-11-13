@@ -1,7 +1,51 @@
+import type { Locator, Page } from "@playwright/test";
+
 import { contact } from "@/data/contact";
-import { nav } from "@/data/site";
+import { nav, site } from "@/data/site";
 
 import { expect, expectScrolledTo, getOverflow, openMenu, scrollY, test } from "../fixtures";
+
+async function getBox(locator: Locator) {
+  const box = await locator.boundingBox();
+  return box && [box.x, box.y, box.width, box.height].map(Math.round);
+}
+
+async function getBarRotations(menu: Locator) {
+  return menu
+    .getByRole("button", { name: "Close menu" })
+    .evaluate((button) => [...button.children].map((bar) => getComputedStyle(bar).rotate));
+}
+
+async function getHiddenLinks(menu: Locator) {
+  return menu.getByRole("navigation", { name: "Mobile" }).evaluate((nav) =>
+    [...nav.querySelectorAll("a")].flatMap((link) => {
+      const mask = link.getBoundingClientRect();
+      const text = link.firstElementChild?.getBoundingClientRect();
+      const shown = text && text.top >= mask.top - 0.5 && text.bottom <= mask.bottom + 0.5;
+      return shown ? [] : [link.textContent ?? ""];
+    }),
+  );
+}
+
+async function watchMenuMotion(page: Page) {
+  await page.evaluate(() => {
+    const root = document.documentElement;
+    const observer = new MutationObserver(() => {
+      const menu = document.querySelector('[role="dialog"]');
+      if (!menu) return;
+      observer.disconnect();
+      const started = performance.now();
+      let most = 0;
+      const sample = () => {
+        most = Math.max(most, menu.getAnimations({ subtree: true }).length);
+        if (performance.now() - started < 500) requestAnimationFrame(sample);
+        else root.dataset.menuAnimations = String(most);
+      };
+      requestAnimationFrame(sample);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+}
 
 test.describe("mobile menu", () => {
   test.use({ viewport: { width: 390, height: 800 } });
@@ -212,6 +256,70 @@ test.describe("mobile menu", () => {
   });
 });
 
+test.describe("mobile menu motion", () => {
+  test.use({ viewport: { width: 390, height: 800 } });
+
+  test("puts the close button exactly over the trigger", async ({ page, visit }) => {
+    await visit("/");
+    const trigger = await getBox(page.getByRole("button", { name: "Open menu" }));
+    const menu = await openMenu(page);
+
+    await expect
+      .poll(() => getBox(menu.getByRole("button", { name: "Close menu" })))
+      .toEqual(trigger);
+  });
+
+  test("lines the panel up with the header gutter", async ({ page, visit }) => {
+    await visit("/");
+    const logo = await page.getByRole("link", { name: `${site.name}, back to top` }).boundingBox();
+    const menu = await openMenu(page);
+
+    await expect
+      .poll(async () =>
+        Math.round((await menu.getByRole("heading", { name: "Menu" }).boundingBox())?.x ?? -1),
+      )
+      .toBe(Math.round(logo?.x ?? 0));
+  });
+
+  test("folds the hamburger into a cross", async ({ page, visit }) => {
+    await visit("/");
+    const menu = await openMenu(page);
+
+    await expect.poll(() => getBarRotations(menu)).toEqual(["45deg", "-45deg"]);
+  });
+
+  test("settles with every link fully revealed", async ({ page, visit }) => {
+    await visit("/");
+    const menu = await openMenu(page);
+
+    await expect.poll(() => getHiddenLinks(menu)).toEqual([]);
+  });
+
+  test("animates open rather than snapping", async ({ page, visit }) => {
+    await visit("/");
+    await watchMenuMotion(page);
+    await openMenu(page);
+
+    await expect
+      .poll(async () => Number(await page.locator("html").getAttribute("data-menu-animations")))
+      .toBeGreaterThan(0);
+  });
+
+  test.describe("with reduced motion", () => {
+    test.use({ contextOptions: { reducedMotion: "reduce" } });
+
+    test("opens already settled", async ({ page, visit }) => {
+      await visit("/");
+      await watchMenuMotion(page);
+      const menu = await openMenu(page);
+
+      await expect.poll(() => page.locator("html").getAttribute("data-menu-animations")).toBe("0");
+      expect(await getBarRotations(menu)).toEqual(["45deg", "-45deg"]);
+      expect(await getHiddenLinks(menu)).toEqual([]);
+    });
+  });
+});
+
 test.describe("mobile menu on a tablet", () => {
   test.use({ viewport: { width: 800, height: 900 } });
 
@@ -229,6 +337,16 @@ test.describe("mobile menu on a tablet", () => {
     await page.mouse.click(40, 450);
 
     await expect(menu).toBeHidden();
+  });
+
+  test("puts the close button exactly over the trigger", async ({ page, visit }) => {
+    await visit("/");
+    const trigger = await getBox(page.getByRole("button", { name: "Open menu" }));
+    const menu = await openMenu(page);
+
+    await expect
+      .poll(() => getBox(menu.getByRole("button", { name: "Close menu" })))
+      .toEqual(trigger);
   });
 });
 
