@@ -123,7 +123,7 @@ function CaseStudyContent({ study }: { study: CaseStudy }) {
           </div>
         </div>
 
-        <CaseStudyCover study={study} className="md:aspect-21/9" />
+        <CaseStudyCover study={study} className="md:aspect-21/9 md:pt-[6%]" />
 
         <CaseStudyMetrics metrics={study.metrics} />
 

@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+
 import { caseStudies, caseStudiesPage, type CaseStudy } from "@/data/caseStudies";
 import { site } from "@/data/site";
 import { getHeadingId } from "@/lib/article";
@@ -204,4 +206,97 @@ test.describe("case study", () => {
     await expect(page).toHaveURL(new RegExp(`${caseStudiesPage.path}$`));
     await expect(page.getByRole("main").getByRole("article")).toHaveCount(caseStudies.length);
   });
+});
+
+const COVER_PATHS = [caseStudiesPage.path, ...caseStudies.map(getCaseStudyPath)];
+
+const COVER_SIZES = [
+  { width: 320, height: 568 },
+  { width: 375, height: 667 },
+  { width: 768, height: 1024 },
+  { width: 1024, height: 768 },
+] as const;
+
+async function getCroppedCovers(page: Page) {
+  return page.getByRole("main").evaluate((main) => {
+    const covers = [...main.querySelectorAll("[data-cover]")];
+    if (covers.length === 0) return ["no covers found"];
+    return covers.flatMap((cover) => {
+      const window = cover.lastElementChild;
+      if (!window) return ["missing window"];
+      const bottom = cover.getBoundingClientRect().bottom;
+      const cropped = [...window.querySelectorAll("*")].some((part) => {
+        const box = part.getBoundingClientRect();
+        return box.width > 0 && box.height > 0 && box.bottom > bottom + 0.5;
+      });
+      return cropped ? [window.firstElementChild?.textContent ?? ""] : [];
+    });
+  });
+}
+
+test.describe("case study covers", () => {
+  for (const path of COVER_PATHS) {
+    test(
+      `${path} shows every cover mock-up in full`,
+      { tag: "@mobile" },
+      async ({ page, visit }) => {
+        await visit(path);
+        expect(await getCroppedCovers(page)).toEqual([]);
+      },
+    );
+  }
+
+  for (const size of COVER_SIZES) {
+    test.describe(`at ${size.width}×${size.height}`, { tag: "@desktop" }, () => {
+      test.use({ viewport: size });
+
+      for (const path of COVER_PATHS) {
+        test(`${path} shows every cover mock-up in full`, async ({ page, visit }) => {
+          await visit(path);
+          expect(await getCroppedCovers(page)).toEqual([]);
+        });
+      }
+    });
+  }
+});
+
+const XL_SIZES = [
+  { width: 1280, height: 800 },
+  { width: 1440, height: 900 },
+] as const;
+
+async function getMovedFrames(page: Page) {
+  return page.getByRole("main").evaluate((main) => {
+    const covers = [...main.querySelectorAll("[data-cover]")];
+    if (covers.length === 0) return ["no covers found"];
+    return covers.flatMap((cover) => {
+      const window = cover.lastElementChild;
+      const [across = 0, down = 0] = getComputedStyle(cover).aspectRatio.split("/").map(Number);
+      const frame = cover.getBoundingClientRect();
+      const box = window?.getBoundingClientRect();
+      const label = window?.firstElementChild?.textContent ?? "missing window";
+      if (!box || across === 0) return [label];
+      const fits =
+        Math.abs(frame.height - (frame.width * down) / across) < 1 &&
+        Math.abs(box.top - frame.top - frame.height * 0.14) < 1 &&
+        Math.abs(box.bottom - frame.bottom) < 1 &&
+        Math.abs(box.left - frame.left - frame.width * 0.08) < 1;
+      return fits ? [] : [label];
+    });
+  });
+}
+
+test.describe("case study covers on xl screens", { tag: "@desktop" }, () => {
+  for (const size of XL_SIZES) {
+    test.describe(`at ${size.width}×${size.height}`, () => {
+      test.use({ viewport: size });
+
+      for (const path of COVER_PATHS) {
+        test(`${path} keeps the fixed cover frame`, async ({ page, visit }) => {
+          await visit(path);
+          expect(await getMovedFrames(page)).toEqual([]);
+        });
+      }
+    });
+  }
 });

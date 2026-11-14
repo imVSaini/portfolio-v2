@@ -246,20 +246,23 @@ export function CaseStudyCover({ study, className }: CaseStudyCoverProps) {
 
   return (
     <div
+      data-cover=""
       aria-hidden="true"
       className={cn(
-        "@container relative aspect-16/10 overflow-hidden rounded-2xl corner-squircle",
+        "@container relative flex aspect-16/10 min-w-0 flex-col rounded-2xl px-[8%] pt-[8.75%] corner-squircle xl:overflow-hidden",
         tints[study.tint],
         className,
       )}
     >
-      <div className="absolute inset-y-0 -left-1/4 flex w-3/2 items-center justify-center">
-        <span className="font-display text-[28cqw] leading-none font-semibold whitespace-nowrap uppercase opacity-15">
-          {study.title}
-        </span>
+      <div className="absolute inset-0 overflow-hidden rounded-2xl corner-squircle">
+        <div className="absolute inset-y-0 -left-1/4 flex w-3/2 items-center justify-center">
+          <span className="font-display text-[28cqw] leading-none font-semibold whitespace-nowrap uppercase opacity-15">
+            {study.title}
+          </span>
+        </div>
       </div>
 
-      <div className="absolute inset-x-[8%] top-[14%] bottom-0 flex flex-col overflow-hidden rounded-t-xl bg-manila-light text-faded-black shadow-2xl transition-transform duration-700 ease-out-expo motion-reduce:transition-none dark:bg-faded-black dark:text-manila-light group-intent:translate-y-[-1.5cqw]">
+      <div className="relative flex flex-1 flex-col overflow-clip rounded-t-xl bg-manila-light text-faded-black shadow-2xl transition-transform duration-700 ease-out-expo [clip-path:inset(-100vmax_-100vmax_0)] motion-reduce:transition-none xl:min-h-0 xl:[clip-path:none] dark:bg-faded-black dark:text-manila-light group-intent:translate-y-[-1.5cqw]">
         <div className="flex items-center gap-[clamp(0.25rem,1cqw,0.5rem)] border-b border-line px-[clamp(0.625rem,2.4cqw,1rem)] py-[clamp(0.5rem,1.8cqw,0.75rem)]">
           <span className="size-[clamp(0.375rem,1.4cqw,0.625rem)] rounded-full bg-red" />
           <span className="size-[clamp(0.375rem,1.4cqw,0.625rem)] rounded-full bg-gold" />
