@@ -67,7 +67,7 @@ export function MobileMenu({ className }: { className?: string }) {
       <Dialog.Trigger
         aria-label="Open menu"
         className={cn(
-          "flex size-11 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-md corner-squircle intent:bg-hover",
+          "flex size-11 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-md corner-squircle",
           className,
         )}
       >
@@ -92,7 +92,7 @@ export function MobileMenu({ className }: { className?: string }) {
             </Dialog.Title>
             <Dialog.Close
               aria-label="Close menu"
-              className="relative size-11 cursor-pointer rounded-md corner-squircle intent:bg-hover"
+              className="relative size-11 cursor-pointer rounded-md corner-squircle"
             >
               <span
                 aria-hidden="true"

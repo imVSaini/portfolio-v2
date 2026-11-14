@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+
 import { contact } from "@/data/contact";
 import { experience } from "@/data/experience";
 import { projects } from "@/data/projects";
@@ -133,6 +135,88 @@ test.describe("selected work", () => {
       await expect(firstLink).toBeVisible();
     },
   );
+});
+
+const PHONES = [
+  { width: 320, height: 568 },
+  { width: 360, height: 780 },
+  { width: 375, height: 667 },
+  { width: 390, height: 844 },
+  { width: 393, height: 852 },
+  { width: 412, height: 915 },
+  { width: 430, height: 932 },
+] as const;
+
+async function getStrandedChips(page: Page) {
+  return page.locator("#approach [data-manifesto]").evaluate((manifesto) =>
+    [...manifesto.querySelectorAll("[data-chip]")].flatMap((chip) => {
+      const word = chip.previousElementSibling;
+      if (!word) return ["missing keyword"];
+      const chipBox = chip.getBoundingClientRect();
+      const wordBox = word.getBoundingClientRect();
+      const offset = Math.abs(
+        chipBox.top + chipBox.height / 2 - (wordBox.top + wordBox.height / 2),
+      );
+      return offset < wordBox.height / 2 ? [] : [word.textContent ?? ""];
+    }),
+  );
+}
+
+async function getFirstFullyLitView(page: Page) {
+  return page.locator("#approach [data-manifesto]").evaluate(async (manifesto) => {
+    const words = [...manifesto.querySelectorAll("[data-word]")];
+    const chips = [...manifesto.querySelectorAll("[data-chip]")];
+    const isLit = () =>
+      words.every((word) => Number(getComputedStyle(word).opacity) > 0.99) &&
+      chips.every((chip) => new DOMMatrix(getComputedStyle(chip).transform).a > 0.99);
+    const start = manifesto.getBoundingClientRect().top + window.scrollY - window.innerHeight;
+    for (let y = start; y < start + window.innerHeight * 4; y += 10) {
+      window.scrollTo(0, y);
+      for (let frame = 0; frame < 2; frame += 1) {
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+      }
+      if (!isLit()) continue;
+      const box = (words[0]?.closest("p") ?? manifesto).getBoundingClientRect();
+      const header = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
+      return { top: box.top - header, bottom: window.innerHeight - box.bottom };
+    }
+    return null;
+  });
+}
+
+async function expectLitWhileInView(page: Page) {
+  const view = await getFirstFullyLitView(page);
+  expect(view, "the manifesto never lights up fully").not.toBeNull();
+  expect(view?.top, "top of the manifesto is under the header").toBeGreaterThanOrEqual(0);
+  expect(view?.bottom, "bottom of the manifesto is below the screen").toBeGreaterThanOrEqual(0);
+}
+
+test.describe("approach manifesto", () => {
+  test("keeps every icon pill on the same line as its keyword", async ({ page, visit }) => {
+    await visit("/");
+    expect(await getStrandedChips(page)).toEqual([]);
+  });
+
+  test("lights up fully while the whole paragraph is on screen", async ({ page, visit }) => {
+    await visit("/");
+    await expectLitWhileInView(page);
+  });
+
+  for (const size of PHONES) {
+    test.describe(`at ${size.width}×${size.height}`, { tag: "@desktop" }, () => {
+      test.use({ viewport: size });
+
+      test("keeps every icon pill on the same line as its keyword", async ({ page, visit }) => {
+        await visit("/");
+        expect(await getStrandedChips(page)).toEqual([]);
+      });
+
+      test("lights up fully while the whole paragraph is on screen", async ({ page, visit }) => {
+        await visit("/");
+        await expectLitWhileInView(page);
+      });
+    });
+  }
 });
 
 test.describe("experience and skills", () => {

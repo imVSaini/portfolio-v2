@@ -74,11 +74,13 @@ export function Manifesto() {
           </Fragment>
         ) : (
           <Fragment key={i}>
-            <span data-word="" className="text-accent">
-              {token.word}
-            </span>
-            <GlyphPill glyph={token.glyph} />
-            {token.after}{" "}
+            <span className="whitespace-nowrap">
+              <span data-word="" className="text-accent">
+                {token.word}
+              </span>
+              <GlyphPill glyph={token.glyph} />
+              {token.after}
+            </span>{" "}
           </Fragment>
         ),
       )}

@@ -26,7 +26,7 @@ export function Approach() {
         const fill = gsap.timeline({
           scrollTrigger: desktop
             ? { trigger: block, start: "center center", end: "+=110%", pin: true, scrub: true }
-            : { trigger: block, start: "top 75%", end: "bottom 45%", scrub: true },
+            : { trigger: block, start: "top 75%", end: "center center", scrub: true },
         });
         fill.fromTo(words, { opacity: 0.2 }, { opacity: 1, ease: "none", stagger: step }, 0);
         gsap.utils.toArray<HTMLElement>("[data-chip]").forEach((chip) => {
