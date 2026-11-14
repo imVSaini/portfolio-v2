@@ -16,7 +16,7 @@ export const parkingMarketplace: CaseStudy = {
     { label: "Role", value: "Lead engineer, schema to deploy pipeline" },
     { label: "Timeline", value: "April to July 2026" },
     { label: "Platform", value: "REST API and background workers" },
-    { label: "Status", value: "Pre-launch" },
+    { label: "Status", value: "In production" },
   ],
   metrics: [
     { value: "210", label: "API routes across 15 modules" },

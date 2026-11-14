@@ -16,7 +16,7 @@ export const bookkeepingPlatform: CaseStudy = {
     { label: "Role", value: "Lead engineer, ledger to queues" },
     { label: "Timeline", value: "November 2025 to March 2026" },
     { label: "Platform", value: "REST API and six queue workers" },
-    { label: "Status", value: "In development" },
+    { label: "Status", value: "In production" },
   ],
   metrics: [
     { value: "319", label: "API routes across 30 routers" },
