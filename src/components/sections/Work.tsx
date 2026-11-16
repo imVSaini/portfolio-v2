@@ -2,6 +2,7 @@ import { HorizontalSection } from "@/components/scroll/HorizontalSection";
 import { ProjectCover } from "@/components/sections/work/ProjectCover";
 import { ProjectIndex } from "@/components/sections/work/ProjectIndex";
 import { ArrowIcon } from "@/components/ui/ArrowIcon";
+import { ArrowSwap } from "@/components/ui/ArrowSwap";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { contact } from "@/data/contact";
 import { projects, type Project } from "@/data/projects";
@@ -12,7 +13,7 @@ function ProjectPanel({ project }: { project: Project }) {
   return (
     <article
       data-h-panel=""
-      className="group hidden min-w-0 flex-col gap-6 md:flex md:tall:motion-safe:h-[min(78svh,calc(48vw+16rem),50rem)] md:tall:motion-safe:w-[min(64vw,60rem)] md:tall:motion-safe:shrink-0"
+      className="group/card hidden min-w-0 flex-col gap-6 md:flex md:tall:motion-safe:h-[min(78svh,calc(48vw+16rem),50rem)] md:tall:motion-safe:w-[min(64vw,60rem)] md:tall:motion-safe:shrink-0"
     >
       <p className="font-display text-p4 text-muted uppercase">{project.category}</p>
 
@@ -32,9 +33,9 @@ function ProjectPanel({ project }: { project: Project }) {
           target="_blank"
           rel="noreferrer"
           data-h-reveal=""
-          className="inline-flex items-center gap-2 self-start justify-self-start py-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 md:self-end intent:text-accent intent:decoration-accent"
+          className="group inline-flex items-center gap-2 self-start justify-self-start py-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 md:self-end intent:text-accent intent:decoration-accent"
         >
-          Visit live <ArrowIcon />
+          Visit live <ArrowSwap />
         </a>
       </div>
       <ul className="flex flex-wrap gap-2" data-h-reveal="">
@@ -94,9 +95,9 @@ export function Work() {
             target="_blank"
             rel="noreferrer"
             data-h-reveal=""
-            className="inline-flex items-center gap-2 py-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 intent:text-accent intent:decoration-accent"
+            className="group inline-flex items-center gap-2 py-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 intent:text-accent intent:decoration-accent"
           >
-            GitHub {github.handle} <ArrowIcon />
+            GitHub {github.handle} <ArrowSwap />
           </a>
         </div>
       )}

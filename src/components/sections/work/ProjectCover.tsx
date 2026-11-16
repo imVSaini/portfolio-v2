@@ -43,7 +43,7 @@ export function ProjectCover({ project, className }: ProjectCoverProps) {
       </div>
 
       {/* Faux browser window. */}
-      <div className="absolute inset-x-[8%] top-[14%] bottom-0 flex flex-col overflow-hidden rounded-t-xl bg-manila-light text-faded-black shadow-2xl transition-transform duration-700 ease-out-expo group-hover:-translate-y-3 dark:bg-faded-black dark:text-manila-light">
+      <div className="absolute inset-x-[8%] top-[14%] bottom-0 flex flex-col overflow-hidden rounded-t-xl bg-manila-light text-faded-black shadow-2xl transition-transform duration-700 ease-out-expo group-hover/card:-translate-y-3 dark:bg-faded-black dark:text-manila-light">
         <div className="flex items-center gap-2 border-b border-line px-4 py-3">
           <span className="size-2.5 rounded-full bg-red" />
           <span className="size-2.5 rounded-full bg-gold" />

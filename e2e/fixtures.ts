@@ -120,21 +120,31 @@ export async function expectScrolledTo(page: Page, selector: string): Promise<vo
     .toBe(true);
 }
 
-export async function clickWhenSettled(link: Locator): Promise<void> {
+async function settleInView(link: Locator): Promise<void> {
   await link.evaluate(async (element) => {
     element.scrollIntoView({ block: "center" });
-    let top = element.getBoundingClientRect().top;
+    let { top, left } = element.getBoundingClientRect();
     let offset = window.scrollY;
     let still = 0;
     while (still < 12) {
       await new Promise((resolve) => requestAnimationFrame(resolve));
-      const nextTop = element.getBoundingClientRect().top;
-      still = nextTop === top && window.scrollY === offset ? still + 1 : 0;
-      top = nextTop;
+      const next = element.getBoundingClientRect();
+      still = next.top === top && next.left === left && window.scrollY === offset ? still + 1 : 0;
+      top = next.top;
+      left = next.left;
       offset = window.scrollY;
     }
   });
+}
+
+export async function clickWhenSettled(link: Locator): Promise<void> {
+  await settleInView(link);
   await link.click();
+}
+
+export async function hoverWhenSettled(link: Locator): Promise<void> {
+  await settleInView(link);
+  await link.hover();
 }
 
 export async function scrollY(page: Page): Promise<number> {

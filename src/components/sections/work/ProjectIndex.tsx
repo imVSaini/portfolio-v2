@@ -1,7 +1,7 @@
 import { Accordion } from "@base-ui/react/accordion";
 
 import { ProjectCover } from "@/components/sections/work/ProjectCover";
-import { ArrowIcon } from "@/components/ui/ArrowIcon";
+import { ArrowSwap } from "@/components/ui/ArrowSwap";
 import type { Project } from "@/data/projects";
 import { cn } from "@/lib/cn";
 
@@ -39,15 +39,29 @@ export function ProjectIndex({ projects, className }: ProjectIndexProps) {
               </span>
               <span
                 aria-hidden="true"
-                className="relative grid size-10 shrink-0 place-items-center rounded-full border border-line-strong transition-colors duration-300 group-data-panel-open:border-accent group-data-panel-open:bg-accent group-data-panel-open:text-faded-black"
+                className="relative grid size-11 shrink-0 place-items-center text-muted transition-colors duration-300 group-data-panel-open:text-accent group-intent:text-accent"
               >
-                <span className="absolute h-0.5 w-3.5 bg-current" />
-                <span className="absolute h-3.5 w-0.5 bg-current transition-transform duration-300 ease-out-expo group-data-panel-open:scale-y-0 motion-reduce:transition-none" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.25"
+                  strokeLinecap="round"
+                  className="size-5"
+                >
+                  <path d="M1 10h18" />
+                  <path
+                    data-toggle-bar
+                    d="M10 1v18"
+                    className="origin-center transition-[scale] duration-500 ease-out-expo group-data-panel-open:scale-y-0 motion-reduce:transition-none"
+                  />
+                </svg>
               </span>
             </Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Panel className="h-(--accordion-panel-height) overflow-hidden transition-[height] duration-500 ease-out-expo motion-reduce:transition-none starting-style:h-0 ending-style:h-0">
-            <div className="group flex flex-col gap-5 pt-1 pb-8">
+            <div className="group/card flex flex-col gap-5 pt-1 pb-8">
               <ProjectCover project={project} className="aspect-4/3 max-h-[60svh]" />
               <div className="flex flex-col gap-2">
                 <p className="text-p4 tracking-wide text-muted uppercase">{project.client}</p>
@@ -68,9 +82,9 @@ export function ProjectIndex({ projects, className }: ProjectIndexProps) {
                 target="_blank"
                 rel="noreferrer"
                 aria-label={`Visit ${project.title} live (opens in a new tab)`}
-                className="inline-flex min-h-11 items-center gap-2 self-start font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 intent:text-accent intent:decoration-accent"
+                className="group inline-flex min-h-11 items-center gap-2 self-start font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 intent:text-accent intent:decoration-accent"
               >
-                Visit live <ArrowIcon />
+                Visit live <ArrowSwap />
               </a>
             </div>
           </Accordion.Panel>

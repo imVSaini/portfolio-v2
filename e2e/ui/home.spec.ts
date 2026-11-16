@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 import { contact } from "@/data/contact";
 import { experience } from "@/data/experience";
@@ -6,7 +6,14 @@ import { projects } from "@/data/projects";
 import { site } from "@/data/site";
 import { skillGroups } from "@/data/skills";
 
-import { clickWhenSettled, expect, expectScrolledTo, scrollToEnd, test } from "../fixtures";
+import {
+  clickWhenSettled,
+  expect,
+  expectScrolledTo,
+  hoverWhenSettled,
+  scrollToEnd,
+  test,
+} from "../fixtures";
 
 const CITY = site.location.split(",")[0] ?? site.location;
 const PERIODS = ["Morning", "Afternoon", "Evening", "Night"] as const;
@@ -98,6 +105,80 @@ test.describe("selected work", () => {
     }
   });
 
+  test("swaps the Visit live arrow on its own focus, not the cover's", async ({
+    page,
+    visit,
+    tabKey,
+  }) => {
+    const [first] = projects;
+    if (!first) throw new Error("the arrow test needs a project");
+    await visit("/");
+    const work = page.locator("#work");
+    const cover = work
+      .getByRole("link", { name: `Visit ${first.title} (opens in a new tab)`, exact: true })
+      .filter({ visible: true });
+    const visitLive = work
+      .getByRole("link", { name: /^Visit (.+ )?live/ })
+      .filter({ visible: true })
+      .first();
+
+    await cover.focus();
+    await page.keyboard.press(tabKey);
+    await expect(visitLive).toBeFocused();
+    await expect.poll(() => isArrowSwapped(visitLive)).toBe(true);
+
+    await page.keyboard.press(`Shift+${tabKey}`);
+    await expect(cover).toBeFocused();
+    await expect.poll(() => isArrowSwapped(visitLive)).toBe(false);
+  });
+
+  test("swaps the GitHub arrow on keyboard focus", async ({ page, visit, tabKey }) => {
+    await visit("/");
+    const github = page.locator("#work").getByRole("link", { name: /^GitHub/ });
+
+    await github.focus();
+    await page.keyboard.press(`Shift+${tabKey}`);
+    await expect.poll(() => isArrowSwapped(github)).toBe(false);
+    await page.keyboard.press(tabKey);
+    await expect(github).toBeFocused();
+    await expect.poll(() => isArrowSwapped(github)).toBe(true);
+  });
+
+  for (const name of ["Visit live", /^GitHub/] as const) {
+    test(
+      `swaps the ${String(name)} arrow on hover`,
+      { tag: "@desktop" },
+      async ({ page, visit }) => {
+        await visit("/");
+        const link = page.locator("#work").getByRole("link", { name, exact: true }).first();
+
+        await hoverWhenSettled(link);
+        await expect.poll(() => isArrowSwapped(link)).toBe(true);
+      },
+    );
+  }
+
+  test(
+    "shows a minus on the open project and a plus on the rest",
+    { tag: "@mobile" },
+    async ({ page, visit }) => {
+      await visit("/");
+      const triggers = page.locator("#work").getByRole("button");
+      const barHeight = (index: number) =>
+        triggers
+          .nth(index)
+          .locator("[data-toggle-bar]")
+          .evaluate((bar) => bar.getBoundingClientRect().height);
+
+      await expect.poll(() => barHeight(0)).toBe(0);
+      await expect.poll(() => barHeight(1)).toBeGreaterThan(0);
+
+      await triggers.nth(1).click();
+      await expect.poll(() => barHeight(1)).toBe(0);
+      await expect.poll(() => barHeight(0)).toBeGreaterThan(0);
+    },
+  );
+
   test(
     "opens one project at a time by tap or keyboard",
     { tag: "@mobile" },
@@ -146,6 +227,17 @@ const PHONES = [
   { width: 412, height: 915 },
   { width: 430, height: 932 },
 ] as const;
+
+async function isArrowSwapped(link: Locator) {
+  return link.evaluate((element) => {
+    const swap = element.querySelector(":scope > [aria-hidden='true']");
+    const enter = swap?.lastElementChild;
+    if (!swap || !enter) return false;
+    const box = swap.getBoundingClientRect();
+    const enterBox = enter.getBoundingClientRect();
+    return Math.abs(enterBox.left - box.left) < 0.5 && Math.abs(enterBox.top - box.top) < 0.5;
+  });
+}
 
 async function getStrandedChips(page: Page) {
   return page.locator("#approach [data-manifesto]").evaluate((manifesto) =>
