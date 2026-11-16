@@ -61,7 +61,7 @@ export function ProjectIndex({ projects, className }: ProjectIndexProps) {
             </Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Panel className="h-(--accordion-panel-height) overflow-hidden transition-[height] duration-500 ease-out-expo motion-reduce:transition-none starting-style:h-0 ending-style:h-0">
-            <div className="group/card flex flex-col gap-5 pt-1 pb-8">
+            <div data-project-card="" className="group relative flex flex-col gap-5 pt-1 pb-8">
               <ProjectCover project={project} className="aspect-4/3 max-h-[60svh]" />
               <div className="flex flex-col gap-2">
                 <p className="text-p4 tracking-wide text-muted uppercase">{project.client}</p>
@@ -80,8 +80,9 @@ export function ProjectIndex({ projects, className }: ProjectIndexProps) {
               <TextLink
                 href={project.url}
                 external
+                stretched
                 label={`Visit ${project.title} live`}
-                className="self-start"
+                className="self-start focus-visible:after:-outline-offset-2"
               >
                 Visit live
               </TextLink>

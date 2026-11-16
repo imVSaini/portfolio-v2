@@ -13,7 +13,8 @@ function ProjectPanel({ project }: { project: Project }) {
   return (
     <article
       data-h-panel=""
-      className="group/card hidden min-w-0 flex-col gap-6 md:flex md:tall:motion-safe:h-[min(78svh,calc(48vw+16rem),50rem)] md:tall:motion-safe:w-[min(64vw,60rem)] md:tall:motion-safe:shrink-0"
+      data-project-card=""
+      className="group relative hidden min-w-0 flex-col gap-6 md:flex md:tall:motion-safe:h-[min(78svh,calc(48vw+16rem),50rem)] md:tall:motion-safe:w-[min(64vw,60rem)] md:tall:motion-safe:shrink-0"
     >
       <p className="font-display text-p4 text-muted uppercase">{project.category}</p>
 
@@ -31,6 +32,7 @@ function ProjectPanel({ project }: { project: Project }) {
         <TextLink
           href={project.url}
           external
+          stretched
           label={`Visit ${project.title} live`}
           data-h-reveal=""
           className="self-start justify-self-start md:self-end"

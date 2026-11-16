@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 import { contact } from "@/data/contact";
 import { experience } from "@/data/experience";
@@ -78,8 +78,9 @@ test.describe("selected work", () => {
         const panel = panels.nth(index);
 
         await expect(panel.getByRole("heading", { level: 3 })).toHaveText(project.title);
+        await expect(panel.getByRole("link")).toHaveCount(1);
         await expect(
-          panel.getByRole("link", { name: `Visit ${project.title} (opens in a new tab)` }),
+          panel.getByRole("link", { name: `Visit ${project.title} live (opens in a new tab)` }),
         ).toHaveAttribute("href", project.url);
         await expect(panel.getByRole("listitem")).toHaveText(project.stack);
       }
@@ -107,32 +108,54 @@ test.describe("selected work", () => {
     }
   });
 
-  test("swaps the Visit live arrow on its own focus, not the cover's", async ({
-    page,
-    visit,
-    tabKey,
-  }) => {
-    const [first] = projects;
-    if (!first) throw new Error("the arrow test needs a project");
+  test("makes each project card one link to its live site", async ({ page, visit }) => {
     await visit("/");
-    const work = page.locator("#work");
-    const cover = work
-      .getByRole("link", { name: `Visit ${first.title} (opens in a new tab)`, exact: true })
-      .filter({ visible: true });
-    const visitLive = work
-      .getByRole("link", { name: /^Visit (.+ )?live/ })
-      .filter({ visible: true })
-      .first();
+    await expectOneLinkCard(page);
+  });
 
-    await cover.focus();
+  test.describe("with motion off", () => {
+    test.use({ contextOptions: { reducedMotion: "reduce" } });
+
+    test("still makes each project card one link", async ({ page, visit }) => {
+      await visit("/");
+      await expectOneLinkCard(page);
+    });
+  });
+
+  test("rings the whole project card on keyboard focus", async ({ page, visit, tabKey }) => {
+    await visit("/");
+    const card = getFirstProjectCard(page);
+    const link = card.getByRole("link");
+
+    await link.focus();
+    await page.keyboard.press(`Shift+${tabKey}`);
     await page.keyboard.press(tabKey);
-    await expect(visitLive).toBeFocused();
-    await expect.poll(() => isArrowSwapped(visitLive)).toBe(true);
+    await expect(link).toBeFocused();
+    await expect.poll(() => isArrowSwapped(link)).toBe(true);
+    await expect.poll(() => getAreaGap(card)).toBeLessThan(1);
+
+    const area = await getLinkArea(link);
+    expect(area.own).toBe("none");
+    expect(area.ring).toBe("solid");
+    expect(area.ringWidth).toBeGreaterThanOrEqual(2);
 
     await page.keyboard.press(`Shift+${tabKey}`);
-    await expect(cover).toBeFocused();
-    await expect.poll(() => isArrowSwapped(visitLive)).toBe(false);
+    await expect.poll(() => isArrowSwapped(link)).toBe(false);
   });
+
+  test(
+    "swaps the Visit live arrow when the cover is hovered",
+    { tag: "@desktop" },
+    async ({ page, visit }) => {
+      await visit("/");
+      const card = getFirstProjectCard(page);
+      const link = card.getByRole("link");
+
+      await expect.poll(() => isArrowSwapped(link)).toBe(false);
+      await hoverWhenSettled(card.locator(":scope > [aria-hidden='true']"));
+      await expect.poll(() => isArrowSwapped(link)).toBe(true);
+    },
+  );
 
   test("swaps the GitHub arrow on keyboard focus", async ({ page, visit, tabKey }) => {
     await visit("/");
@@ -246,6 +269,66 @@ const PHONES = [
   { width: 412, height: 915 },
   { width: 430, height: 932 },
 ] as const;
+
+async function expectOneLinkCard(page: Page) {
+  const [first] = projects;
+  if (!first) throw new Error("the card test needs a project");
+  const card = getFirstProjectCard(page);
+
+  await expect(card.getByRole("link")).toHaveCount(1);
+  await expect(
+    card.getByRole("link", { name: `Visit ${first.title} live (opens in a new tab)` }),
+  ).toHaveAttribute("href", first.url);
+  await card.getByRole("link").evaluate((link) => link.scrollIntoView({ block: "center" }));
+  await expect.poll(() => getAreaGap(card)).toBeLessThan(1);
+  for (const part of [":scope > [aria-hidden='true']", "ul"]) {
+    await expect.poll(() => hitsCardLink(card, part), part).toBe(true);
+  }
+}
+
+function getFirstProjectCard(page: Page) {
+  return page.locator("#work [data-project-card]").filter({ visible: true }).first();
+}
+
+/** Hit-tests the middle of the part's on-screen slice below the header. */
+async function hitsCardLink(card: Locator, part: string) {
+  return card.evaluate((element, selector) => {
+    const target = element.querySelector(selector);
+    const link = element.querySelector("a");
+    if (!target || !link) return false;
+    const box = target.getBoundingClientRect();
+    const top = Math.max(
+      box.top,
+      document.querySelector("header")?.getBoundingClientRect().bottom ?? 0,
+    );
+    const bottom = Math.min(box.bottom, window.innerHeight);
+    if (bottom <= top) return false;
+    const hit = document.elementFromPoint(box.left + box.width / 2, (top + bottom) / 2);
+    return hit?.closest("a") === link;
+  }, part);
+}
+
+async function getLinkArea(link: Locator) {
+  return link.evaluate((element) => {
+    const area = getComputedStyle(element, "::after");
+    return {
+      own: getComputedStyle(element).outlineStyle,
+      ring: area.outlineStyle,
+      ringWidth: Number.parseFloat(area.outlineWidth),
+      width: Number.parseFloat(area.width),
+      height: Number.parseFloat(area.height),
+    };
+  });
+}
+
+async function getAreaGap(card: Locator) {
+  const area = await getLinkArea(card.getByRole("link"));
+  const box = await card.boundingBox();
+  return Math.max(
+    Math.abs(area.width - (box?.width ?? 0)),
+    Math.abs(area.height - (box?.height ?? 0)),
+  );
+}
 
 async function getStrandedChips(page: Page) {
   return page.locator("#approach [data-manifesto]").evaluate((manifesto) =>

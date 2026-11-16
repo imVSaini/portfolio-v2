@@ -78,6 +78,7 @@ export function HorizontalSection({ id, label, children, className }: Horizontal
             ease: "expo.out",
             duration: 1,
             stagger: 0.08,
+            clearProps: "transform",
             scrollTrigger: {
               trigger: panel,
               containerAnimation: travel,

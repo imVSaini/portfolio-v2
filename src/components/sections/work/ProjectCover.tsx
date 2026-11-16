@@ -20,11 +20,8 @@ type ProjectCoverProps = {
 
 export function ProjectCover({ project, className }: ProjectCoverProps) {
   return (
-    <a
-      href={project.url}
-      target="_blank"
-      rel="noreferrer"
-      aria-label={`Visit ${project.title} (opens in a new tab)`}
+    <div
+      aria-hidden="true"
       className={cn(
         "@container relative block overflow-hidden rounded-2xl corner-squircle",
         tints[project.tint],
@@ -43,7 +40,7 @@ export function ProjectCover({ project, className }: ProjectCoverProps) {
       </div>
 
       {/* Faux browser window. */}
-      <div className="absolute inset-x-[8%] top-[14%] bottom-0 flex flex-col overflow-hidden rounded-t-xl bg-manila-light text-faded-black shadow-2xl transition-transform duration-700 ease-out-expo group-hover/card:-translate-y-3 dark:bg-faded-black dark:text-manila-light">
+      <div className="absolute inset-x-[8%] top-[14%] bottom-0 flex flex-col overflow-hidden rounded-t-xl bg-manila-light text-faded-black shadow-2xl transition-transform duration-700 ease-out-expo dark:bg-faded-black dark:text-manila-light group-intent:-translate-y-3">
         <div className="flex items-center gap-2 border-b border-line px-4 py-3">
           <span className="size-2.5 rounded-full bg-red" />
           <span className="size-2.5 rounded-full bg-gold" />
@@ -67,6 +64,6 @@ export function ProjectCover({ project, className }: ProjectCoverProps) {
           </div>
         </div>
       </div>
-    </a>
+    </div>
   );
 }
