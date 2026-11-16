@@ -147,6 +147,18 @@ export async function hoverWhenSettled(link: Locator): Promise<void> {
   await link.hover();
 }
 
+/** Whether the `ArrowSwap` directly inside `container` has slid its fresh arrow fully in. */
+export async function isArrowSwapped(container: Locator): Promise<boolean> {
+  return container.evaluate((element) => {
+    const swap = element.querySelector(":scope > [aria-hidden='true']");
+    const enter = swap?.lastElementChild;
+    if (!swap || !enter) return false;
+    const box = swap.getBoundingClientRect();
+    const enterBox = enter.getBoundingClientRect();
+    return Math.abs(enterBox.left - box.left) < 0.5 && Math.abs(enterBox.top - box.top) < 0.5;
+  });
+}
+
 export async function scrollY(page: Page): Promise<number> {
   return page.evaluate(() => Math.round(window.scrollY));
 }

@@ -1,4 +1,4 @@
-import type { Locator, Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 import { contact } from "@/data/contact";
 import { experience } from "@/data/experience";
@@ -11,6 +11,7 @@ import {
   expect,
   expectScrolledTo,
   hoverWhenSettled,
+  isArrowSwapped,
   scrollToEnd,
   test,
 } from "../fixtures";
@@ -227,17 +228,6 @@ const PHONES = [
   { width: 412, height: 915 },
   { width: 430, height: 932 },
 ] as const;
-
-async function isArrowSwapped(link: Locator) {
-  return link.evaluate((element) => {
-    const swap = element.querySelector(":scope > [aria-hidden='true']");
-    const enter = swap?.lastElementChild;
-    if (!swap || !enter) return false;
-    const box = swap.getBoundingClientRect();
-    const enterBox = enter.getBoundingClientRect();
-    return Math.abs(enterBox.left - box.left) < 0.5 && Math.abs(enterBox.top - box.top) < 0.5;
-  });
-}
 
 async function getStrandedChips(page: Page) {
   return page.locator("#approach [data-manifesto]").evaluate((manifesto) =>

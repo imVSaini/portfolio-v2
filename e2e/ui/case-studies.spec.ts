@@ -5,7 +5,14 @@ import { site } from "@/data/site";
 import { getHeadingId } from "@/lib/article";
 import { DECISIONS_HEADING, getCaseStudyHeadings } from "@/lib/caseStudies";
 
-import { clickWhenSettled, expect, expectScrolledTo, test } from "../fixtures";
+import {
+  clickWhenSettled,
+  expect,
+  expectScrolledTo,
+  hoverWhenSettled,
+  isArrowSwapped,
+  test,
+} from "../fixtures";
 import { getCaseStudyPath, getFirstCaseStudy } from "../routes";
 
 const STUDY = getFirstCaseStudy();
@@ -75,7 +82,42 @@ test.describe("case studies index", () => {
 
     await expect(page).toHaveURL(new RegExp(`${getCaseStudyPath(study)}$`));
   });
+
+  test("swaps the Read the case study arrow on keyboard focus", async ({ page, visit, tabKey }) => {
+    const study = getNextCaseStudy();
+    await visit(caseStudiesPage.path);
+    const link = page.getByRole("link", { name: study.title, exact: true });
+    const cue = getReadCue(page, study);
+
+    await link.focus();
+    await page.keyboard.press(`Shift+${tabKey}`);
+    await expect.poll(() => isArrowSwapped(cue)).toBe(false);
+    await page.keyboard.press(tabKey);
+    await expect(link).toBeFocused();
+    await expect.poll(() => isArrowSwapped(cue)).toBe(true);
+  });
+
+  test(
+    "swaps the Read the case study arrow on hover",
+    { tag: "@desktop" },
+    async ({ page, visit }) => {
+      await visit(caseStudiesPage.path);
+      const cue = getReadCue(page, STUDY);
+
+      await expect.poll(() => isArrowSwapped(cue)).toBe(false);
+      await hoverWhenSettled(page.getByRole("link", { name: STUDY.title, exact: true }));
+      await expect.poll(() => isArrowSwapped(cue)).toBe(true);
+    },
+  );
 });
+
+function getReadCue(page: Page, study: CaseStudy) {
+  return page
+    .getByRole("main")
+    .getByRole("article")
+    .filter({ has: page.getByRole("heading", { name: study.title, exact: true }) })
+    .locator("p[aria-hidden='true']", { hasText: "Read the case study" });
+}
 
 test.describe("case study", () => {
   test("shows the facts, the numbers and the stack", async ({ page, visit }) => {

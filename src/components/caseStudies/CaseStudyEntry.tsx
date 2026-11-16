@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { CaseStudyCover } from "@/components/caseStudies/CaseStudyCover";
-import { ArrowIcon } from "@/components/ui/ArrowIcon";
+import { ArrowSwap } from "@/components/ui/ArrowSwap";
 import type { CaseStudy } from "@/data/caseStudies";
 import { getCaseStudyPath } from "@/lib/caseStudies";
 import { cn } from "@/lib/cn";
@@ -55,7 +55,7 @@ export function CaseStudyEntry({
           className="flex items-center gap-2 font-display text-p4 font-medium tracking-wide uppercase transition-colors duration-300 group-intent:text-accent"
         >
           Read the case study
-          <ArrowIcon className="transition-transform duration-500 ease-out-expo motion-reduce:transition-none group-intent:translate-x-0.5 group-intent:-translate-y-0.5" />
+          <ArrowSwap />
         </p>
       </div>
     </article>
