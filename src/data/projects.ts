@@ -24,6 +24,50 @@ export const projects: Project[] = [
     tint: "orange",
   },
   {
+    slug: "ai-support-assistant",
+    title: "AI Support Assistant",
+    client: "In-house product",
+    category: "AI product",
+    blurb:
+      "An embeddable support chatbot that answers from each business’s own documents and captures leads mid-conversation.",
+    stack: ["FastAPI", "PostgreSQL", "pgvector", "WebSockets", "OpenAI API", "React 19"],
+    url: "https://support-assistant.example.com/",
+    tint: "magenta",
+  },
+  {
+    slug: "lead-management-crm",
+    title: "Lead Management CRM",
+    client: "In-house product",
+    category: "B2B SaaS",
+    blurb:
+      "A multi-tenant CRM with a schema per workspace, scoped roles and leads that flow in from Facebook and Instagram ads.",
+    stack: ["FastAPI", "PostgreSQL 16", "Celery", "Next.js 16", "React 19"],
+    url: "https://lead-crm.example.com/",
+    tint: "orange",
+  },
+  {
+    slug: "bookkeeping-platform",
+    title: "Bookkeeping Platform",
+    client: "In-house product",
+    category: "Accounting SaaS",
+    blurb:
+      "A bookkeeping API with a double-entry ledger for every client company, duplicate-free statement imports and OCR-read bills.",
+    stack: ["Node.js", "Express", "PostgreSQL 16", "BullMQ", "OpenAI API"],
+    url: "https://bookkeeping.example.com/",
+    tint: "gold",
+  },
+  {
+    slug: "parking-marketplace",
+    title: "Parking Marketplace",
+    client: "In-house product",
+    category: "Marketplace",
+    blurb:
+      "An airport parking marketplace that holds each space for ten minutes while a Stripe deposit confirms the booking.",
+    stack: ["Node.js 22", "Express", "PostgreSQL 16", "BullMQ", "Stripe"],
+    url: "https://parking.example.com/",
+    tint: "red",
+  },
+  {
     slug: "vlsid-2027",
     title: "VLSID 2027",
     client: "40th International VLSI Design Conference",

@@ -62,7 +62,7 @@ export function Work() {
         <div className="flex flex-col gap-5">
           <SectionLabel>Selected work</SectionLabel>
           <h2 className="text-h2 uppercase">
-            Seven builds,{" "}
+            Eleven builds,{" "}
             <span className="text-stroke-faded-black dark:text-stroke-manila-light">
               one standard.
             </span>
