@@ -7,65 +7,50 @@ export type Project = {
   category: string;
   blurb: string;
   stack: string[];
-  url: string;
+  url?: string;
   tint: ProjectTint;
 };
 
 export const projects: Project[] = [
   {
-    slug: "work-os",
-    title: "Work OS",
-    client: "Own product",
-    category: "SaaS",
-    blurb:
-      "A workspace OS that puts tasks, time, clients, docs and finance on one grid, with a separate workspace for every context. It installs as a PWA.",
-    stack: ["Next.js 15", "React 19", "FastAPI", "Zustand", "PostgreSQL 16", "Redis 7", "PWA"],
-    url: "https://workos.dsgnphy.com/",
-    tint: "orange",
-  },
-  {
-    slug: "ai-support-assistant",
-    title: "AI Support Assistant",
-    client: "In-house product",
-    category: "AI product",
-    blurb:
-      "An embeddable support chatbot that answers from each business’s own documents and captures leads mid-conversation.",
-    stack: ["FastAPI", "PostgreSQL", "pgvector", "WebSockets", "OpenAI API", "React 19"],
-    url: "https://support-assistant.example.com/",
-    tint: "magenta",
-  },
-  {
-    slug: "lead-management-crm",
-    title: "Lead Management CRM",
-    client: "In-house product",
-    category: "B2B SaaS",
-    blurb:
-      "A multi-tenant CRM with a schema per workspace, scoped roles and leads that flow in from Facebook and Instagram ads.",
-    stack: ["FastAPI", "PostgreSQL 16", "Celery", "Next.js 16", "React 19"],
-    url: "https://lead-crm.example.com/",
-    tint: "orange",
-  },
-  {
     slug: "bookkeeping-platform",
     title: "Bookkeeping Platform",
-    client: "In-house product",
+    client: "Accounting and bookkeeping practices",
     category: "Accounting SaaS",
     blurb:
       "A bookkeeping API with a double-entry ledger for every client company, duplicate-free statement imports and OCR-read bills.",
     stack: ["Node.js", "Express", "PostgreSQL 16", "BullMQ", "OpenAI API"],
-    url: "https://bookkeeping.example.com/",
     tint: "gold",
   },
   {
     slug: "parking-marketplace",
     title: "Parking Marketplace",
-    client: "In-house product",
+    client: "Airport travellers and parking operators",
     category: "Marketplace",
     blurb:
       "An airport parking marketplace that holds each space for ten minutes while a Stripe deposit confirms the booking.",
     stack: ["Node.js 22", "Express", "PostgreSQL 16", "BullMQ", "Stripe"],
-    url: "https://parking.example.com/",
     tint: "red",
+  },
+  {
+    slug: "ai-support-assistant",
+    title: "AI Support Assistant",
+    client: "Customer support teams",
+    category: "AI product",
+    blurb:
+      "An embeddable support chatbot that answers from each business’s own documents and captures leads mid-conversation.",
+    stack: ["FastAPI", "PostgreSQL", "pgvector", "WebSockets", "OpenAI API", "React 19"],
+    tint: "magenta",
+  },
+  {
+    slug: "lead-management-crm",
+    title: "Lead Management CRM",
+    client: "B2B sales teams",
+    category: "B2B SaaS",
+    blurb:
+      "A multi-tenant CRM with a schema per workspace, scoped roles and leads that flow in from Facebook and Instagram ads.",
+    stack: ["FastAPI", "PostgreSQL 16", "Celery", "Next.js 16", "React 19"],
+    tint: "orange",
   },
   {
     slug: "vlsid-2027",

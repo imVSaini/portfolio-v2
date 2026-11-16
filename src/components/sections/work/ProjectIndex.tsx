@@ -15,6 +15,7 @@ export function ProjectIndex({ projects, className }: ProjectIndexProps) {
 
   return (
     <Accordion.Root
+      key={first?.slug}
       keepMounted
       {...(first && { defaultValue: [first.slug] })}
       className={cn("border-t border-line", className)}
@@ -77,15 +78,17 @@ export function ProjectIndex({ projects, className }: ProjectIndexProps) {
                   </li>
                 ))}
               </ul>
-              <TextLink
-                href={project.url}
-                external
-                stretched
-                label={`Visit ${project.title} live`}
-                className="self-start focus-visible:after:-outline-offset-2"
-              >
-                Visit live
-              </TextLink>
+              {project.url && (
+                <TextLink
+                  href={project.url}
+                  external
+                  stretched
+                  label={`Visit ${project.title} live`}
+                  className="self-start focus-visible:after:-outline-offset-2"
+                >
+                  Visit live
+                </TextLink>
+              )}
             </div>
           </Accordion.Panel>
         </Accordion.Item>

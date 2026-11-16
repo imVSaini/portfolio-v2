@@ -29,16 +29,18 @@ function ProjectPanel({ project }: { project: Project }) {
           <p className="text-p4 tracking-wide text-muted uppercase">{project.client}</p>
           <p className="max-w-xl text-p3 text-muted">{project.blurb}</p>
         </div>
-        <TextLink
-          href={project.url}
-          external
-          stretched
-          label={`Visit ${project.title} live`}
-          data-h-reveal=""
-          className="self-start justify-self-start md:self-end"
-        >
-          Visit live
-        </TextLink>
+        {project.url && (
+          <TextLink
+            href={project.url}
+            external
+            stretched
+            label={`Visit ${project.title} live`}
+            data-h-reveal=""
+            className="self-start justify-self-start md:self-end"
+          >
+            Visit live
+          </TextLink>
+        )}
       </div>
       <ul className="flex flex-wrap gap-2" data-h-reveal="">
         {project.stack.map((tool) => (
@@ -62,15 +64,15 @@ export function Work() {
         <div className="flex flex-col gap-5">
           <SectionLabel>Selected work</SectionLabel>
           <h2 className="text-h2 uppercase">
-            Eleven builds,{" "}
+            Every build,{" "}
             <span className="text-stroke-faded-black dark:text-stroke-manila-light">
               one standard.
             </span>
           </h2>
         </div>
         <p className="max-w-sm text-p2 text-muted">
-          SaaS, conferences, commerce and studios. Each card opens the live site, so you can judge
-          the real thing.
+          SaaS, conferences, commerce and studios. Public builds open the live site, so you can
+          judge the real thing.
         </p>
         <p className="hidden items-center gap-3 font-display text-p4 text-muted uppercase md:tall:motion-safe:flex">
           Keep scrolling

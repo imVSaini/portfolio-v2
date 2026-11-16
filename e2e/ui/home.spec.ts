@@ -15,10 +15,18 @@ import {
   isArrowSwapped,
   scrollToEnd,
   test,
+  type Layout,
 } from "../fixtures";
 
 const CITY = site.location.split(",")[0] ?? site.location;
 const PERIODS = ["Morning", "Afternoon", "Evening", "Night"] as const;
+
+const LIVE = projects.flatMap((project, index) =>
+  project.url ? [{ ...project, url: project.url, index }] : [],
+);
+const PRIVATE_INDEX = projects.findIndex((project) => !project.url);
+const PRIVATE = projects[PRIVATE_INDEX];
+if (!PRIVATE) throw new Error("the work tests need a project without a live site");
 
 const MOMENTS = [
   { utc: "2026-01-15T23:30:00Z", time: "05:00:00", period: "Morning" },
@@ -78,10 +86,12 @@ test.describe("selected work", () => {
         const panel = panels.nth(index);
 
         await expect(panel.getByRole("heading", { level: 3 })).toHaveText(project.title);
-        await expect(panel.getByRole("link")).toHaveCount(1);
-        await expect(
-          panel.getByRole("link", { name: `Visit ${project.title} live (opens in a new tab)` }),
-        ).toHaveAttribute("href", project.url);
+        await expect(panel.getByRole("link")).toHaveCount(project.url ? 1 : 0);
+        if (project.url) {
+          await expect(
+            panel.getByRole("link", { name: `Visit ${project.title} live (opens in a new tab)` }),
+          ).toHaveAttribute("href", project.url);
+        }
         await expect(panel.getByRole("listitem")).toHaveText(project.stack);
       }
       await expect(work.getByRole("link", { name: /GitHub/ })).toHaveAttribute(
@@ -108,28 +118,33 @@ test.describe("selected work", () => {
     }
   });
 
-  test("makes each project card one link to its live site", async ({ page, visit }) => {
+  test("makes each project card one link to its live site", async ({ page, visit, layout }) => {
     await visit("/");
-    await expectOneLinkCard(page);
+    await expectOneLinkCard(page, layout);
   });
 
   test.describe("with motion off", () => {
     test.use({ contextOptions: { reducedMotion: "reduce" } });
 
-    test("still makes each project card one link", async ({ page, visit }) => {
+    test("still makes each project card one link", async ({ page, visit, layout }) => {
       await visit("/");
-      await expectOneLinkCard(page);
+      await expectOneLinkCard(page, layout);
     });
   });
 
-  test("rings the whole project card on keyboard focus", async ({ page, visit, tabKey }) => {
+  test("rings the whole project card on keyboard focus", async ({
+    page,
+    visit,
+    layout,
+    tabKey,
+  }) => {
     await visit("/");
-    const card = getFirstProjectCard(page);
+    const card = await getFirstLiveCard(page, layout);
     const link = card.getByRole("link");
 
     await link.focus();
-    await page.keyboard.press(`Shift+${tabKey}`);
     await page.keyboard.press(tabKey);
+    await page.keyboard.press(`Shift+${tabKey}`);
     await expect(link).toBeFocused();
     await expect.poll(() => isArrowSwapped(link)).toBe(true);
     await expect.poll(() => getAreaGap(card)).toBeLessThan(1);
@@ -139,16 +154,16 @@ test.describe("selected work", () => {
     expect(area.ring).toBe("solid");
     expect(area.ringWidth).toBeGreaterThanOrEqual(2);
 
-    await page.keyboard.press(`Shift+${tabKey}`);
+    await page.keyboard.press(tabKey);
     await expect.poll(() => isArrowSwapped(link)).toBe(false);
   });
 
   test(
     "swaps the Visit live arrow when the cover is hovered",
     { tag: "@desktop" },
-    async ({ page, visit }) => {
+    async ({ page, visit, layout }) => {
       await visit("/");
-      const card = getFirstProjectCard(page);
+      const card = await getFirstLiveCard(page, layout);
       const link = card.getByRole("link");
 
       await expect.poll(() => isArrowSwapped(link)).toBe(false);
@@ -156,6 +171,40 @@ test.describe("selected work", () => {
       await expect.poll(() => isArrowSwapped(link)).toBe(true);
     },
   );
+
+  test.describe("a project without a live site", () => {
+    test.use({ contextOptions: { reducedMotion: "reduce" } });
+
+    test(
+      "has no link but still lifts its cover on hover",
+      { tag: "@desktop" },
+      async ({ page, visit }) => {
+        await visit("/");
+        const card = page.locator("#work article[data-h-panel]").nth(PRIVATE_INDEX);
+        const cover = card.locator(":scope > [aria-hidden='true']");
+        const frame = cover.locator(":scope > div").last();
+        const lift = () => frame.evaluate((element) => getComputedStyle(element).translate);
+
+        await expect(card.getByRole("heading", { level: 3 })).toHaveText(PRIVATE.title);
+        await expect(card.getByRole("link")).toHaveCount(0);
+        await expect(card).toContainText(PRIVATE.client);
+        await expect(cover).toContainText("In production");
+        await expect(card).not.toContainText(/in-house/i);
+        expect(await lift()).toBe("none");
+        await hoverWhenSettled(cover);
+        await expect.poll(lift).not.toBe("none");
+      },
+    );
+
+    test("has no link in its accordion panel", { tag: "@mobile" }, async ({ page, visit }) => {
+      await visit("/");
+      const panel = await openProjectRow(page, PRIVATE_INDEX);
+
+      await expect(panel).toHaveCount(1);
+      await expect(panel).toContainText(PRIVATE.client);
+      await expect(panel.getByRole("link")).toHaveCount(0);
+    });
+  });
 
   test("swaps the GitHub arrow on keyboard focus", async ({ page, visit, tabKey }) => {
     await visit("/");
@@ -182,13 +231,9 @@ test.describe("selected work", () => {
     });
   }
 
-  test("points outside links up-right and in-page links right", async ({ page, visit }) => {
+  test("points outside links up-right and in-page links right", async ({ page, visit, layout }) => {
     await visit("/");
-    const visitLive = page
-      .locator("#work")
-      .getByRole("link", { name: /^Visit .+ live \(opens in a new tab\)$/ })
-      .filter({ visible: true })
-      .first();
+    const visitLive = (await getFirstLiveCard(page, layout)).getByRole("link");
     const github = page.locator("#work").getByRole("link", { name: /^GitHub/ });
     const talk = page.locator("#experience").getByRole("link", { name: "Let’s talk" });
 
@@ -225,8 +270,8 @@ test.describe("selected work", () => {
     "opens one project at a time by tap or keyboard",
     { tag: "@mobile" },
     async ({ page, visit }) => {
-      const [first, second] = projects;
-      if (!first || !second) throw new Error("the accordion test needs two projects");
+      const [first, second] = LIVE;
+      if (!first || !second) throw new Error("the accordion test needs two live projects");
       await visit("/");
       const work = page.locator("#work");
       const triggers = work.getByRole("button");
@@ -237,24 +282,27 @@ test.describe("selected work", () => {
         name: `Visit ${second.title} live (opens in a new tab)`,
       });
 
+      await expect(firstLink).toBeHidden();
+      await triggers.nth(first.index).click();
+      await expect(triggers.nth(first.index)).toHaveAttribute("aria-expanded", "true");
       await expect(firstLink).toBeVisible();
       await expect(firstLink).toHaveAttribute("href", first.url);
       await expect(secondLink).toBeHidden();
 
-      await triggers.nth(1).click();
-      await expect(triggers.nth(1)).toHaveAttribute("aria-expanded", "true");
-      await expect(triggers.nth(0)).toHaveAttribute("aria-expanded", "false");
+      await triggers.nth(second.index).click();
+      await expect(triggers.nth(second.index)).toHaveAttribute("aria-expanded", "true");
+      await expect(triggers.nth(first.index)).toHaveAttribute("aria-expanded", "false");
       await expect(secondLink).toBeVisible();
       await expect(secondLink).toHaveAttribute("href", second.url);
       await expect(firstLink).toBeHidden();
       await expect(work.getByText(second.blurb).filter({ visible: true })).toHaveCount(1);
 
-      await triggers.nth(1).press("Enter");
-      await expect(triggers.nth(1)).toHaveAttribute("aria-expanded", "false");
+      await triggers.nth(second.index).press("Enter");
+      await expect(triggers.nth(second.index)).toHaveAttribute("aria-expanded", "false");
       await expect(secondLink).toBeHidden();
 
-      await triggers.nth(0).press("Space");
-      await expect(triggers.nth(0)).toHaveAttribute("aria-expanded", "true");
+      await triggers.nth(first.index).press("Space");
+      await expect(triggers.nth(first.index)).toHaveAttribute("aria-expanded", "true");
       await expect(firstLink).toBeVisible();
     },
   );
@@ -270,10 +318,10 @@ const PHONES = [
   { width: 430, height: 932 },
 ] as const;
 
-async function expectOneLinkCard(page: Page) {
-  const [first] = projects;
-  if (!first) throw new Error("the card test needs a project");
-  const card = getFirstProjectCard(page);
+async function expectOneLinkCard(page: Page, layout: Layout) {
+  const [first] = LIVE;
+  if (!first) throw new Error("the card test needs a project with a live site");
+  const card = await getFirstLiveCard(page, layout);
 
   await expect(card.getByRole("link")).toHaveCount(1);
   await expect(
@@ -286,8 +334,40 @@ async function expectOneLinkCard(page: Page) {
   }
 }
 
-function getFirstProjectCard(page: Page) {
-  return page.locator("#work [data-project-card]").filter({ visible: true }).first();
+async function getFirstLiveCard(page: Page, layout: Layout): Promise<Locator> {
+  const [first] = LIVE;
+  if (!first) throw new Error("the card test needs a project with a live site");
+  if (layout === "phone") return openProjectRow(page, first.index);
+  const panel = page.locator("#work article[data-h-panel]").nth(first.index);
+
+  await panel.evaluate((element) => {
+    const track = element.parentElement;
+    const section = track?.parentElement;
+    if (!track || !section) throw new Error("the panel sits outside the work track");
+    const shift = new DOMMatrix(getComputedStyle(track).transform).m41;
+    const box = element.getBoundingClientRect();
+    const left = box.left - shift;
+    if (left + box.width <= window.innerWidth) {
+      element.scrollIntoView({ block: "center" });
+      return;
+    }
+    const start = (section.parentElement ?? section).getBoundingClientRect().top + window.scrollY;
+    window.scrollTo(0, Math.round(start + left - (window.innerWidth - box.width) / 2));
+  });
+  await expect(panel).toBeInViewport({ ratio: 0.9 });
+  return panel;
+}
+
+async function openProjectRow(page: Page, index: number): Promise<Locator> {
+  const project = projects[index];
+  if (!project) throw new Error(`there is no project at ${index}`);
+  const trigger = page.locator("#work").getByRole("button").nth(index);
+
+  if ((await trigger.getAttribute("aria-expanded")) !== "true") await trigger.click();
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  return page
+    .locator("#work [data-project-card]")
+    .filter({ visible: true, hasText: project.blurb });
 }
 
 /** Hit-tests the middle of the part's on-screen slice below the header. */

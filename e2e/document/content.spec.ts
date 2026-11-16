@@ -115,11 +115,14 @@ test.describe("home without JavaScript", () => {
     }
   });
 
-  test("lists every project with its client, summary, stack and live link", async ({ page }) => {
+  test("lists every project with its client, summary, stack and any live link", async ({
+    page,
+  }) => {
     const work = page.locator("#work");
     const panels = work.locator("article[data-h-panel]");
 
     await expect(work).toHaveAttribute("aria-label", "Selected work");
+    await expect(work.getByRole("heading", { level: 2 })).toHaveText("Every build, one standard.");
     await expect(panels).toHaveCount(projects.length);
     for (const [index, project] of projects.entries()) {
       const panel = panels.nth(index);
@@ -129,10 +132,15 @@ test.describe("home without JavaScript", () => {
       await expect(panel).toContainText(project.client);
       await expect(panel).toContainText(project.blurb);
       await expect(panel.locator("ul > li")).toHaveText(project.stack);
-      for (const link of await panel.getByRole("link").all()) {
-        await expect(link).toHaveAttribute("href", project.url);
+      if (project.url) {
+        for (const link of await panel.getByRole("link").all()) {
+          await expect(link).toHaveAttribute("href", project.url);
+        }
+      } else {
+        await expect(panel.getByRole("link")).toHaveCount(0);
       }
     }
+    await expect(work).not.toContainText(/in-house/i);
     await expect(work.getByRole("link", { name: /GitHub/ })).toHaveAttribute(
       "href",
       contact.links.find((link) => link.label === "GitHub")?.href ?? "",

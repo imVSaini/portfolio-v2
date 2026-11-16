@@ -167,7 +167,7 @@ export function getProfileMarkdown(): string {
     projects
       .map(
         (project) =>
-          `- [${project.title}](${project.url}): ${project.category} for ${project.client}. ${project.blurb} Built with ${project.stack.join(", ")}.`,
+          `- ${project.url ? `[${project.title}](${project.url})` : project.title}: ${project.category} for ${project.client}. ${project.blurb} Built with ${project.stack.join(", ")}.`,
       )
       .join("\n"),
     "## Contact",

@@ -6,7 +6,7 @@ const MD = 768;
 const LG = 1024;
 const MUTED_OPACITY_FLOOR = 0.5;
 
-type Layout = "phone" | "tablet" | "desktop";
+export type Layout = "phone" | "tablet" | "desktop";
 
 type Options = {
   intro: "skip" | "play";

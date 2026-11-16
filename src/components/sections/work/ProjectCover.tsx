@@ -46,7 +46,7 @@ export function ProjectCover({ project, className }: ProjectCoverProps) {
           <span className="size-2.5 rounded-full bg-gold" />
           <span className="size-2.5 rounded-full bg-manila-dark" />
           <span className="ml-3 truncate rounded-full bg-surface px-3 py-1 text-p4 text-muted">
-            {hostname(project.url)}
+            {project.url ? hostname(project.url) : "In production"}
           </span>
         </div>
         <div className="flex flex-1 flex-col justify-between gap-[clamp(0.75rem,3.6cqw,1.5rem)] p-[clamp(1rem,4.8cqw,2rem)]">

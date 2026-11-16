@@ -16,14 +16,12 @@ type TextLinkProps = Omit<
   "href" | "children" | "target" | "rel" | "aria-label"
 > & {
   children: string;
-  /** Make the whole surrounding card (a `relative group`) the link, as in a block-link card. */
   stretched?: boolean;
 } & (
     | { href: `#${string}`; external?: never; label?: never }
     | {
         href: string;
         external: true;
-        /** Fuller name for screen readers when the visible text is vague, e.g. "Visit Work OS live". */
         label?: string;
       }
   );
