@@ -117,4 +117,15 @@ export const projects: Project[] = [
     url: "https://3dvisual.in/",
     tint: "magenta",
   },
+  {
+    slug: "portfolio-v1",
+    title: "Portfolio v1",
+    client: "Personal site",
+    category: "Portfolio",
+    blurb:
+      "The first version of this portfolio: a hand-drawn sketchbook look, with a career timeline that scrolls sideways.",
+    stack: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS 4", "GSAP", "Rough.js"],
+    url: "https://imvsaini.vercel.app/",
+    tint: "orange",
+  },
 ];
