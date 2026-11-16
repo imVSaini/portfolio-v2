@@ -15,7 +15,6 @@ const CRAWLED_ROUTES = [...PAGE_ROUTES, "/nope"];
 
 const IMPLICIT_TOP = "#top";
 const NEW_TAB_HINT = "(opens in a new tab)";
-const UNLABELLED_ROUTES = ["/"];
 
 async function readAnchors(page: Page): Promise<Anchor[]> {
   return page.locator("a").evaluateAll((anchors) =>
@@ -74,10 +73,6 @@ test.describe("links", () => {
     });
 
     test(`${path} says so when a link opens in a new tab`, async ({ page }) => {
-      test.fail(
-        UNLABELLED_ROUTES.includes(path),
-        "the desktop work panels' Visit live and GitHub links open a new tab without saying so",
-      );
       await page.goto(path);
       const unannounced = (await readAnchors(page))
         .filter((anchor) => anchor.target === "_blank" && !anchor.label.includes(NEW_TAB_HINT))

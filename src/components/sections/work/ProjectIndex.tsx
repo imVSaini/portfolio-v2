@@ -1,7 +1,7 @@
 import { Accordion } from "@base-ui/react/accordion";
 
 import { ProjectCover } from "@/components/sections/work/ProjectCover";
-import { ArrowSwap } from "@/components/ui/ArrowSwap";
+import { TextLink } from "@/components/ui/TextLink";
 import type { Project } from "@/data/projects";
 import { cn } from "@/lib/cn";
 
@@ -77,15 +77,14 @@ export function ProjectIndex({ projects, className }: ProjectIndexProps) {
                   </li>
                 ))}
               </ul>
-              <a
+              <TextLink
                 href={project.url}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={`Visit ${project.title} live (opens in a new tab)`}
-                className="group inline-flex min-h-11 items-center gap-2 self-start font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 intent:text-accent intent:decoration-accent"
+                external
+                label={`Visit ${project.title} live`}
+                className="self-start"
               >
-                Visit live <ArrowSwap />
-              </a>
+                Visit live
+              </TextLink>
             </div>
           </Accordion.Panel>
         </Accordion.Item>

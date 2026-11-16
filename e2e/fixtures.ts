@@ -147,6 +147,25 @@ export async function hoverWhenSettled(link: Locator): Promise<void> {
   await link.hover();
 }
 
+/** Which way the resting `ArrowSwap` directly inside `container` points, read from where its
+ * fresh arrow waits: left of the visible one for "right", below-left for "up-right". */
+export async function getArrowDirection(
+  container: Locator,
+): Promise<"right" | "up-right" | "unknown"> {
+  return container.evaluate((element) => {
+    const swap = element.querySelector(":scope > [aria-hidden='true']");
+    const enter = swap?.lastElementChild;
+    if (!swap || !enter) return "unknown";
+    const box = swap.getBoundingClientRect();
+    const enterBox = enter.getBoundingClientRect();
+    const dx = enterBox.left - box.left;
+    const dy = enterBox.top - box.top;
+    if (dx < -1 && Math.abs(dy) < 0.5) return "right";
+    if (dx < -1 && dy > 1) return "up-right";
+    return "unknown";
+  });
+}
+
 /** Whether the `ArrowSwap` directly inside `container` has slid its fresh arrow fully in. */
 export async function isArrowSwapped(container: Locator): Promise<boolean> {
   return container.evaluate((element) => {

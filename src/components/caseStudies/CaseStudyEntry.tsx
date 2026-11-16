@@ -31,7 +31,7 @@ export function CaseStudyEntry({
         <Heading className="text-[clamp(1.5rem,9.4cqw,2.25rem)] leading-none wrap-break-word uppercase lg:text-[3.7cqw]">
           <Link
             href={getCaseStudyPath(study)}
-            className="rounded-md transition-colors duration-300 after:absolute after:inset-0 group-intent:text-accent"
+            className="transition-colors duration-300 after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-gold group-intent:text-accent"
           >
             {study.title}
           </Link>

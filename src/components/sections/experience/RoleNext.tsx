@@ -1,5 +1,4 @@
-import { ScrollLink } from "@/components/scroll/ScrollLink";
-import { ArrowIcon } from "@/components/ui/ArrowIcon";
+import { TextLink } from "@/components/ui/TextLink";
 
 export function RoleNext() {
   return (
@@ -15,12 +14,7 @@ export function RoleNext() {
         <p className="max-w-xl text-p1 text-muted">
           The next chapter is unwritten. Bring the hard problem and I’ll bring the plan.
         </p>
-        <ScrollLink
-          href="#contact"
-          className="inline-flex items-center gap-2 py-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 intent:text-accent intent:decoration-accent"
-        >
-          Let’s talk <ArrowIcon direction="right" />
-        </ScrollLink>
+        <TextLink href="#contact">Let’s talk</TextLink>
       </div>
     </li>
   );

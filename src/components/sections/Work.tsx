@@ -2,8 +2,8 @@ import { HorizontalSection } from "@/components/scroll/HorizontalSection";
 import { ProjectCover } from "@/components/sections/work/ProjectCover";
 import { ProjectIndex } from "@/components/sections/work/ProjectIndex";
 import { ArrowIcon } from "@/components/ui/ArrowIcon";
-import { ArrowSwap } from "@/components/ui/ArrowSwap";
 import { SectionLabel } from "@/components/ui/SectionLabel";
+import { TextLink } from "@/components/ui/TextLink";
 import { contact } from "@/data/contact";
 import { projects, type Project } from "@/data/projects";
 
@@ -28,15 +28,15 @@ function ProjectPanel({ project }: { project: Project }) {
           <p className="text-p4 tracking-wide text-muted uppercase">{project.client}</p>
           <p className="max-w-xl text-p3 text-muted">{project.blurb}</p>
         </div>
-        <a
+        <TextLink
           href={project.url}
-          target="_blank"
-          rel="noreferrer"
+          external
+          label={`Visit ${project.title} live`}
           data-h-reveal=""
-          className="group inline-flex items-center gap-2 self-start justify-self-start py-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 md:self-end intent:text-accent intent:decoration-accent"
+          className="self-start justify-self-start md:self-end"
         >
-          Visit live <ArrowSwap />
-        </a>
+          Visit live
+        </TextLink>
       </div>
       <ul className="flex flex-wrap gap-2" data-h-reveal="">
         {project.stack.map((tool) => (
@@ -90,15 +90,9 @@ export function Work() {
           <p className="font-display text-h3 font-semibold uppercase" data-h-reveal="">
             More in the <span className="text-accent">workshop</span>.
           </p>
-          <a
-            href={github.href}
-            target="_blank"
-            rel="noreferrer"
-            data-h-reveal=""
-            className="group inline-flex items-center gap-2 py-2 font-display text-p3 font-medium uppercase underline decoration-line-strong underline-offset-6 intent:text-accent intent:decoration-accent"
-          >
-            GitHub {github.handle} <ArrowSwap />
-          </a>
+          <TextLink href={github.href} external data-h-reveal="">
+            {`GitHub ${github.handle}`}
+          </TextLink>
         </div>
       )}
     </HorizontalSection>

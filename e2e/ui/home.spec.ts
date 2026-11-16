@@ -10,6 +10,7 @@ import {
   clickWhenSettled,
   expect,
   expectScrolledTo,
+  getArrowDirection,
   hoverWhenSettled,
   isArrowSwapped,
   scrollToEnd,
@@ -145,19 +146,36 @@ test.describe("selected work", () => {
     await expect.poll(() => isArrowSwapped(github)).toBe(true);
   });
 
-  for (const name of ["Visit live", /^GitHub/] as const) {
-    test(
-      `swaps the ${String(name)} arrow on hover`,
-      { tag: "@desktop" },
-      async ({ page, visit }) => {
-        await visit("/");
-        const link = page.locator("#work").getByRole("link", { name, exact: true }).first();
+  for (const { title, name } of [
+    { title: "Visit live", name: /^Visit .+ live \(opens in a new tab\)$/ },
+    { title: "GitHub", name: /^GitHub .+ \(opens in a new tab\)$/ },
+  ]) {
+    test(`swaps the ${title} arrow on hover`, { tag: "@desktop" }, async ({ page, visit }) => {
+      await visit("/");
+      const link = page.locator("#work").getByRole("link", { name }).first();
 
-        await hoverWhenSettled(link);
-        await expect.poll(() => isArrowSwapped(link)).toBe(true);
-      },
-    );
+      await hoverWhenSettled(link);
+      await expect.poll(() => isArrowSwapped(link)).toBe(true);
+    });
   }
+
+  test("points outside links up-right and in-page links right", async ({ page, visit }) => {
+    await visit("/");
+    const visitLive = page
+      .locator("#work")
+      .getByRole("link", { name: /^Visit .+ live \(opens in a new tab\)$/ })
+      .filter({ visible: true })
+      .first();
+    const github = page.locator("#work").getByRole("link", { name: /^GitHub/ });
+    const talk = page.locator("#experience").getByRole("link", { name: "Let’s talk" });
+
+    for (const link of [visitLive, github]) {
+      await expect(link).toHaveAttribute("target", "_blank");
+      expect(await getArrowDirection(link)).toBe("up-right");
+    }
+    await expect(talk).not.toHaveAttribute("target");
+    expect(await getArrowDirection(talk)).toBe("right");
+  });
 
   test(
     "shows a minus on the open project and a plus on the rest",
@@ -315,6 +333,18 @@ test.describe("experience and skills", () => {
     await clickWhenSettled(section.getByRole("link", { name: "Let’s talk" }));
     await expectScrolledTo(page, "#contact");
     await expect(page).toHaveURL(/\/#contact$/);
+  });
+
+  test("swaps the Let’s talk arrow on keyboard focus", async ({ page, visit, tabKey }) => {
+    await visit("/");
+    const talk = page.locator("#experience").getByRole("link", { name: "Let’s talk" });
+
+    await talk.focus();
+    await page.keyboard.press(`Shift+${tabKey}`);
+    await expect.poll(() => isArrowSwapped(talk)).toBe(false);
+    await page.keyboard.press(tabKey);
+    await expect(talk).toBeFocused();
+    await expect.poll(() => isArrowSwapped(talk)).toBe(true);
   });
 
   test("groups every skill under its discipline", async ({ page, visit }) => {

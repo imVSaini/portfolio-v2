@@ -9,6 +9,7 @@ import {
   clickWhenSettled,
   expect,
   expectScrolledTo,
+  getArrowDirection,
   hoverWhenSettled,
   isArrowSwapped,
   test,
@@ -83,12 +84,51 @@ test.describe("case studies index", () => {
     await expect(page).toHaveURL(new RegExp(`${getCaseStudyPath(study)}$`));
   });
 
+  test("rings the whole entry, not just its title, on keyboard focus", async ({
+    page,
+    visit,
+    tabKey,
+  }) => {
+    const study = getNextCaseStudy();
+    await visit(caseStudiesPage.path);
+    const link = page.getByRole("link", { name: study.title, exact: true });
+    const entry = page
+      .getByRole("main")
+      .getByRole("article")
+      .filter({ has: page.getByRole("heading", { name: study.title, exact: true }) });
+
+    await link.focus();
+    await page.keyboard.press(`Shift+${tabKey}`);
+    await page.keyboard.press(tabKey);
+    await expect(link).toBeFocused();
+
+    const ring = await link.evaluate((element) => {
+      const own = getComputedStyle(element);
+      const area = getComputedStyle(element, "::after");
+      return {
+        own: own.outlineStyle,
+        area: area.outlineStyle,
+        width: Number.parseFloat(area.outlineWidth),
+        areaWidth: Number.parseFloat(area.width),
+        areaHeight: Number.parseFloat(area.height),
+      };
+    });
+    const box = await entry.boundingBox();
+
+    expect(ring.own).toBe("none");
+    expect(ring.area).toBe("solid");
+    expect(ring.width).toBeGreaterThanOrEqual(2);
+    expect(ring.areaWidth).toBeCloseTo(box?.width ?? 0, 0);
+    expect(ring.areaHeight).toBeCloseTo(box?.height ?? 0, 0);
+  });
+
   test("swaps the Read the case study arrow on keyboard focus", async ({ page, visit, tabKey }) => {
     const study = getNextCaseStudy();
     await visit(caseStudiesPage.path);
     const link = page.getByRole("link", { name: study.title, exact: true });
     const cue = getReadCue(page, study);
 
+    expect(await getArrowDirection(cue)).toBe("up-right");
     await link.focus();
     await page.keyboard.press(`Shift+${tabKey}`);
     await expect.poll(() => isArrowSwapped(cue)).toBe(false);
