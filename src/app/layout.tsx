@@ -37,14 +37,6 @@ export const metadata: Metadata = {
   title: { default: title, template: `%s — ${site.name}` },
   description: site.description,
   authors: [{ name: site.name, url: site.url }],
-  keywords: [
-    "Vaibhav Kumar Saini",
-    "Full Stack Developer",
-    "Lead Software Engineer",
-    "FastAPI",
-    "Next.js",
-    "Bengaluru",
-  ],
   openGraph: {
     type: "website",
     url: site.url,

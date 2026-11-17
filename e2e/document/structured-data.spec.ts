@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { blog } from "@/data/blog";
 import { caseStudies, caseStudiesPage } from "@/data/caseStudies";
 import { contact } from "@/data/contact";
+import { experience } from "@/data/experience";
 import { posts } from "@/data/posts";
 import { site } from "@/data/site";
 
@@ -24,6 +25,7 @@ const BLOG_URL = `${site.url}/blog`;
 const CASE_STUDIES_URL = getCanonical(caseStudiesPage.path);
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const SITE_DOMAIN = new URL(site.url).hostname.replace(/^www\./, "");
+const CURRENT_EMPLOYER = experience.find((role) => role.end === "Present")?.company;
 
 function isNode(value: unknown): value is Node {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -72,6 +74,10 @@ function expectSiteNodes(graph: Node[]): void {
     alternateName: site.fullName,
     url: site.url,
     jobTitle: site.role,
+    description: site.description,
+    homeLocation: { "@type": "Place", name: site.location },
+    worksFor: { "@type": "Organization", name: CURRENT_EMPLOYER },
+    knowsAbout: [...site.expertise],
     sameAs: contact.links.map((link) => link.href),
   });
   expect(findNode(graph, "WebSite")).toEqual({
@@ -87,14 +93,14 @@ function expectSiteNodes(graph: Node[]): void {
 }
 
 test.describe("structured data", () => {
-  test("the home page describes the person, the site and the page", async ({ page }) => {
+  test("the home page is a profile page about the person", async ({ page }) => {
     await page.goto("/");
     const graph = await readGraph(page);
 
-    expect(getTypes(graph)).toEqual(["Person", "WebSite", "WebPage"]);
+    expect(getTypes(graph)).toEqual(["Person", "WebSite", "ProfilePage"]);
     expectSiteNodes(graph);
-    expect(findNode(graph, "WebPage")).toEqual({
-      "@type": "WebPage",
+    expect(findNode(graph, "ProfilePage")).toEqual({
+      "@type": "ProfilePage",
       "@id": site.url,
       url: site.url,
       name: `${site.name} — ${site.role}`,

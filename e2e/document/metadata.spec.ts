@@ -89,6 +89,7 @@ test.describe("document metadata", () => {
           getCanonical(path),
         );
         await expect(meta(page, "robots")).toHaveCount(0);
+        await expect(meta(page, "keywords")).toHaveCount(0);
       });
 
       test("declares its language, viewport and colour schemes", async ({ page }) => {

@@ -69,6 +69,36 @@ test.describe("hero", () => {
       await expect(page.locator(target)).toBeFocused();
     });
   }
+
+  test("rolls a copy of each letter into view on keyboard focus", async ({
+    page,
+    visit,
+    tabKey,
+  }) => {
+    await visit("/");
+    const link = page.getByRole("link", { name: "See selected work" });
+    const glyphs = link.locator("[data-char]");
+
+    await expect(glyphs).toHaveCount("See selected work".length);
+    await link.focus();
+    await page.keyboard.press(`Shift+${tabKey}`);
+    await page.keyboard.press(tabKey);
+    await expect(link).toBeFocused();
+    await expect
+      .poll(() =>
+        glyphs.evaluateAll((spans) =>
+          spans.map((span) => {
+            const clip = span.parentElement?.getBoundingClientRect();
+            const box = span.getBoundingClientRect();
+            const copy = getComputedStyle(span, "::after").content;
+            return (
+              clip !== undefined && box.bottom <= clip.top + 1 && copy === `"${span.textContent}"`
+            );
+          }),
+        ),
+      )
+      .not.toContain(false);
+  });
 });
 
 test.describe("selected work", () => {

@@ -1,6 +1,7 @@
 import { blog } from "@/data/blog";
 import { caseStudiesPage, type CaseStudy } from "@/data/caseStudies";
 import { contact } from "@/data/contact";
+import { experience } from "@/data/experience";
 import type { Post } from "@/data/posts";
 import { site } from "@/data/site";
 import { getCaseStudyPath } from "@/lib/caseStudies";
@@ -14,6 +15,10 @@ type PersonNode = NodeReference & {
   alternateName?: string;
   url: string;
   jobTitle?: string;
+  description?: string;
+  homeLocation?: { "@type": "Place"; name: string };
+  worksFor?: { "@type": "Organization"; name: string };
+  knowsAbout?: string[];
   sameAs?: string[];
 };
 
@@ -39,7 +44,7 @@ type BlogNode = NodeReference & {
 };
 
 type WebPageNode = NodeReference & {
-  "@type": "WebPage" | "CollectionPage";
+  "@type": "WebPage" | "CollectionPage" | "ProfilePage";
   url: string;
   name: string;
   description: string;
@@ -161,6 +166,8 @@ export function serializeJsonLd(nodes: readonly JsonLdNode[]): string {
  * ```
  */
 function getSiteNodes(): (PersonNode | WebSiteNode)[] {
+  const employer = experience.find((role) => role.end === "Present")?.company;
+
   return [
     {
       "@type": "Person",
@@ -169,6 +176,10 @@ function getSiteNodes(): (PersonNode | WebSiteNode)[] {
       alternateName: site.fullName,
       url: site.url,
       jobTitle: site.role,
+      description: site.description,
+      homeLocation: { "@type": "Place", name: site.location },
+      ...(employer && { worksFor: { "@type": "Organization", name: employer } }),
+      knowsAbout: [...site.expertise],
       sameAs: contact.links.map((link) => link.href),
     },
     {
@@ -270,7 +281,7 @@ export function getHomeJsonLd(): JsonLdNode[] {
   return [
     ...getSiteNodes(),
     {
-      "@type": "WebPage",
+      "@type": "ProfilePage",
       "@id": site.url,
       url: site.url,
       name: `${site.name} — ${site.role}`,

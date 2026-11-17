@@ -85,6 +85,15 @@ test.describe("home without JavaScript", () => {
     const hero = page.locator("#top");
 
     await expect(page.locator("h1")).toHaveText(/Backend depth,\s*frontend\s*finish\./);
+    expect(await page.locator("h1").textContent(), "words must not run together").toMatch(
+      /^Backend depth,\s+frontend\s+finish\.$/,
+    );
+    await expect(
+      hero
+        .getByRole("link", { name: "See selected work" })
+        .locator("[aria-hidden='true']:has([data-char])"),
+      "the rolled-in copy is drawn by CSS, so each letter is in the HTML once",
+    ).toHaveText("See selected work", { useInnerText: false });
     await expect(hero).toHaveAttribute("aria-label", "Introduction");
     await expect(hero).toContainText(`I’m ${site.shortName}, a full stack developer`);
     await expect(hero.getByRole("link", { name: "See selected work" })).toHaveAttribute(

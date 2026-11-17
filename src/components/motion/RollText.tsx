@@ -30,16 +30,17 @@ export function RollText({
         {[...text].map((char, i) => {
           const delay: CSSProperties = { transitionDelay: `${i * stagger}ms` };
           return (
-            <span key={i} className="relative inline-block whitespace-pre">
-              <span className={roll} style={delay}>
-                {char}
-              </span>
-              <span
-                className={cn("absolute inset-x-0 top-full", accent && "text-accent", roll)}
-                style={delay}
-              >
-                {char}
-              </span>
+            <span
+              key={i}
+              data-char={char}
+              className={cn(
+                roll,
+                "relative whitespace-pre after:absolute after:inset-x-0 after:top-full after:content-[attr(data-char)]",
+                accent && "after:text-accent",
+              )}
+              style={delay}
+            >
+              {char}
             </span>
           );
         })}
