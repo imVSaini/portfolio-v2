@@ -65,7 +65,6 @@ export function ProjectIndex({ projects, className }: ProjectIndexProps) {
             <div data-project-card="" className="group relative flex flex-col gap-5 pt-1 pb-8">
               <ProjectCover project={project} className="aspect-4/3 max-h-[60svh]" />
               <div className="flex flex-col gap-2">
-                <p className="text-p4 tracking-wide text-muted uppercase">{project.client}</p>
                 <p className="text-p2 text-muted">{project.blurb}</p>
               </div>
               <ul className="flex flex-wrap gap-2">

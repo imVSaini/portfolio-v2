@@ -115,7 +115,7 @@ test.describe("home without JavaScript", () => {
     }
   });
 
-  test("lists every project with its client, summary, stack and any live link", async ({
+  test("lists every project with its category, summary, stack and any live link", async ({
     page,
   }) => {
     const work = page.locator("#work");
@@ -129,7 +129,6 @@ test.describe("home without JavaScript", () => {
 
       await expect(panel.getByRole("heading", { level: 3 })).toHaveText(project.title);
       await expect(panel).toContainText(project.category);
-      await expect(panel).toContainText(project.client);
       await expect(panel).toContainText(project.blurb);
       await expect(panel.locator("ul > li")).toHaveText(project.stack);
       if (project.url) {

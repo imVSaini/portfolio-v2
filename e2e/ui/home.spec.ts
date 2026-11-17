@@ -86,6 +86,8 @@ test.describe("selected work", () => {
         const panel = panels.nth(index);
 
         await expect(panel.getByRole("heading", { level: 3 })).toHaveText(project.title);
+        await expect(panel.locator("h3 + p")).toHaveText(project.category);
+        await expect(panel.getByText(project.category, { exact: true })).toHaveCount(1);
         await expect(panel.getByRole("link")).toHaveCount(project.url ? 1 : 0);
         if (project.url) {
           await expect(
@@ -187,7 +189,7 @@ test.describe("selected work", () => {
 
         await expect(card.getByRole("heading", { level: 3 })).toHaveText(PRIVATE.title);
         await expect(card.getByRole("link")).toHaveCount(0);
-        await expect(card).toContainText(PRIVATE.client);
+        await expect(card).toContainText(PRIVATE.category);
         await expect(cover).toContainText("In production");
         await expect(card).not.toContainText(/in-house/i);
         expect(await lift()).toBe("none");
@@ -201,7 +203,9 @@ test.describe("selected work", () => {
       const panel = await openProjectRow(page, PRIVATE_INDEX);
 
       await expect(panel).toHaveCount(1);
-      await expect(panel).toContainText(PRIVATE.client);
+      await expect(page.locator("#work").getByRole("button").nth(PRIVATE_INDEX)).toContainText(
+        PRIVATE.category,
+      );
       await expect(panel.getByRole("link")).toHaveCount(0);
     });
   });

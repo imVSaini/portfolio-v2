@@ -3,7 +3,6 @@ export type ProjectTint = "orange" | "gold" | "magenta" | "red" | "soot";
 export type Project = {
   slug: string;
   title: string;
-  client: string;
   category: string;
   blurb: string;
   stack: string[];
@@ -15,7 +14,6 @@ export const projects: Project[] = [
   {
     slug: "bookkeeping-platform",
     title: "Bookkeeping Platform",
-    client: "Accounting and bookkeeping practices",
     category: "Accounting SaaS",
     blurb:
       "A bookkeeping API with a double-entry ledger for every client company, duplicate-free statement imports and OCR-read bills.",
@@ -25,7 +23,6 @@ export const projects: Project[] = [
   {
     slug: "parking-marketplace",
     title: "Parking Marketplace",
-    client: "Airport travellers and parking operators",
     category: "Marketplace",
     blurb:
       "An airport parking marketplace that holds each space for ten minutes while a Stripe deposit confirms the booking.",
@@ -35,7 +32,6 @@ export const projects: Project[] = [
   {
     slug: "ai-support-assistant",
     title: "AI Support Assistant",
-    client: "Customer support teams",
     category: "AI product",
     blurb:
       "An embeddable support chatbot that answers from each business’s own documents and captures leads mid-conversation.",
@@ -45,7 +41,6 @@ export const projects: Project[] = [
   {
     slug: "lead-management-crm",
     title: "Lead Management CRM",
-    client: "B2B sales teams",
     category: "B2B SaaS",
     blurb:
       "A multi-tenant CRM with a schema per workspace, scoped roles and leads that flow in from Facebook and Instagram ads.",
@@ -55,7 +50,6 @@ export const projects: Project[] = [
   {
     slug: "vlsid-2027",
     title: "VLSID 2027",
-    client: "40th International VLSI Design Conference",
     category: "Conference",
     blurb:
       "The official platform for the 40th International Conference on VLSI Design, held at the Sheraton Grand, Bengaluru.",
@@ -66,7 +60,6 @@ export const projects: Project[] = [
   {
     slug: "travel-kampany",
     title: "Travel Kampany",
-    client: "Travellers planning tailor-made holidays",
     category: "Travel & tourism",
     blurb:
       "The site for a Kerala travel studio, with customisable holiday packages across India and abroad, each shaped around the traveller’s dates, pace and budget.",
@@ -77,7 +70,6 @@ export const projects: Project[] = [
   {
     slug: "kvpr-masalas",
     title: "KVPR Masalas",
-    client: "Home cooks and spice dealers",
     category: "E-commerce",
     blurb:
       "A storefront for Mantrupti and Rajadhya, two South Indian spice brands, with catalogue, cart and checkout, dealership enquiries and a recipe library.",
@@ -88,7 +80,6 @@ export const projects: Project[] = [
   {
     slug: "vlsid-2026",
     title: "VLSID 2026",
-    client: "39th International VLSI Design Conference",
     category: "Conference",
     blurb:
       "A dual-venue site for the 39th edition in Pune, January 2026, built and run end to end.",
@@ -99,7 +90,6 @@ export const projects: Project[] = [
   {
     slug: "basics-architect",
     title: "Basics Architect",
-    client: "Institutions, developers and corporates",
     category: "Architecture",
     blurb:
       "The site for an award-winning New Delhi architecture and interiors studio, presenting its nature-integrated projects in education, hospitality, commercial and residential work.",
@@ -110,7 +100,6 @@ export const projects: Project[] = [
   {
     slug: "3d-visual",
     title: "3D Visual Solutions",
-    client: "Architects, designers and real estate developers",
     category: "3D visualisation",
     blurb:
       "The site for a Bengaluru visualisation studio, showing renders, 3D walkthroughs, floor plans and drone surveys of spaces before they are built.",
@@ -121,7 +110,6 @@ export const projects: Project[] = [
   {
     slug: "portfolio-v1",
     title: "Portfolio v1",
-    client: "Recruiters and engineering teams",
     category: "Portfolio",
     blurb:
       "The first version of this portfolio: a hand-drawn sketchbook look, with a career timeline that scrolls sideways.",

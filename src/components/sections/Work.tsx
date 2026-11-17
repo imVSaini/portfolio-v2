@@ -16,8 +16,6 @@ function ProjectPanel({ project }: { project: Project }) {
       data-project-card=""
       className="group relative hidden min-w-0 flex-col gap-6 md:flex md:tall:motion-safe:h-[min(78svh,calc(48vw+16rem),50rem)] md:tall:motion-safe:w-[min(64vw,60rem)] md:tall:motion-safe:shrink-0"
     >
-      <p className="font-display text-p4 text-muted uppercase">{project.category}</p>
-
       <ProjectCover
         project={project}
         className="aspect-video max-h-[60svh] md:tall:motion-safe:aspect-auto md:tall:motion-safe:max-h-none md:tall:motion-safe:flex-1"
@@ -26,7 +24,7 @@ function ProjectPanel({ project }: { project: Project }) {
       <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
         <div className="flex flex-col gap-2" data-h-reveal="">
           <h3 className="text-h3 uppercase">{project.title}</h3>
-          <p className="text-p4 tracking-wide text-muted uppercase">{project.client}</p>
+          <p className="text-p4 tracking-wide text-muted uppercase">{project.category}</p>
           <p className="max-w-xl text-p3 text-muted">{project.blurb}</p>
         </div>
         {project.url && (
