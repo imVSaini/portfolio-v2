@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useId, useRef } from "react";
 
 import { cn } from "@/lib/cn";
 import { gsap, MOTION_QUERY, ScrollTrigger, useGSAP } from "@/lib/gsap";
@@ -10,6 +10,13 @@ import { wordmark } from "./wordmark";
 
 const FOLD_AT = 120;
 const HOVER_INTENT = 0.12;
+const SLITS = [
+  { y: 22.31, height: 0.96 },
+  { y: 25, height: 1.15 },
+] as const;
+const MONO_WIDTH = Math.max(
+  ...wordmark.letters.map((letter) => ("fold" in letter ? letter.fold : 0)),
+);
 
 type LogoProps = {
   condense?: boolean;
@@ -18,6 +25,7 @@ type LogoProps = {
 
 export function Logo({ condense = false, className }: LogoProps) {
   const ref = useRef<SVGSVGElement>(null);
+  const maskId = useId();
 
   useGSAP(
     () => {
@@ -25,6 +33,7 @@ export function Logo({ condense = false, className }: LogoProps) {
       const trigger = svg?.closest<HTMLElement>("a") ?? svg?.parentElement;
       if (!svg || !trigger) return;
       const paths = gsap.utils.toArray<SVGPathElement>("[data-letter]", svg);
+      const slits = gsap.utils.toArray<SVGRectElement>("[data-slit]", svg);
       const mm = gsap.matchMedia();
 
       mm.add(MOTION_QUERY, () => {
@@ -67,6 +76,7 @@ export function Logo({ condense = false, className }: LogoProps) {
             (i - wordStart) * 0.04,
           );
         });
+        fold.fromTo(slits, { scaleX: 0 }, { scaleX: 1, transformOrigin: "0% 50%" }, 0.2);
 
         let waves: gsap.core.Tween[] = [];
         const settle = () => {
@@ -78,17 +88,25 @@ export function Logo({ condense = false, className }: LogoProps) {
             if (path) gsap.set(path, { morphSVG: letter.regular });
           });
         };
+        const foldTo = (on: boolean) => {
+          settle();
+          if (on) fold.play();
+          else fold.reverse();
+        };
         const folded = condense
           ? ScrollTrigger.create({
               start: FOLD_AT,
               end: "max",
-              onToggle: (self) => {
-                settle();
-                if (self.isActive) fold.play();
-                else fold.reverse();
+              onEnter: () => foldTo(true),
+              onLeave: () => foldTo(true),
+              onEnterBack: () => foldTo(true),
+              onLeaveBack: () => foldTo(false),
+              onRefresh: (self) => {
+                if (self.progress > 0) fold.play();
               },
             })
           : null;
+        const isFolded = () => (folded?.progress ?? 0) > 0;
 
         const wave = () => {
           if (fold.progress() > 0) return;
@@ -108,12 +126,12 @@ export function Logo({ condense = false, className }: LogoProps) {
         };
         let intent: gsap.core.Tween | null = null;
         const enter = (delay: number) => {
-          if (!folded?.isActive) return wave();
+          if (!isFolded()) return wave();
           intent = gsap.delayedCall(delay, () => fold.reverse());
         };
         const leave = () => {
           intent?.kill();
-          if (folded?.isActive) fold.play();
+          if (isFolded()) fold.play();
         };
         const isMouse = (event: PointerEvent) => event.pointerType !== "touch";
         const onPointerEnter = (event: PointerEvent) => isMouse(event) && enter(HOVER_INTENT);
@@ -150,15 +168,39 @@ export function Logo({ condense = false, className }: LogoProps) {
       data-logo=""
       className={cn("shrink-0", className)}
     >
-      {wordmark.letters.map((letter, i) => (
-        <path
-          key={i}
-          data-letter=""
-          d={letter.regular}
-          style={{ transitionDelay: `${i * 12}ms` }}
-          className="fill-current transition-[fill] duration-300 ease-out-expo group-hover:fill-accent group-focus-visible:fill-accent motion-reduce:transition-none"
-        />
-      ))}
+      <mask
+        id={maskId}
+        maskUnits="userSpaceOnUse"
+        x={-2}
+        y={0}
+        width={wordmark.width + 4}
+        height={wordmark.height}
+      >
+        <rect x={-2} y={0} width={wordmark.width + 4} height={wordmark.height} fill="white" />
+        {SLITS.map((slit) => (
+          <rect
+            key={slit.y}
+            data-slit=""
+            x={0}
+            y={slit.y}
+            width={MONO_WIDTH}
+            height={slit.height}
+            transform="scale(0 1)"
+            fill="black"
+          />
+        ))}
+      </mask>
+      <g mask={`url(#${maskId})`}>
+        {wordmark.letters.map((letter, i) => (
+          <path
+            key={i}
+            data-letter=""
+            d={letter.regular}
+            style={{ transitionDelay: `${i * 12}ms` }}
+            className="fill-current transition-[fill] duration-300 ease-out-expo group-hover:fill-accent group-focus-visible:fill-accent motion-reduce:transition-none"
+          />
+        ))}
+      </g>
     </svg>
   );
 }

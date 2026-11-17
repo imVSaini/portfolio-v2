@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+
 import { contact } from "@/data/contact";
 import { nav, site } from "@/data/site";
 
@@ -14,6 +16,16 @@ import { getFirstPost, getPostPath, MISSING_ROUTES } from "../routes";
 
 const SECTION_LINKS = nav.filter((item) => item.kind === "section" && item.href !== "#top");
 const BLOG_HEADING = /Notes\s*from\s*production\./;
+
+function getSlitScales(page: Page): Promise<number[]> {
+  return page
+    .locator("[data-logo] [data-slit]")
+    .evaluateAll((rects: SVGRectElement[]) =>
+      rects.map(
+        (rect) => Math.round((rect.transform.baseVal.consolidate()?.matrix.a ?? 1) * 100) / 100,
+      ),
+    );
+}
 
 test.describe("site navigation on the home page", () => {
   for (const { label, href } of SECTION_LINKS) {
@@ -73,6 +85,21 @@ test.describe("site navigation on the home page", () => {
     await expect(page).toHaveURL(/\/$/);
   });
 
+  test("the logo folds to the favicon's slit VS and stays folded at the very bottom", async ({
+    page,
+    visit,
+  }) => {
+    await visit("/");
+    await expect(page.locator("[data-logo] [data-slit]")).toHaveCount(2);
+    await expect.poll(() => getSlitScales(page)).toEqual([0, 0]);
+
+    await scrollToEnd(page);
+    await expect.poll(() => getSlitScales(page)).toEqual([1, 1]);
+
+    await page.getByRole("link", { name: `${site.name}, back to top` }).hover();
+    await expect.poll(() => getSlitScales(page)).toEqual([0, 0]);
+  });
+
   test('the footer\'s "Back to top" returns to the top', async ({ page, visit }) => {
     await visit("/");
     await scrollToEnd(page);
@@ -88,6 +115,17 @@ test.describe("site navigation on the home page", () => {
     await visit("/#contact");
 
     await expectScrolledTo(page, "#contact");
+  });
+});
+
+test.describe("the logo with reduced motion", () => {
+  test.use({ contextOptions: { reducedMotion: "reduce" } });
+
+  test("keeps the full name without slits after scrolling", async ({ page, visit }) => {
+    await visit("/");
+    await scrollToEnd(page);
+
+    await expect.poll(() => getSlitScales(page)).toEqual([0, 0]);
   });
 });
 
