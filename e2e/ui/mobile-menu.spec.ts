@@ -13,7 +13,66 @@ async function getBox(locator: Locator) {
 async function getBarRotations(menu: Locator) {
   return menu
     .getByRole("button", { name: "Close menu" })
-    .evaluate((button) => [...button.children].map((bar) => getComputedStyle(bar).rotate));
+    .evaluate((button) =>
+      [...(button.lastElementChild?.children ?? [])].map((bar) => getComputedStyle(bar).rotate),
+    );
+}
+
+async function getShownLabel(button: Locator) {
+  return button.evaluate((control) => {
+    const mask = control.querySelector("span")?.getBoundingClientRect();
+    if (!mask) return [];
+    return [...(control.querySelector("span")?.children ?? [])].flatMap((word) => {
+      const box = word.getBoundingClientRect();
+      const shown =
+        getComputedStyle(word).visibility === "visible" &&
+        box.top >= mask.top - 0.5 &&
+        box.bottom <= mask.bottom + 0.5;
+      return shown ? [word.textContent ?? ""] : [];
+    });
+  });
+}
+
+async function watchMenuReveal(page: Page, phase: "open" | "close") {
+  await page.evaluate((phase) => {
+    const root = document.documentElement;
+    const sampleFrom = (menu: Element) => {
+      const close = menu.querySelector('[aria-label="Close menu"]');
+      if (!close) return;
+      const started = performance.now();
+      const frames: string[] = [];
+      const sample = () => {
+        const button = close.getBoundingClientRect();
+        const atButton = document.elementFromPoint(
+          button.left + button.width / 2,
+          button.top + button.height / 2,
+        );
+        const atCorner = document.elementFromPoint(window.innerWidth - 2, window.innerHeight - 2);
+        frames.push(`${menu.contains(atButton)}/${menu.contains(atCorner)}`);
+        const done = phase === "open" ? performance.now() - started >= 1500 : !menu.isConnected;
+        if (done) root.dataset.menuReveal = frames.join(",");
+        else requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    };
+    const open = document.querySelector('[role="dialog"]');
+    if (phase === "close" && open) {
+      open.addEventListener("transitionstart", () => sampleFrom(open), { once: true });
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      const menu = document.querySelector('[role="dialog"]');
+      if (!menu) return;
+      observer.disconnect();
+      sampleFrom(menu);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }, phase);
+}
+
+async function readMenuReveal(page: Page) {
+  await expect.poll(() => page.locator("html").getAttribute("data-menu-reveal")).not.toBeNull();
+  return (await page.locator("html").getAttribute("data-menu-reveal"))?.split(",") ?? [];
 }
 
 async function getHiddenLinks(menu: Locator) {
@@ -64,7 +123,7 @@ test.describe("mobile menu", () => {
       "aria-expanded",
       "true",
     );
-    await expect(menu.getByRole("heading", { name: "Menu", level: 2 })).toBeVisible();
+    await expect(menu.getByRole("heading", { name: "Menu", level: 2 })).toBeAttached();
     await expect(menu.getByRole("button", { name: "Close menu" })).toBeFocused();
     const links = menu.getByRole("navigation", { name: "Mobile" }).getByRole("link");
     await expect(links).toHaveCount(nav.length);
@@ -143,6 +202,30 @@ test.describe("mobile menu", () => {
     await expectScrolledTo(page, "#experience");
 
     await expect(page).toHaveURL(/\/#experience$/, { timeout: 2_000 });
+  });
+
+  test("the logo closes the menu, then travels back to the top", async ({ page, visit }) => {
+    await visit("/");
+    let menu = await openMenu(page);
+    await menu.getByRole("link", { name: "Experience", exact: true }).click();
+    await expectScrolledTo(page, "#experience");
+    menu = await openMenu(page);
+
+    await menu.getByRole("link", { name: `${site.name}, back to top` }).click();
+
+    await expect(menu).toBeHidden();
+    await expect.poll(() => scrollY(page)).toBe(0);
+    await expect(page).toHaveURL(/\/$/);
+  });
+
+  test("on another page, the logo leads home", async ({ page, visit }) => {
+    await visit("/blog");
+    const menu = await openMenu(page);
+
+    await menu.getByRole("link", { name: `${site.name}, home` }).click();
+
+    await expect(page).toHaveURL(/\/$/);
+    await expect(menu).toBeHidden();
   });
 
   test("a page link navigates and closes the menu", async ({ page, visit }) => {
@@ -348,16 +431,40 @@ test.describe("mobile menu motion", () => {
       .toEqual(trigger);
   });
 
-  test("lines the panel up with the header gutter", async ({ page, visit }) => {
+  test("keeps the logo on the left exactly where the header has it", async ({ page, visit }) => {
     await visit("/");
-    const logo = await page.getByRole("link", { name: `${site.name}, back to top` }).boundingBox();
+    const logo = await getBox(page.getByRole("link", { name: `${site.name}, back to top` }));
     const menu = await openMenu(page);
 
     await expect
-      .poll(async () =>
-        Math.round((await menu.getByRole("heading", { name: "Menu" }).boundingBox())?.x ?? -1),
-      )
-      .toBe(Math.round(logo?.x ?? 0));
+      .poll(() => getBox(menu.getByRole("link", { name: `${site.name}, back to top` })))
+      .toEqual(logo);
+  });
+
+  test("swaps the Menu label for Close", async ({ page, visit }) => {
+    await visit("/");
+    const trigger = page.getByRole("button", { name: "Open menu" });
+
+    expect(await getShownLabel(trigger)).toEqual(["Menu"]);
+    const menu = await openMenu(page);
+
+    await expect
+      .poll(() => getShownLabel(menu.getByRole("button", { name: "Close menu" })))
+      .toEqual(["Close"]);
+  });
+
+  test("folds back into the close button as it closes", async ({ page, visit }) => {
+    await visit("/");
+    const menu = await openMenu(page);
+    await expect.poll(() => getHiddenLinks(menu)).toEqual([]);
+    await watchMenuReveal(page, "close");
+
+    await menu.getByRole("button", { name: "Close menu" }).click();
+
+    await expect(menu).toBeHidden();
+    const frames = await readMenuReveal(page);
+    expect(frames).toContain("true/false");
+    expect(frames).not.toContain("false/true");
   });
 
   test("folds the hamburger into a cross", async ({ page, visit }) => {
@@ -376,34 +483,10 @@ test.describe("mobile menu motion", () => {
 
   test("grows out of the close button", async ({ page, visit }) => {
     await visit("/");
-    await page.evaluate(() => {
-      const root = document.documentElement;
-      const observer = new MutationObserver(() => {
-        const menu = document.querySelector('[role="dialog"]');
-        const close = menu?.querySelector('[aria-label="Close menu"]');
-        if (!menu || !close) return;
-        observer.disconnect();
-        const started = performance.now();
-        const frames: string[] = [];
-        const sample = () => {
-          const button = close.getBoundingClientRect();
-          const atButton = document.elementFromPoint(
-            button.left + button.width / 2,
-            button.top + button.height / 2,
-          );
-          const atCorner = document.elementFromPoint(window.innerWidth - 2, window.innerHeight - 2);
-          frames.push(`${menu.contains(atButton)}/${menu.contains(atCorner)}`);
-          if (performance.now() - started < 1500) requestAnimationFrame(sample);
-          else root.dataset.menuReveal = frames.join(",");
-        };
-        requestAnimationFrame(sample);
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
-    });
+    await watchMenuReveal(page, "open");
     await openMenu(page);
 
-    await expect.poll(() => page.locator("html").getAttribute("data-menu-reveal")).not.toBeNull();
-    const frames = (await page.locator("html").getAttribute("data-menu-reveal"))?.split(",") ?? [];
+    const frames = await readMenuReveal(page);
     expect(frames).toContain("true/false");
     expect(frames).not.toContain("false/true");
     expect(frames.at(-1)).toBe("true/true");
@@ -462,6 +545,9 @@ test.describe("mobile menu motion", () => {
 
       await expect.poll(() => page.locator("html").getAttribute("data-menu-animations")).toBe("0");
       expect(await getBarRotations(menu)).toEqual(["45deg", "-45deg"]);
+      expect(await getShownLabel(menu.getByRole("button", { name: "Close menu" }))).toEqual([
+        "Close",
+      ]);
       expect(await getHiddenLinks(menu)).toEqual([]);
     });
   });
@@ -470,20 +556,11 @@ test.describe("mobile menu motion", () => {
 test.describe("mobile menu on a tablet", () => {
   test.use({ viewport: { width: 800, height: 900 } });
 
-  test("opens as a side sheet and closes on an outside click", async ({ page, visit }) => {
+  test("covers the whole screen", async ({ page, visit }) => {
     await visit("/");
     const menu = await openMenu(page);
 
-    await expect
-      .poll(async () => {
-        const box = await menu.boundingBox();
-        return box ? Math.round(box.x + box.width) : 0;
-      })
-      .toBe(800);
-    expect((await menu.boundingBox())?.width).toBeLessThan(800);
-    await page.mouse.click(40, 450);
-
-    await expect(menu).toBeHidden();
+    await expect.poll(() => getBox(menu)).toEqual([0, 0, 800, 900]);
   });
 
   test("puts the close button exactly over the trigger", async ({ page, visit }) => {

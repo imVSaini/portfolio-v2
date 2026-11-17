@@ -91,6 +91,7 @@
   --radius-lg: 0.7rem;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-wipe: cubic-bezier(0.7, 0, 0.2, 1);
 
   --animate-marquee: marquee var(--marquee-duration, 40s) linear infinite;
   --animate-pulse-dot: pulse-dot 2s var(--ease-out-expo) infinite;
