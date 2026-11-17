@@ -66,10 +66,10 @@ export const projects: Project[] = [
   {
     slug: "travel-kampany",
     title: "Travel Kampany",
-    client: "Travel Kampany",
+    client: "Travellers planning tailor-made holidays",
     category: "Travel & tourism",
     blurb:
-      "A travel platform with an itinerary builder and its own showcase page for every destination.",
+      "The site for a Kerala travel studio, with customisable holiday packages across India and abroad, each shaped around the traveller’s dates, pace and budget.",
     stack: ["PHP", "Node.js", "Tailwind CSS"],
     url: "https://travelkampany.in/",
     tint: "gold",
@@ -77,10 +77,10 @@ export const projects: Project[] = [
   {
     slug: "kvpr-masalas",
     title: "KVPR Masalas",
-    client: "KVPR",
+    client: "Home cooks and spice dealers",
     category: "E-commerce",
     blurb:
-      "A storefront for a premium Indian spice brand, with catalogue, cart and checkout, dealership enquiries and a recipe library.",
+      "A storefront for Mantrupti and Rajadhya, two South Indian spice brands, with catalogue, cart and checkout, dealership enquiries and a recipe library.",
     stack: ["WordPress", "WooCommerce", "Custom theme", "PHP"],
     url: "https://kvprfs.com/",
     tint: "red",
@@ -99,10 +99,10 @@ export const projects: Project[] = [
   {
     slug: "basics-architect",
     title: "Basics Architect",
-    client: "Basics Co.",
+    client: "Institutions, developers and corporates",
     category: "Architecture",
     blurb:
-      "A calm, image-led portfolio for an architecture studio, built around its projects and client stories.",
+      "The site for an award-winning New Delhi architecture and interiors studio, presenting its nature-integrated projects in education, hospitality, commercial and residential work.",
     stack: ["WordPress", "Custom theme", "Vite"],
     url: "https://basics.co.in/",
     tint: "gold",
@@ -110,9 +110,10 @@ export const projects: Project[] = [
   {
     slug: "3d-visual",
     title: "3D Visual Solutions",
-    client: "3D Visual Solutions",
+    client: "Architects, designers and real estate developers",
     category: "3D visualisation",
-    blurb: "A showcase for photo-real architectural renders, walkthroughs and drone mapping.",
+    blurb:
+      "The site for a Bengaluru visualisation studio, showing renders, 3D walkthroughs, floor plans and drone surveys of spaces before they are built.",
     stack: ["WordPress", "Custom theme", "PHP"],
     url: "https://3dvisual.in/",
     tint: "magenta",
@@ -120,7 +121,7 @@ export const projects: Project[] = [
   {
     slug: "portfolio-v1",
     title: "Portfolio v1",
-    client: "Personal site",
+    client: "Recruiters and engineering teams",
     category: "Portfolio",
     blurb:
       "The first version of this portfolio: a hand-drawn sketchbook look, with a career timeline that scrolls sideways.",
