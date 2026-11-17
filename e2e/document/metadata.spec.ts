@@ -26,6 +26,7 @@ const HOME_TITLE = `${site.name} — ${site.role}`;
 const DEFAULT_CARD = `${site.url}${site.ogImage.url}`;
 const FEED_TITLE = `${blog.title} — ${site.name}`;
 const CASE_STUDIES_TITLE = `${caseStudiesPage.title} — ${site.name}`;
+const SNIPPET_MAX_CHARACTERS = 155;
 
 const STATIC_PAGES: PageMeta[] = [
   { path: "/", title: HOME_TITLE, socialTitle: HOME_TITLE, description: site.description },
@@ -222,16 +223,33 @@ test.describe("document metadata", () => {
     for (const path of ["/", getPostPath(getFirstPost()), getCaseStudyPath(getFirstCaseStudy())]) {
       await page.goto(path);
       const card = new URL(await content(page, "og:image"));
-      const icon = (await page.locator('head link[rel="icon"]').getAttribute("href")) ?? "";
-      const touch =
-        (await page.locator('head link[rel="apple-touch-icon"]').getAttribute("href")) ?? "";
+      const icons = await page
+        .locator('head link[rel="icon"], head link[rel="apple-touch-icon"]')
+        .evaluateAll((links) => links.map((link) => link.getAttribute("href") ?? ""));
 
-      for (const target of [`${card.pathname}${card.search}`, icon, touch]) {
+      expect(icons).toHaveLength(3);
+      for (const target of [`${card.pathname}${card.search}`, ...icons]) {
         const response = await request.get(target);
         expect(response.status(), target).toBe(200);
         expect(response.headers()["content-type"], target).toMatch(/^image\//);
       }
     }
+  });
+
+  test("every page offers search engines a raster favicon at a stable URL", async ({ page }) => {
+    for (const path of PAGE_ROUTES) {
+      await page.goto(path);
+      await expect(page.locator('head link[rel="icon"][type="image/x-icon"]')).toHaveAttribute(
+        "href",
+        /^\/favicon\.ico(\?[\w.-]+)?$/,
+      );
+    }
+  });
+
+  test("the home description fits a search snippet without truncation", async ({ page }) => {
+    await page.goto("/");
+
+    expect((await content(page, "description")).length).toBeLessThanOrEqual(SNIPPET_MAX_CHARACTERS);
   });
 
   test("the not-found page is kept out of search indexes", async ({ page }) => {

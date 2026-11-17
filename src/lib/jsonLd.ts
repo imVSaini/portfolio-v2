@@ -21,6 +21,7 @@ type WebSiteNode = NodeReference & {
   "@type": "WebSite";
   url: string;
   name: string;
+  alternateName: string[];
   description: string;
   inLanguage: string;
   publisher: NodeReference;
@@ -123,6 +124,8 @@ const JSON_LD_IDS = {
   blog: `${site.url}/blog#blog`,
 } as const;
 
+const SITE_DOMAIN = new URL(site.url).hostname.replace(/^www\./, "");
+
 /**
  * Serialises a structured-data graph for a `<script type="application/ld+json">` tag.
  *
@@ -173,6 +176,7 @@ function getSiteNodes(): (PersonNode | WebSiteNode)[] {
       "@id": JSON_LD_IDS.website,
       url: site.url,
       name: site.name,
+      alternateName: [site.fullName, SITE_DOMAIN],
       description: site.description,
       inLanguage: "en-IN",
       publisher: { "@id": JSON_LD_IDS.person },

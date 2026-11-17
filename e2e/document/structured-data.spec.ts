@@ -23,6 +23,7 @@ const BLOG_ID = `${site.url}/blog#blog`;
 const BLOG_URL = `${site.url}/blog`;
 const CASE_STUDIES_URL = getCanonical(caseStudiesPage.path);
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const SITE_DOMAIN = new URL(site.url).hostname.replace(/^www\./, "");
 
 function isNode(value: unknown): value is Node {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -78,6 +79,7 @@ function expectSiteNodes(graph: Node[]): void {
     "@id": WEBSITE_ID,
     url: site.url,
     name: site.name,
+    alternateName: [site.fullName, SITE_DOMAIN],
     description: site.description,
     inLanguage: "en-IN",
     publisher: { "@id": PERSON_ID },
@@ -101,6 +103,18 @@ test.describe("structured data", () => {
       isPartOf: { "@id": WEBSITE_ID },
       mainEntity: { "@id": PERSON_ID },
     });
+  });
+
+  test("the home page gives Google a site name with a domain fallback", async ({ page }) => {
+    await page.goto("/");
+    const website = findNode(await readGraph(page), "WebSite");
+    const alternates = website["alternateName"];
+
+    expect(website["name"]).toBe(
+      await page.locator('meta[property="og:site_name"]').getAttribute("content"),
+    );
+    expect(Array.isArray(alternates) && alternates.at(-1)).toMatch(/^[a-z0-9.-]+\.[a-z]+$/);
+    expect(Array.isArray(alternates) && alternates.at(-1)).toBe(SITE_DOMAIN);
   });
 
   test("the blog index describes the collection and lists every post", async ({ page }) => {

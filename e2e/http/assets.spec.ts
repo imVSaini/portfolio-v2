@@ -21,6 +21,18 @@ test.describe("static assets", () => {
     expect(readPngSize(body)).toEqual({ width: site.ogImage.width, height: site.ogImage.height });
   });
 
+  test("the favicon is an ICO with sizes from 16px up to 256px", async ({ request }) => {
+    const response = await request.get("/favicon.ico");
+    const body = await response.body();
+    const count = body.readUInt16LE(4);
+    const sizes = Array.from({ length: count }, (_, i) => body.readUInt8(6 + i * 16) || 256);
+
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toBe("image/x-icon");
+    expect(body.readUInt16LE(2), "ICO resource type").toBe(1);
+    expect(sizes).toEqual([16, 32, 48, 256]);
+  });
+
   test("the SVG icon is served", async ({ request }) => {
     const response = await request.get("/icon.svg");
 
