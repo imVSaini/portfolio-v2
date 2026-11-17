@@ -27,7 +27,7 @@ export function getCaseStudyPath(study: CaseStudy): `/case-studies/${string}` {
  *
  * @example
  * ```tsx
- * <ArticleToc headings={getCaseStudyHeadings(study)} />
+ * <ArticleAside headings={getCaseStudyHeadings(study)} share={{ url, title }} />
  * ```
  */
 export function getCaseStudyHeadings(study: CaseStudy): string[] {

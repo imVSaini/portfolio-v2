@@ -9,6 +9,7 @@ import {
   expect,
   expectScrolledTo,
   getOverflow,
+  openArticleAside,
   scrollY,
   test,
 } from "../fixtures";
@@ -43,11 +44,45 @@ async function pickRoomyHeading(page: Page): Promise<string> {
   return heading;
 }
 
+async function expectContentsToggle(page: Page): Promise<void> {
+  const toggle = page.getByRole("button", { name: "On this page" });
+  const contents = page.getByRole("navigation", { name: "On this page" });
+  const copy = page.getByRole("button", { name: "Copy link" });
+
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(contents).toHaveCount(0);
+  await expect(copy).toHaveCount(0);
+  expect((await toggle.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(contents.getByRole("link")).toHaveCount(HEADINGS.length);
+  for (const [index, heading] of HEADINGS.entries()) {
+    await expect(contents.getByRole("link").nth(index)).toContainText(heading);
+  }
+  await expect(copy).toBeVisible();
+  await expect(page.getByRole("link", { name: /^Share on / })).toHaveCount(2);
+
+  await toggle.press("Enter");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(contents).toHaveCount(0);
+  await expect(copy).toHaveCount(0);
+
+  await toggle.press("Space");
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(contents).toBeVisible();
+}
+
 test.describe("post table of contents", () => {
-  test("travels to a section, records it and moves focus there", async ({ page, visit }) => {
+  test("travels to a section, records it and moves focus there", async ({
+    page,
+    visit,
+    layout,
+  }) => {
     await visit(PATH);
     const heading = await pickRoomyHeading(page);
     const id = getHeadingId(heading);
+    await openArticleAside(page, layout);
     const contents = page.getByRole("navigation", { name: "On this page" });
 
     await clickWhenSettled(contents.getByRole("link", { name: heading }));
@@ -62,10 +97,11 @@ test.describe("post table of contents", () => {
     await expect(contents.locator("[aria-current]")).toHaveCount(1);
   });
 
-  test("highlights the section being read while scrolling", async ({ page, visit }) => {
+  test("highlights the section being read while scrolling", async ({ page, visit, layout }) => {
     await visit(PATH);
-    const heading = await pickRoomyHeading(page);
+    await openArticleAside(page, layout);
     const contents = page.getByRole("navigation", { name: "On this page" });
+    const heading = await pickRoomyHeading(page);
 
     await page
       .locator(`[id="${getHeadingId(heading)}"]`)
@@ -91,6 +127,43 @@ test.describe("post table of contents", () => {
       );
 
     await expect(contents).toBeInViewport({ ratio: 1 });
+  });
+
+  test(
+    "keeps the contents and share open in the sidebar with no toggle",
+    { tag: "@desktop" },
+    async ({ page, visit }) => {
+      await visit(PATH);
+
+      await expect(page.getByRole("button", { name: "On this page" })).toHaveCount(0);
+      await expect(
+        page.getByRole("navigation", { name: "On this page" }).getByRole("link"),
+      ).toHaveCount(HEADINGS.length);
+      await expect(page.getByRole("button", { name: "Copy link" })).toBeVisible();
+    },
+  );
+
+  for (const motion of ["no-preference", "reduce"] as const) {
+    test.describe(`with motion set to ${motion}`, { tag: "@mobile" }, () => {
+      test.use({ contextOptions: { reducedMotion: motion } });
+
+      test("folds contents and share behind a toggle that opens by tap and keyboard", async ({
+        page,
+        visit,
+      }) => {
+        await visit(PATH);
+        await expectContentsToggle(page);
+      });
+    });
+  }
+
+  test.describe("at tablet width", { tag: "@desktop" }, () => {
+    test.use({ viewport: { width: 820, height: 1180 } });
+
+    test("folds contents and share behind a toggle", async ({ page, visit }) => {
+      await visit(PATH);
+      await expectContentsToggle(page);
+    });
   });
 
   test("a link straight to a section opens on that section", async ({ page, visit }) => {
@@ -240,9 +313,11 @@ test.describe("post sharing", () => {
   test("copy link puts the canonical address on the clipboard and announces it", async ({
     page,
     visit,
+    layout,
     clipboard,
   }) => {
     await visit(PATH);
+    await openArticleAside(page, layout);
     const button = page.getByRole("button", { name: "Copy link" });
 
     await expect(button.locator("[aria-live]")).toHaveText("");
@@ -254,8 +329,9 @@ test.describe("post sharing", () => {
     await expect(button.locator("[aria-live]")).toHaveText("");
   });
 
-  test("share links carry this post's address", async ({ page, visit }) => {
+  test("share links carry this post's address", async ({ page, visit, layout }) => {
     await visit(PATH);
+    await openArticleAside(page, layout);
     const target = encodeURIComponent(`${site.url}${PATH}`);
 
     await expect(

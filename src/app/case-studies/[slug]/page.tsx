@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ArticleAside } from "@/components/article/ArticleAside";
 import { ArticleBody } from "@/components/article/ArticleBody";
-import { ArticleShare } from "@/components/article/ArticleShare";
-import { ArticleToc } from "@/components/article/ArticleToc";
 import { CaseStudyBreadcrumbs } from "@/components/caseStudies/CaseStudyBreadcrumbs";
 import { CaseStudyCover } from "@/components/caseStudies/CaseStudyCover";
 import { CaseStudyDecisions } from "@/components/caseStudies/CaseStudyDecisions";
@@ -129,14 +128,13 @@ function CaseStudyContent({ study }: { study: CaseStudy }) {
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
           <aside className="lg:order-2 lg:col-span-3 lg:col-start-10">
-            <div className="flex flex-col gap-10 lg:sticky lg:top-[calc(var(--header-h)+2rem)]">
-              <ArticleToc headings={getCaseStudyHeadings(study)} />
-              <ArticleShare
-                url={`${site.url}${getCaseStudyPath(study)}`}
-                title={`${study.title} case study`}
-                className="flex-col items-start border-t border-line pt-8"
-              />
-            </div>
+            <ArticleAside
+              headings={getCaseStudyHeadings(study)}
+              share={{
+                url: `${site.url}${getCaseStudyPath(study)}`,
+                title: `${study.title} case study`,
+              }}
+            />
           </aside>
           <div className="flex max-w-prose min-w-0 flex-col gap-6 text-prose lg:col-span-8">
             <ArticleBody blocks={study.overview} Diagram={CaseStudyDiagram} />

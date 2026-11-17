@@ -12,6 +12,7 @@ import {
   getArrowDirection,
   hoverWhenSettled,
   isArrowSwapped,
+  openArticleAside,
   test,
 } from "../fixtures";
 import { getCaseStudyPath, getFirstCaseStudy } from "../routes";
@@ -217,10 +218,12 @@ test.describe("case study", () => {
   test("the contents list covers every section and travels to the decisions", async ({
     page,
     visit,
+    layout,
   }) => {
     await visit(PATH);
     const headings = getCaseStudyHeadings(STUDY);
     const id = getHeadingId(DECISIONS_HEADING);
+    await openArticleAside(page, layout);
     const contents = page.getByRole("navigation", { name: "On this page" });
 
     await expect(contents.getByRole("link")).toHaveCount(headings.length);

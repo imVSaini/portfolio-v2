@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ArticleAside } from "@/components/article/ArticleAside";
 import { ArticleBody } from "@/components/article/ArticleBody";
-import { ArticleShare } from "@/components/article/ArticleShare";
-import { ArticleToc } from "@/components/article/ArticleToc";
 import { PostAuthor } from "@/components/blog/PostAuthor";
 import { PostAuthorCard } from "@/components/blog/PostAuthorCard";
 import { PostBreadcrumbs } from "@/components/blog/PostBreadcrumbs";
@@ -119,14 +118,7 @@ function PostContent({ post }: { post: Post }) {
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
           <aside className="lg:order-2 lg:col-span-3 lg:col-start-10">
-            <div className="flex flex-col gap-10 lg:sticky lg:top-[calc(var(--header-h)+2rem)]">
-              {headings.length > 0 && <ArticleToc headings={headings} />}
-              <ArticleShare
-                url={url}
-                title={post.title}
-                className="flex-col items-start border-t border-line pt-8"
-              />
-            </div>
+            <ArticleAside headings={headings} share={{ url, title: post.title }} />
           </aside>
           <div className="flex max-w-prose flex-col gap-12 text-prose lg:col-span-8">
             <ArticleBody blocks={post.body} Diagram={PostDiagram} />

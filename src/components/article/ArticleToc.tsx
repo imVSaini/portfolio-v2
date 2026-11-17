@@ -11,10 +11,11 @@ const ACTIVE_BAND = "0px 0px -66% 0px";
 
 type ArticleTocProps = {
   headings: string[];
+  showLabel?: boolean;
   className?: string;
 };
 
-export function ArticleToc({ headings, className }: ArticleTocProps) {
+export function ArticleToc({ headings, showLabel = true, className }: ArticleTocProps) {
   const [active, setActive] = useState<string>();
 
   useEffect(() => {
@@ -34,9 +35,11 @@ export function ArticleToc({ headings, className }: ArticleTocProps) {
 
   return (
     <nav aria-label="On this page" className={cn("flex flex-col gap-4", className)}>
-      <p className="font-display text-p4 font-medium tracking-wide text-muted uppercase">
-        On this page
-      </p>
+      {showLabel && (
+        <p className="font-display text-p4 font-medium tracking-wide text-muted uppercase">
+          On this page
+        </p>
+      )}
       <ol className="flex flex-col border-l border-line">
         {headings.map((heading, i) => {
           const id = getHeadingId(heading);

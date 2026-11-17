@@ -101,6 +101,14 @@ export async function openSiteNav(page: Page, layout: Layout): Promise<Locator> 
   return menu.getByRole("navigation", { name: "Mobile" });
 }
 
+export async function openArticleAside(page: Page, layout: Layout): Promise<void> {
+  if (layout === "desktop") return;
+  const toggle = page.getByRole("button", { name: "On this page" });
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByRole("button", { name: "Copy link" })).toBeVisible();
+}
+
 export async function openAppearance(page: Page, layout: Layout): Promise<Locator> {
   if (layout === "phone") return openMenu(page);
   await page.getByRole("button", { name: "Appearance" }).click();
