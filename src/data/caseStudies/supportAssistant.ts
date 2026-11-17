@@ -4,7 +4,7 @@ import { diagram, type CaseStudy } from "@/data/caseStudies/schema";
 export const supportAssistant: CaseStudy = {
   slug: "ai-support-assistant",
   title: "AI Support Assistant",
-  category: "AI product",
+  category: "AI chatbot",
   headline:
     "An embeddable AI support chatbot that answers from each business’s own documents, captures leads mid-conversation and accounts for every token it spends.",
   summary:

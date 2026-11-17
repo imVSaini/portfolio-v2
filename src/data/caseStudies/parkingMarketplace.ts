@@ -4,7 +4,7 @@ import { diagram, type CaseStudy } from "@/data/caseStudies/schema";
 export const parkingMarketplace: CaseStudy = {
   slug: "parking-marketplace",
   title: "Parking Marketplace",
-  category: "Marketplace",
+  category: "Parking marketplace",
   headline:
     "An airport parking marketplace API: a ten-minute hold on every space, a Stripe deposit that is also the platform’s commission and three separate ways for a payment to confirm a booking.",
   summary:

@@ -4,7 +4,7 @@ import { diagram, type CaseStudy } from "@/data/caseStudies/schema";
 export const bookkeepingPlatform: CaseStudy = {
   slug: "bookkeeping-platform",
   title: "Bookkeeping Platform",
-  category: "Accounting SaaS",
+  category: "Accounting software",
   headline:
     "A multi-tenant bookkeeping API for an accounting practice: a double-entry ledger for every client company, bank statements that import without duplicates, supplier bills read by OCR and a client portal opened by magic link.",
   summary:

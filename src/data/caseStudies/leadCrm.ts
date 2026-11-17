@@ -4,7 +4,7 @@ import { diagram, type CaseStudy } from "@/data/caseStudies/schema";
 export const leadCrm: CaseStudy = {
   slug: "lead-management-crm",
   title: "Lead Management CRM",
-  category: "B2B SaaS",
+  category: "CRM",
   headline:
     "A multi-tenant lead management CRM: a Postgres schema per workspace, scoped roles, an audit log nobody can edit and leads that flow in from Facebook and Instagram ads.",
   summary:

@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { caseStudies } from "@/data/caseStudies";
 import { contact } from "@/data/contact";
 import { experience } from "@/data/experience";
 import { posts } from "@/data/posts";
@@ -146,6 +147,13 @@ test.describe("home without JavaScript", () => {
       "href",
       contact.links.find((link) => link.label === "GitHub")?.href ?? "",
     );
+  });
+
+  test("gives each case-study project the same category as its study", () => {
+    for (const study of caseStudies) {
+      const project = projects.find((item) => item.slug === study.slug);
+      expect(project?.category, study.title).toBe(study.category);
+    }
   });
 
   test("keeps every project reachable without JavaScript", async ({ page }) => {
