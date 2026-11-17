@@ -128,6 +128,16 @@ export const projects: Project[] = [
     tint: "soot",
   },
   {
+    slug: "digital-invite",
+    title: "Digital Invite",
+    category: "Event website",
+    blurb:
+      "An invitation that opens like a letter: tap the wax seal, shuffle draggable photos, follow the story chapter by chapter and save the date to your calendar.",
+    stack: ["HTML", "Tailwind CSS 4", "JavaScript", "GSAP", "Lenis"],
+    url: "https://sandeep-deepthi.netlify.app/",
+    tint: "gold",
+  },
+  {
     slug: "portfolio-v1",
     title: "Portfolio v1",
     category: "Personal Portfolio",
