@@ -149,6 +149,17 @@ test.describe("home without JavaScript", () => {
     );
   });
 
+  test("draws the data-first principle as a plain grid with no dashed line", async ({ page }) => {
+    const card = page
+      .locator("#approach article")
+      .filter({ has: page.getByRole("heading", { name: "Data first, pixels second" }) });
+    const art = card.locator("svg");
+
+    await expect(art).toHaveCount(1);
+    await expect(art.locator("rect[stroke]")).toHaveCount(16);
+    await expect(art.locator("[stroke-dasharray]")).toHaveCount(0);
+  });
+
   test("gives each case-study project the same category as its study", () => {
     for (const study of caseStudies) {
       const project = projects.find((item) => item.slug === study.slug);

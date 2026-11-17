@@ -33,6 +33,8 @@ for accessible primitives.
 ## Working agreements
 
 - Match the surrounding code. Do not add dependencies without asking.
+- Every feature added, updated or removed comes with matching Playwright changes, run and passing
+  (see "Every change ships with tests").
 - This file is the single source of rules for every agent (Cursor reads it directly; `CLAUDE.md`
   imports it). Edit only below the Next.js block above; `next dev` rewrites that block.
 
@@ -201,6 +203,26 @@ rebuild and restart it after changing app code.
 - `npm run test:e2e:ui`: UI mode. `npm run test:e2e:report`: open the last HTML report.
 - One file or test: `npx playwright test e2e/ui/post.spec.ts --project=chromium -g "contents"`.
 
+### Every change ships with tests
+
+Every feature added, updated or removed changes its Playwright coverage in the same piece of work.
+A change is not done until its tests pass.
+
+1. **Add**: write specs for the new behaviour, including layout (`phone`, `tablet`, `desktop`),
+   keyboard use and reduced motion where they apply.
+2. **Update**: change the existing assertions to match the new behaviour. Add cases for anything
+   the old tests did not cover.
+3. **Delete**: remove the specs, helpers and fixtures that only served the removed feature, and
+   any leftover `test.fail` markers.
+4. **Run** the affected spec files on all five UI projects (plus `http` or `document` if routes,
+   metadata or server HTML changed). A server already on port 3200 is reused, so stop it first so
+   the run builds the current code.
+5. **On failure**: decide whether the app or the test is wrong. Fix the app when the behaviour is
+   wrong. Fix the test only when the test itself is faulty, and never by weakening an assertion.
+   Then run again until it passes.
+6. **Confirm** a failure that looks like flakiness by rerunning that spec on its own before
+   writing it off, and say so in the report. Finish with `npm run check`.
+
 ### Projects
 
 - `http` (`e2e/http`): status codes, headers, feeds and markdown routes through `request`, no
@@ -238,6 +260,11 @@ rebuild and restart it after changing app code.
 - Press Tab through the `tabKey` fixture (`page.keyboard.press(tabKey)`, `` `Shift+${tabKey}` ``).
   WebKit on macOS only tabs to links with Option held, and the fixture picks the key that does.
 - Motion-off behaviour is tested with `test.use({ contextOptions: { reducedMotion: "reduce" } })`.
+- Inside an open Base UI dialog, `locator.evaluateAll()` crashes the page in Playwright's Firefox.
+  Call `evaluate()` on one container and query its children instead (see `getHiddenLinks` in
+  `e2e/ui/mobile-menu.spec.ts`).
+- To assert that something animates, sample `getAnimations({ subtree: true })` on every frame over
+  a short window. A single early sample can run before the transition starts.
 
 ## Commit messages
 

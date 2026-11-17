@@ -20,7 +20,7 @@ const centre: CSSProperties = { transformBox: "fill-box", transformOrigin: "cent
 const bottom: CSSProperties = { transformBox: "fill-box", transformOrigin: "50% 100%" };
 const delay = (s: number): CSSProperties => ({ animationDelay: `${s}s` });
 
-/** Data first — a schema grid; a wave of cells lights up while data flows along the diagonal. */
+/** Data first — a schema grid; a wave of cells lights up across it. */
 export function SchemaArt(props: ArtProps) {
   const filled = new Set([0, 5, 10, 15]);
   return (
@@ -58,16 +58,6 @@ export function SchemaArt(props: ArtProps) {
           </g>
         );
       })}
-      <g data-art-piece="">
-        <path
-          d="M45 45 L195 195"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeDasharray="4 6"
-          opacity="0.6"
-          className={`animate-dash-flow ${LOOP}`}
-        />
-      </g>
     </svg>
   );
 }
