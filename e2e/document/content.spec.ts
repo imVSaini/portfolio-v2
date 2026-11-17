@@ -131,6 +131,8 @@ test.describe("home without JavaScript", () => {
       await expect(panel).toContainText(project.category);
       await expect(panel).toContainText(project.blurb);
       await expect(panel.locator("ul > li")).toHaveText(project.stack);
+      expect(project.stack.length, project.title).toBeGreaterThanOrEqual(3);
+      expect(project.stack.length, project.title).toBeLessThanOrEqual(5);
       if (project.url) {
         for (const link of await panel.getByRole("link").all()) {
           await expect(link).toHaveAttribute("href", project.url);

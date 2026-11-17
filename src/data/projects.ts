@@ -16,7 +16,7 @@ export const projects: Project[] = [
     title: "Bookkeeping Platform",
     category: "Accounting SaaS",
     blurb:
-      "A bookkeeping API with a double-entry ledger for every client company, duplicate-free statement imports and OCR-read bills.",
+      "A multi-tenant bookkeeping API that gives every client company its own Postgres schema, imports bank statements without duplicates and turns scanned bills into entries only after review.",
     stack: ["Node.js", "Express", "PostgreSQL 16", "BullMQ", "OpenAI API"],
     tint: "gold",
   },
@@ -25,7 +25,7 @@ export const projects: Project[] = [
     title: "Parking Marketplace",
     category: "Marketplace",
     blurb:
-      "An airport parking marketplace that holds each space for ten minutes while a Stripe deposit confirms the booking.",
+      "An airport parking marketplace that never oversells: a row lock and a ten-minute hold guard each space while a Stripe deposit confirms the booking.",
     stack: ["Node.js 22", "Express", "PostgreSQL 16", "BullMQ", "Stripe"],
     tint: "red",
   },
@@ -34,8 +34,8 @@ export const projects: Project[] = [
     title: "AI Support Assistant",
     category: "AI product",
     blurb:
-      "An embeddable support chatbot that answers from each business’s own documents and captures leads mid-conversation.",
-    stack: ["FastAPI", "PostgreSQL", "pgvector", "WebSockets", "OpenAI API", "React 19"],
+      "An embeddable support chatbot that answers only from each business’s own documents, captures leads mid-chat and records the cost of every reply.",
+    stack: ["FastAPI", "pgvector", "WebSockets", "OpenAI API", "React 19"],
     tint: "magenta",
   },
   {
@@ -43,7 +43,7 @@ export const projects: Project[] = [
     title: "Lead Management CRM",
     category: "B2B SaaS",
     blurb:
-      "A multi-tenant CRM with a schema per workspace, scoped roles and leads that flow in from Facebook and Instagram ads.",
+      "A multi-tenant CRM that isolates each workspace in its own Postgres schema and pulls in leads from Facebook and Instagram ads without losing or doubling one.",
     stack: ["FastAPI", "PostgreSQL 16", "Celery", "Next.js 16", "React 19"],
     tint: "orange",
   },
@@ -113,7 +113,7 @@ export const projects: Project[] = [
     category: "Portfolio",
     blurb:
       "The first version of this portfolio: a hand-drawn sketchbook look, with a career timeline that scrolls sideways.",
-    stack: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS 4", "GSAP", "Rough.js"],
+    stack: ["Next.js 16", "TypeScript", "Tailwind CSS 4", "GSAP", "Rough.js"],
     url: "https://imvsaini.vercel.app/",
     tint: "orange",
   },
