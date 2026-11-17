@@ -108,6 +108,26 @@ export const projects: Project[] = [
     tint: "magenta",
   },
   {
+    slug: "artsy-lens",
+    title: "Artsy Lens",
+    category: "Wedding photography",
+    blurb:
+      "The site for a Bengaluru wedding studio shooting since 1994, with a cinematic hero slideshow, a page for every shoot from pre-wedding to maternity, and its films and portfolio.",
+    stack: ["HTML", "Tailwind CSS", "JavaScript"],
+    url: "https://artsy-lens.netlify.app/",
+    tint: "red",
+  },
+  {
+    slug: "3-knots-photography",
+    title: "3 Knots Photography",
+    category: "Photography studio",
+    blurb:
+      "The site for a Bangalore wedding and candid photography studio, opening on a slideshow with a camera-settings overlay and leading couples from recent work to a consultation.",
+    stack: ["HTML", "Tailwind CSS", "JavaScript"],
+    url: "https://3-knots-photography.netlify.app/",
+    tint: "soot",
+  },
+  {
     slug: "portfolio-v1",
     title: "Portfolio v1",
     category: "Personal Portfolio",
