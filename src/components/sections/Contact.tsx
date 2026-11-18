@@ -25,7 +25,7 @@ export function Contact() {
           <SectionLabel>Contact</SectionLabel>
 
           <RevealText as="h2" id="contact-title" className="text-h1 uppercase">
-            Got an idea? <span className="text-accent">Say hello.</span>
+            Let’s make <span className="text-accent">something</span>
           </RevealText>
         </div>
 

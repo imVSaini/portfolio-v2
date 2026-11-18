@@ -242,9 +242,7 @@ test.describe("home without JavaScript", () => {
   test("offers a way to get in touch", async ({ page }) => {
     const section = page.locator("#contact");
 
-    await expect(section.getByRole("heading", { level: 2 })).toHaveText(
-      /Got an idea\?\s*Say hello\./,
-    );
+    await expect(section.getByRole("heading", { level: 2 })).toHaveText(/Let’s make\s*something/);
     await expect(section.getByRole("link", { name: contact.email })).toHaveAttribute(
       "href",
       `mailto:${contact.email}`,

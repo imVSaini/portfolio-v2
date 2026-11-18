@@ -557,6 +557,15 @@ test.describe("experience and skills", () => {
 });
 
 test.describe("contact", () => {
+  test("invites the visitor to make something", async ({ page, visit }) => {
+    await visit("/");
+    const heading = page.locator("#contact").getByRole("heading", { level: 2 });
+
+    await heading.scrollIntoViewIfNeeded();
+    await expect(heading).toHaveText(/Let’s make\s*something/);
+    await expect(heading).toBeVisible();
+  });
+
   test("offers the email address as a mail link", async ({ page, visit }) => {
     await visit("/");
     const link = page.locator("#contact").getByRole("link", { name: contact.email });
