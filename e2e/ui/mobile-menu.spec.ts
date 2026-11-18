@@ -41,6 +41,32 @@ async function getLogoState(scope: Locator) {
   });
 }
 
+async function getScrimStrength(page: Page) {
+  return page.evaluate(() => {
+    const alphaOf = (color: string) => {
+      if (color === "transparent") return 0;
+      const slash = /\/\s*([\d.]+%?)\s*\)$/.exec(color)?.[1];
+      const comma = /^rgba\([^)]*,\s*([\d.]+)\)$/.exec(color)?.[1];
+      const value = slash ?? comma;
+      if (value === undefined) return 1;
+      return value.endsWith("%") ? parseFloat(value) / 100 : parseFloat(value);
+    };
+    return Math.max(
+      0,
+      ...[...document.body.querySelectorAll("div")].map((layer) => {
+        const style = getComputedStyle(layer);
+        const box = layer.getBoundingClientRect();
+        const covers =
+          style.position === "fixed" &&
+          Number(style.zIndex) > 50 &&
+          box.width >= window.innerWidth &&
+          box.height >= window.innerHeight;
+        return covers ? alphaOf(style.backgroundColor) * Number(style.opacity) : 0;
+      }),
+    );
+  });
+}
+
 async function getBottom(locator: Locator) {
   const box = await locator.boundingBox();
   return box && Math.round(box.y + box.height);
@@ -667,6 +693,28 @@ test.describe("appearance drawer", () => {
     expect((await drawer.boundingBox())?.height).toBe(light);
   });
 
+  test("dims the menu behind it with a scrim", async ({ page, visit }) => {
+    await visit("/");
+    const { menu } = await openDrawer(page);
+
+    await expect.poll(() => getScrimStrength(page)).toBeCloseTo(0.32, 2);
+    await page.keyboard.press("Escape");
+    await expect.poll(() => getScrimStrength(page)).toBe(0);
+    await expect(menu).toBeVisible();
+  });
+
+  test.describe("in the dark theme", () => {
+    test.use({ colorScheme: "dark" });
+
+    test("dims the menu behind it just as much", async ({ page, visit }) => {
+      await visit("/");
+      await expect(page.locator("html")).toHaveClass(/(^|\s)dark(\s|$)/);
+      await openDrawer(page);
+
+      await expect.poll(() => getScrimStrength(page)).toBeCloseTo(0.32, 2);
+    });
+  });
+
   test("Escape closes the drawer and leaves the menu open", async ({ page, visit }) => {
     await visit("/");
     const { menu, drawer } = await openDrawer(page);
@@ -741,6 +789,7 @@ test.describe("appearance drawer", () => {
       const { drawer } = await openDrawer(page);
 
       expect(await drawer.evaluate((popup) => popup.getAnimations().length)).toBe(0);
+      expect(await getScrimStrength(page)).toBeCloseTo(0.32, 2);
       expect(await getBottom(drawer)).toBe(800);
     });
   });

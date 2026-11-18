@@ -21,8 +21,9 @@ export function AppearanceDrawer({ className }: { className?: string }) {
       </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Backdrop
+          forceRender
           data-lenis-prevent=""
-          className="fixed inset-0 z-60 bg-faded-black/40 transition-opacity duration-500 ease-out-expo motion-reduce:transition-none starting-style:opacity-0 ending-style:opacity-0 ending-style:duration-300"
+          className="fixed inset-0 z-60 bg-black/32 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-500 ease-out-expo data-swiping:duration-0 motion-reduce:transition-none starting-style:opacity-0 ending-style:opacity-0 ending-style:duration-300"
         />
         <Drawer.Viewport
           data-lenis-prevent=""
