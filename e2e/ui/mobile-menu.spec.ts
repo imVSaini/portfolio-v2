@@ -337,6 +337,21 @@ test.describe("mobile menu", () => {
     },
   );
 
+  test("spaces its links as 48px targets on an even 8px rhythm", async ({ page, visit }) => {
+    await visit("/");
+    const menu = await openMenu(page);
+    await expect.poll(() => getHiddenLinks(menu)).toEqual([]);
+
+    const rows = await menu
+      .getByRole("navigation", { name: "Mobile" })
+      .evaluate((nav) =>
+        [...nav.querySelectorAll("a")].map((link) => link.getBoundingClientRect()),
+      );
+    for (const row of rows) expect(row.height).toBeGreaterThanOrEqual(48);
+    const gaps = rows.slice(1).map((row, i) => Math.round(row.top - (rows[i]?.bottom ?? 0)));
+    expect(gaps).toEqual(rows.slice(1).map(() => 8));
+  });
+
   test("gives its own controls a 44px touch target", async ({ page, visit }) => {
     await visit("/");
     const trigger = await page.getByRole("button", { name: "Open menu" }).boundingBox();

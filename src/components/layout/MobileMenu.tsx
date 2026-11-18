@@ -31,7 +31,7 @@ const NAV_LINK_CLASS_NAME =
   "group block overflow-hidden font-display uppercase aria-[current=page]:text-accent";
 
 const RISE_CLASS_NAME =
-  "flex min-h-11 items-center text-h2 font-semibold transition-transform delay-(--delay) duration-900 ease-out-expo group-starting-style/menu:translate-y-full group-ending-style/menu:translate-y-full group-ending-style/menu:delay-0 group-ending-style/menu:duration-500 group-ending-style/menu:ease-wipe motion-reduce:transition-none";
+  "flex min-h-12 items-center text-h2 font-semibold transition-transform delay-(--delay) duration-900 ease-out-expo group-starting-style/menu:translate-y-full group-ending-style/menu:translate-y-full group-ending-style/menu:delay-0 group-ending-style/menu:duration-500 group-ending-style/menu:ease-wipe motion-reduce:transition-none";
 
 const FADE_CLASS_NAME =
   "transition-[translate,opacity] delay-(--delay) duration-700 ease-out-expo group-starting-style/menu:translate-y-4 group-starting-style/menu:opacity-0 group-ending-style/menu:opacity-0 group-ending-style/menu:delay-0 group-ending-style/menu:duration-300 motion-reduce:transition-none";
@@ -175,7 +175,7 @@ export function MobileMenu({ className }: { className?: string }) {
             </Dialog.Close>
           </div>
           <nav aria-label="Mobile">
-            <ul className="flex flex-col">
+            <ul className="flex flex-col gap-2">
               {nav.map((item, i) => (
                 <li key={item.href}>
                   {item.kind === "section" && onHome ? (
