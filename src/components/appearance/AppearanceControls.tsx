@@ -65,9 +65,6 @@ export function AppearanceControls({ className }: { className?: string }) {
           pending={!hydrated}
           disabled={hydrated && !isDark}
         />
-        {hydrated && !isDark && (
-          <span className="text-p4 dark:text-muted">Applies when the dark theme is on.</span>
-        )}
       </Group>
 
       <Group label="Accent">

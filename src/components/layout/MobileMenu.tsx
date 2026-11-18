@@ -11,7 +11,7 @@ import {
   type MouseEvent as ReactMouseEvent,
 } from "react";
 
-import { AppearanceControls } from "@/components/appearance/AppearanceControls";
+import { AppearanceDrawer } from "@/components/appearance/AppearanceDrawer";
 import { RollText } from "@/components/motion/RollText";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
 import { Logo } from "@/components/ui/Logo";
@@ -210,12 +210,12 @@ export function MobileMenu({ className }: { className?: string }) {
               ))}
             </ul>
           </nav>
-          <div className={FADE_CLASS_NAME} style={delay(STAGGER_START + nav.length * STAGGER_STEP)}>
-            <AppearanceControls className="gap-3" />
-          </div>
           <div
-            className={cn("mt-auto flex items-center justify-between gap-4", FADE_CLASS_NAME)}
-            style={delay(STAGGER_START + (nav.length + 1) * STAGGER_STEP)}
+            className={cn(
+              "mt-auto flex flex-wrap items-center justify-between gap-x-4",
+              FADE_CLASS_NAME,
+            )}
+            style={delay(STAGGER_START + nav.length * STAGGER_STEP)}
           >
             <a
               href={`mailto:${contact.email}`}
@@ -224,6 +224,7 @@ export function MobileMenu({ className }: { className?: string }) {
               {contact.email}
             </a>
             <div className="flex">
+              <AppearanceDrawer />
               {contact.links.map((link) => {
                 const Icon = socialIcons[link.label];
                 return (

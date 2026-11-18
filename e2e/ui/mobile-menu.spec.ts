@@ -18,6 +18,11 @@ async function getBarRotations(menu: Locator) {
     );
 }
 
+async function getBottom(locator: Locator) {
+  const box = await locator.boundingBox();
+  return box && Math.round(box.y + box.height);
+}
+
 async function getShownLabel(button: Locator) {
   return button.evaluate((control) => {
     const mask = control.querySelector("span")?.getBoundingClientRect();
@@ -346,6 +351,7 @@ test.describe("mobile menu", () => {
         menu.getByRole("link", { name: item.label, exact: true }),
       ]),
       [contact.email, menu.getByRole("link", { name: contact.email })],
+      ["Appearance", menu.getByRole("button", { name: "Appearance" })],
       ...outside.map((name): [string, Locator] => [name, menu.getByRole("link", { name })]),
     ];
 
@@ -373,24 +379,6 @@ test.describe("mobile menu", () => {
         expect(await scrollY(page)).toBe(0);
       },
     );
-  });
-
-  test("fits a 320px screen without clipping its controls", async ({ page, visit }) => {
-    await page.setViewportSize({ width: 320, height: 568 });
-    await visit("/");
-    const menu = await openMenu(page);
-
-    const controls = [
-      ...["System", "Light", "Dark"].map((name) => menu.getByRole("button", { name, exact: true })),
-      ...["Gold", "Orange", "Red", "Magenta"].map((name) => menu.getByRole("radio", { name })),
-    ];
-    for (const control of controls) {
-      await control.scrollIntoViewIfNeeded();
-      await expect(control).toBeInViewport({ ratio: 1 });
-    }
-    expect(await getOverflow(page)).toBe(0);
-    await menu.getByRole("link", { name: contact.email }).scrollIntoViewIfNeeded();
-    await expect(menu.getByRole("link", { name: contact.email })).toBeInViewport();
   });
 });
 
@@ -582,5 +570,140 @@ test.describe("mobile menu on a desktop", () => {
 
     await expect(page.getByRole("button", { name: "Open menu" })).toBeHidden();
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
+  });
+});
+
+test.describe("appearance drawer", () => {
+  test.use({ viewport: { width: 390, height: 800 } });
+
+  async function openDrawer(page: Page) {
+    const menu = await openMenu(page);
+    await menu.getByRole("button", { name: "Appearance" }).click();
+    const drawer = page.getByRole("dialog", { name: "Appearance" });
+    await expect(drawer).toBeVisible();
+    return { menu, drawer };
+  }
+
+  test("the menu carries a theme icon instead of the controls", async ({ page, visit }) => {
+    await visit("/");
+    const menu = await openMenu(page);
+
+    await expect(menu.getByRole("button", { name: "Appearance" })).toBeVisible();
+    await expect(menu.getByRole("group", { name: "Color theme" })).toHaveCount(0);
+    await expect(menu.getByRole("radiogroup", { name: "Accent color" })).toHaveCount(0);
+  });
+
+  test("the icon opens the controls in a drawer along the bottom", async ({ page, visit }) => {
+    await visit("/");
+    const { drawer } = await openDrawer(page);
+
+    await expect.poll(() => getBottom(drawer)).toBe(800);
+    const box = await drawer.boundingBox();
+    expect([box?.x, box?.width]).toEqual([0, 390]);
+    await expect(drawer.getByRole("group", { name: "Color theme" })).toBeInViewport();
+    await expect(drawer.getByRole("radiogroup", { name: "Accent color" })).toBeInViewport();
+  });
+
+  test("stays open while choices are made", async ({ page, visit }) => {
+    await visit("/");
+    const { drawer } = await openDrawer(page);
+
+    await drawer.getByRole("button", { name: "Dark", exact: true }).click();
+    await drawer.getByRole("radio", { name: "Orange" }).click();
+
+    await expect(drawer).toBeVisible();
+    await expect(page.locator("html")).toHaveClass(/(^|\s)dark(\s|$)/);
+    await expect(page.locator("html")).toHaveAttribute("data-accent", "orange");
+  });
+
+  test("keeps the same height in light and dark", async ({ page, visit }) => {
+    await visit("/");
+    const { drawer } = await openDrawer(page);
+    await drawer.getByRole("button", { name: "Light", exact: true }).click();
+    await expect.poll(() => getBottom(drawer)).toBe(800);
+    const light = (await drawer.boundingBox())?.height;
+
+    await drawer.getByRole("button", { name: "Dark", exact: true }).click();
+    await expect(page.locator("html")).toHaveClass(/(^|\s)dark(\s|$)/);
+
+    expect((await drawer.boundingBox())?.height).toBe(light);
+  });
+
+  test("Escape closes the drawer and leaves the menu open", async ({ page, visit }) => {
+    await visit("/");
+    const { menu, drawer } = await openDrawer(page);
+
+    await page.keyboard.press("Escape");
+
+    await expect(drawer).toBeHidden();
+    await expect(menu).toBeVisible();
+    await expect(menu.getByRole("button", { name: "Appearance" })).toBeFocused();
+  });
+
+  test("a tap above the drawer closes it", async ({ page, visit }) => {
+    await visit("/");
+    const { menu, drawer } = await openDrawer(page);
+
+    await page.mouse.click(195, 120);
+
+    await expect(drawer).toBeHidden();
+    await expect(menu).toBeVisible();
+  });
+
+  test("slides up rather than snapping", async ({ page, visit }) => {
+    await visit("/");
+    const menu = await openMenu(page);
+    await page.evaluate(() => {
+      const root = document.documentElement;
+      const observer = new MutationObserver(() => {
+        const drawer = document.querySelectorAll('[role="dialog"]')[1];
+        if (!drawer) return;
+        observer.disconnect();
+        const started = performance.now();
+        let most = 0;
+        const sample = () => {
+          most = Math.max(most, drawer.getAnimations().length);
+          if (performance.now() - started < 400) requestAnimationFrame(sample);
+          else root.dataset.drawerAnimations = String(most);
+        };
+        requestAnimationFrame(sample);
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    });
+
+    await menu.getByRole("button", { name: "Appearance" }).click();
+
+    await expect
+      .poll(async () => Number(await page.locator("html").getAttribute("data-drawer-animations")))
+      .toBeGreaterThan(0);
+  });
+
+  test("fits a 320px screen without clipping its controls", async ({ page, visit }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await visit("/");
+    const { drawer } = await openDrawer(page);
+
+    const controls = [
+      ...["System", "Light", "Dark"].map((name) =>
+        drawer.getByRole("button", { name, exact: true }),
+      ),
+      ...["Gold", "Orange", "Red", "Magenta"].map((name) => drawer.getByRole("radio", { name })),
+    ];
+    for (const control of controls) {
+      await expect(control).toBeInViewport({ ratio: 1 });
+    }
+    expect(await getOverflow(page)).toBe(0);
+  });
+
+  test.describe("with reduced motion", () => {
+    test.use({ contextOptions: { reducedMotion: "reduce" } });
+
+    test("opens already settled", async ({ page, visit }) => {
+      await visit("/");
+      const { drawer } = await openDrawer(page);
+
+      expect(await drawer.evaluate((popup) => popup.getAnimations().length)).toBe(0);
+      expect(await getBottom(drawer)).toBe(800);
+    });
   });
 });

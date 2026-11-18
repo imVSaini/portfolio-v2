@@ -14,7 +14,6 @@ type Applied = {
 type Stored = { theme: string | null; accent: string | null; tone: string | null };
 
 const ACCENT_LABELS = { gold: "Gold", orange: "Orange", red: "Red", magenta: "Magenta" } as const;
-const NOTE = "Applies when the dark theme is on.";
 const UNSET: Stored = { theme: null, accent: null, tone: null };
 
 function themeButton(page: Page, name: string): Locator {
@@ -149,16 +148,13 @@ test.describe("appearance", () => {
     await openAppearance(page, layout);
 
     for (const name of ["Soft", "Deep"]) await expect(toneButton(page, name)).toBeDisabled();
-    await expect(page.getByText(NOTE)).toBeVisible();
 
     await themeButton(page, "Dark").click();
     for (const name of ["Soft", "Deep"]) await expect(toneButton(page, name)).toBeEnabled();
     await expect(toneButton(page, "Deep")).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByText(NOTE)).toBeHidden();
 
     await themeButton(page, "Light").click();
     for (const name of ["Soft", "Deep"]) await expect(toneButton(page, name)).toBeDisabled();
-    await expect(page.getByText(NOTE)).toBeVisible();
   });
 
   for (const theme of ["light", "dark"] as const) {
@@ -230,6 +226,11 @@ test.describe("appearance", () => {
     await expect(toneButton(page, "Soft")).toHaveAttribute("aria-pressed", "true");
     await expect(accentRadio(page, "Magenta")).toBeChecked();
     await page.keyboard.press("Escape");
+    if (layout === "phone") {
+      await expect(page.getByRole("dialog", { name: "Appearance" })).toBeHidden();
+      await page.keyboard.press("Escape");
+      await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
+    }
 
     const navigation = await openSiteNav(page, layout);
     await navigation.getByRole("link", { name: "Blog", exact: true }).click();
@@ -303,7 +304,7 @@ test.describe("appearance", () => {
 
     await page.emulateMedia({ colorScheme: "dark" });
     await expect(page.locator("html")).not.toHaveClass(/(^|\s)dark(\s|$)/);
-    await expect(page.getByText(NOTE)).toBeVisible();
+    await expect(toneButton(page, "Deep")).toBeDisabled();
 
     await themeButton(page, "System").click();
     await expect(page.locator("html")).toHaveClass(/(^|\s)dark(\s|$)/);
@@ -326,7 +327,6 @@ test.describe("appearance", () => {
       await openAppearance(page, layout);
       await expect(themeButton(page, "System")).toHaveAttribute("aria-pressed", "true");
       await expect(toneButton(page, "Deep")).toBeEnabled();
-      await expect(page.getByText(NOTE)).toBeHidden();
     });
 
     test("choosing light overrides it", async ({ page, visit, layout }) => {

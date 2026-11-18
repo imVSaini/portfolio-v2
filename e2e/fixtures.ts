@@ -110,7 +110,13 @@ export async function openArticleAside(page: Page, layout: Layout): Promise<void
 }
 
 export async function openAppearance(page: Page, layout: Layout): Promise<Locator> {
-  if (layout === "phone") return openMenu(page);
+  if (layout === "phone") {
+    const menu = await openMenu(page);
+    await menu.getByRole("button", { name: "Appearance" }).click();
+    const drawer = page.getByRole("dialog", { name: "Appearance" });
+    await expect(drawer).toBeVisible();
+    return drawer;
+  }
   await page.getByRole("button", { name: "Appearance" }).click();
   const group = page.getByRole("group", { name: "Color theme" });
   await expect(group).toBeVisible();
