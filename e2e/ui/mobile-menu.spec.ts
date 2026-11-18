@@ -67,6 +67,27 @@ async function getScrimStrength(page: Page) {
   });
 }
 
+async function getScrimBlur(page: Page) {
+  return page.evaluate(() => {
+    const layer = [...document.body.querySelectorAll("div")].find((div) => {
+      const style = getComputedStyle(div);
+      const box = div.getBoundingClientRect();
+      return (
+        style.position === "fixed" &&
+        Number(style.zIndex) > 50 &&
+        box.width >= window.innerWidth &&
+        box.height >= window.innerHeight &&
+        style.backgroundColor !== "rgba(0, 0, 0, 0)"
+      );
+    });
+    if (!layer) return null;
+    const style = getComputedStyle(layer);
+    const filter =
+      style.backdropFilter || style.getPropertyValue("-webkit-backdrop-filter") || "none";
+    return parseFloat(/blur\(([\d.]+)px\)/.exec(filter)?.[1] ?? "0");
+  });
+}
+
 async function getBottom(locator: Locator) {
   const box = await locator.boundingBox();
   return box && Math.round(box.y + box.height);
@@ -703,6 +724,35 @@ test.describe("appearance drawer", () => {
     await expect(menu).toBeVisible();
   });
 
+  test("blurs the menu behind it", async ({ page, visit }) => {
+    await visit("/");
+    const { drawer } = await openDrawer(page);
+
+    await expect.poll(() => getScrimBlur(page)).toBeGreaterThan(0);
+    await page.keyboard.press("Escape");
+    await expect(drawer).toBeHidden();
+    expect(await getScrimBlur(page)).toBeNull();
+  });
+
+  test("is a frosted sheet over the menu", async ({ page, visit }) => {
+    await visit("/");
+    const { drawer } = await openDrawer(page);
+
+    const sheet = await drawer.evaluate((popup) => {
+      const style = getComputedStyle(popup);
+      const filter =
+        style.backdropFilter || style.getPropertyValue("-webkit-backdrop-filter") || "none";
+      const alpha = /\/\s*([\d.]+)\s*\)$|,\s*([\d.]+)\)$/.exec(style.backgroundColor);
+      return {
+        blur: parseFloat(/blur\(([\d.]+)px\)/.exec(filter)?.[1] ?? "0"),
+        alpha: parseFloat(alpha?.[1] ?? alpha?.[2] ?? "1"),
+      };
+    });
+    expect(sheet.blur).toBeGreaterThan(await getScrimBlur(page).then((blur) => blur ?? 0));
+    expect(sheet.alpha).toBeGreaterThanOrEqual(0.8);
+    expect(sheet.alpha).toBeLessThan(1);
+  });
+
   test.describe("in the dark theme", () => {
     test.use({ colorScheme: "dark" });
 
@@ -790,6 +840,7 @@ test.describe("appearance drawer", () => {
 
       expect(await drawer.evaluate((popup) => popup.getAnimations().length)).toBe(0);
       expect(await getScrimStrength(page)).toBeCloseTo(0.32, 2);
+      expect(await getScrimBlur(page)).toBeGreaterThan(0);
       expect(await getBottom(drawer)).toBe(800);
     });
   });
