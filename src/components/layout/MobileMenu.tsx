@@ -127,7 +127,7 @@ export function MobileMenu({ className }: { className?: string }) {
                 onClick={(event) => closeThenScroll(event, "#top")}
                 className="group flex items-center rounded-md"
               >
-                <Logo className="h-8 w-auto" />
+                <Logo mirror className="h-8 w-auto" />
               </ScrollLink>
             ) : (
               <Link
@@ -136,7 +136,7 @@ export function MobileMenu({ className }: { className?: string }) {
                 onNavigate={closeThenNavigate}
                 className="group flex items-center rounded-md"
               >
-                <Logo className="h-8 w-auto" />
+                <Logo mirror className="h-8 w-auto" />
               </Link>
             )}
             <Dialog.Close ref={closeRef} aria-label="Close menu" className={TOGGLE_CLASS_NAME}>

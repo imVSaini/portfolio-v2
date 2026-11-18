@@ -3,7 +3,15 @@ import type { Locator, Page } from "@playwright/test";
 import { contact } from "@/data/contact";
 import { nav, site } from "@/data/site";
 
-import { expect, expectScrolledTo, getOverflow, openMenu, scrollY, test } from "../fixtures";
+import {
+  expect,
+  expectScrolledTo,
+  getOverflow,
+  openMenu,
+  scrollToEnd,
+  scrollY,
+  test,
+} from "../fixtures";
 
 async function getBox(locator: Locator) {
   const box = await locator.boundingBox();
@@ -16,6 +24,21 @@ async function getBarRotations(menu: Locator) {
     .evaluate((button) =>
       [...(button.lastElementChild?.children ?? [])].map((bar) => getComputedStyle(bar).rotate),
     );
+}
+
+async function getLogoState(scope: Locator) {
+  return scope.locator("[data-logo]").evaluate((svg) => {
+    const matrixOf = (node: Element) =>
+      node instanceof SVGGraphicsElement ? node.transform.baseVal.consolidate()?.matrix : null;
+    return {
+      slits: [...svg.querySelectorAll("[data-slit]")].map(
+        (slit) => Math.round((matrixOf(slit)?.a ?? 1) * 100) / 100,
+      ),
+      risen: [...svg.querySelectorAll("[data-letter]")].every(
+        (letter) => Math.abs(matrixOf(letter)?.f ?? 0) < 0.5,
+      ),
+    };
+  });
 }
 
 async function getBottom(locator: Locator) {
@@ -719,6 +742,72 @@ test.describe("appearance drawer", () => {
 
       expect(await drawer.evaluate((popup) => popup.getAnimations().length)).toBe(0);
       expect(await getBottom(drawer)).toBe(800);
+    });
+  });
+});
+
+test.describe("mobile menu logo", () => {
+  test.use({ viewport: { width: 390, height: 800 } });
+
+  test("shows the full wordmark, settled, at the top of the page", async ({ page, visit }) => {
+    await visit("/");
+    const menu = await openMenu(page);
+
+    expect(await getLogoState(menu)).toEqual({ slits: [0, 0], risen: true });
+  });
+
+  test("matches a folded header logo at once", async ({ page, visit }) => {
+    await visit("/");
+    await scrollToEnd(page);
+    const header = page.getByRole("banner");
+    await expect.poll(() => getLogoState(header)).toEqual({ slits: [1, 1], risen: true });
+
+    const menu = await openMenu(page);
+
+    expect(await getLogoState(menu)).toEqual({ slits: [1, 1], risen: true });
+  });
+
+  test("unfolds again once the page is back at the top", async ({ page, visit }) => {
+    await visit("/");
+    await scrollToEnd(page);
+    const header = page.getByRole("banner");
+    await expect.poll(() => getLogoState(header)).toEqual({ slits: [1, 1], risen: true });
+    let menu = await openMenu(page);
+
+    await menu.getByRole("link", { name: "Home", exact: true }).click();
+    await expect.poll(() => scrollY(page)).toBe(0);
+    await expect.poll(() => getLogoState(header)).toEqual({ slits: [0, 0], risen: true });
+    menu = await openMenu(page);
+
+    expect(await getLogoState(menu)).toEqual({ slits: [0, 0], risen: true });
+  });
+
+  test("matches the header after arriving on a section from another page", async ({
+    page,
+    visit,
+  }) => {
+    await visit("/blog");
+    let menu = await openMenu(page);
+    await menu.getByRole("link", { name: "Contact", exact: true }).click();
+    await expectScrolledTo(page, "#contact");
+    const header = page.getByRole("banner");
+    await expect.poll(() => getLogoState(header)).toEqual({ slits: [1, 1], risen: true });
+
+    menu = await openMenu(page);
+
+    expect(await getLogoState(menu)).toEqual({ slits: [1, 1], risen: true });
+  });
+
+  test.describe("with reduced motion", () => {
+    test.use({ contextOptions: { reducedMotion: "reduce" } });
+
+    test("matches the header's full wordmark after scrolling", async ({ page, visit }) => {
+      await visit("/");
+      await scrollToEnd(page);
+      const header = await getLogoState(page.getByRole("banner"));
+      const menu = await openMenu(page);
+
+      expect(await getLogoState(menu)).toEqual(header);
     });
   });
 });

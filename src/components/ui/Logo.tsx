@@ -5,6 +5,7 @@ import { useId, useRef } from "react";
 import { cn } from "@/lib/cn";
 import { gsap, MOTION_QUERY, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { useIntro, whenIntroDone } from "@/stores/intro";
+import { useLogo } from "@/stores/logo";
 
 import { wordmark } from "./wordmark";
 
@@ -19,11 +20,14 @@ const MONO_WIDTH = Math.max(
 );
 
 type LogoProps = {
+  /** Folds to the monogram once the page scrolls past `FOLD_AT`. */
   condense?: boolean;
+  /** A copy of the header logo: starts in its fold state, with no entrance. */
+  mirror?: boolean;
   className?: string;
 };
 
-export function Logo({ condense = false, className }: LogoProps) {
+export function Logo({ condense = false, mirror = false, className }: LogoProps) {
   const ref = useRef<SVGSVGElement>(null);
   const maskId = useId();
 
@@ -46,10 +50,13 @@ export function Logo({ condense = false, className }: LogoProps) {
           delay: 0.15,
           paused: true,
         });
-        const stopWaiting = whenIntroDone(() => {
-          if (useIntro.getState().handoff) rise.progress(1);
-          else rise.play();
-        });
+        if (mirror) rise.progress(1);
+        const stopWaiting = mirror
+          ? () => {}
+          : whenIntroDone(() => {
+              if (useIntro.getState().handoff) rise.progress(1);
+              else rise.play();
+            });
 
         const fold = gsap.timeline({
           paused: true,
@@ -90,6 +97,7 @@ export function Logo({ condense = false, className }: LogoProps) {
         };
         const foldTo = (on: boolean) => {
           settle();
+          useLogo.getState().setFolded(on);
           if (on) fold.play();
           else fold.reverse();
         };
@@ -102,11 +110,15 @@ export function Logo({ condense = false, className }: LogoProps) {
               onEnterBack: () => foldTo(true),
               onLeaveBack: () => foldTo(false),
               onRefresh: (self) => {
-                if (self.progress > 0) fold.play();
+                if (self.progress <= 0) return;
+                useLogo.getState().setFolded(true);
+                fold.play();
               },
             })
           : null;
-        const isFolded = () => (folded?.progress ?? 0) > 0;
+        const startFolded = mirror && useLogo.getState().folded;
+        if (startFolded) fold.progress(1);
+        const isFolded = () => startFolded || (folded?.progress ?? 0) > 0;
 
         const wave = () => {
           if (fold.progress() > 0) return;
@@ -154,7 +166,7 @@ export function Logo({ condense = false, className }: LogoProps) {
 
       return () => mm.revert();
     },
-    { scope: ref, dependencies: [condense] },
+    { scope: ref, dependencies: [condense, mirror] },
   );
 
   return (
