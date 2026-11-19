@@ -102,7 +102,7 @@ test.describe("sitemap.xml", () => {
     expect(new Set(locations).size).toBe(locations.length);
   });
 
-  test("gives every post an entry and dates the edited ones", async ({ request }) => {
+  test("dates every post by its last edit or publish date", async ({ request }) => {
     const xml = await (await request.get("/sitemap.xml")).text();
     const entries = matchAll(xml, /<url>([\s\S]*?)<\/url>/g);
 
@@ -111,7 +111,21 @@ test.describe("sitemap.xml", () => {
       const [modified] = matchAll(entry ?? "", /<lastmod>([^<]+)<\/lastmod>/g);
 
       expect(entry, post.slug).toBeDefined();
-      if (post.updatedAt) expect(modified?.slice(0, 10)).toBe(post.updatedAt);
+      expect(modified?.slice(0, 10), post.slug).toBe(post.updatedAt ?? post.date);
+    }
+  });
+
+  test("dates every case study", async ({ request }) => {
+    const xml = await (await request.get("/sitemap.xml")).text();
+    const entries = matchAll(xml, /<url>([\s\S]*?)<\/url>/g);
+
+    for (const study of caseStudies) {
+      const loc = `${getCanonical(getCaseStudyPath(study))}</loc>`;
+      const entry = entries.find((item) => item.includes(loc));
+      const [modified] = matchAll(entry ?? "", /<lastmod>([^<]+)<\/lastmod>/g);
+
+      expect(entry, study.slug).toBeDefined();
+      expect(modified?.slice(0, 10), study.slug).toBe(study.date);
     }
   });
 });
