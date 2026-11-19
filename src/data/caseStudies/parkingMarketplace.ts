@@ -8,7 +8,7 @@ export const parkingMarketplace: CaseStudy = {
   headline:
     "An airport parking marketplace API: a ten-minute hold on every space, a Stripe deposit that is also the platform’s commission and three separate ways for a payment to confirm a booking.",
   summary:
-    "Building an airport parking marketplace backend on Express, PostgreSQL and Stripe: overselling stopped by a row lock, holds that expire by themselves and what each cost.",
+    "An airport parking marketplace backend on Express, PostgreSQL and Stripe: overselling stopped by a row lock and holds that expire by themselves.",
   date: "2026-11-13",
   tint: "red",
   art: "parking",

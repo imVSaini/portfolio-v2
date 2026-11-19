@@ -6,6 +6,9 @@ export const observability: PostSource = {
   title: "Production debugging: logs, metrics and distributed tracing are not optional",
   excerpt:
     "You cannot attach a debugger to production, and you cannot reproduce most incidents on a laptop. What you can do is make the system explain itself. What each of the three signals is for, how a request ID ties them together, and how to alert on symptoms users feel instead of causes you guessed.",
+  metaTitle: "Logs, metrics and traces in production",
+  metaDescription:
+    "You cannot attach a debugger to production. What each signal is for, how a request ID ties them together, and how to alert on symptoms users actually feel.",
   topic: "DevOps",
   date: "2026-09-24",
   tint: "soot",

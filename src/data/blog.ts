@@ -2,7 +2,7 @@ import { site } from "@/data/site";
 
 export const blog = {
   title: "Blog",
-  description: `Notes by ${site.name} on system design, backend, frontend, DevOps and engineering leadership: the trade-offs behind real technology decisions, written from products in production.`,
+  description: `Notes by ${site.name} on system design, backend, frontend and DevOps: the trade-offs behind real technology decisions, drawn from products in production.`,
   /** Site-relative, for links that should stay on the current host. */
   feedPath: "/rss.xml",
   feedUrl: new URL("/rss.xml", site.url).href,

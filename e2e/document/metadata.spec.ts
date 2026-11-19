@@ -26,6 +26,7 @@ const HOME_TITLE = `${site.name} — ${site.role}`;
 const DEFAULT_CARD = `${site.url}${site.ogImage.url}`;
 const FEED_TITLE = `${blog.title} — ${site.name}`;
 const CASE_STUDIES_TITLE = `${caseStudiesPage.title} — ${site.name}`;
+const TITLE_MAX_CHARACTERS = 55;
 const SNIPPET_MAX_CHARACTERS = 155;
 
 const STATIC_PAGES: PageMeta[] = [
@@ -53,9 +54,9 @@ const CASE_STUDY_PAGES: PageMeta[] = caseStudies.map((study) => ({
 
 const POST_PAGES: PageMeta[] = posts.map((post) => ({
   path: getPostPath(post),
-  title: `${post.title} — ${site.name}`,
-  socialTitle: post.title,
-  description: post.excerpt,
+  title: `${post.metaTitle} — ${site.name}`,
+  socialTitle: post.metaTitle,
+  description: post.metaDescription,
 }));
 
 function meta(page: Page, key: string) {
@@ -247,10 +248,15 @@ test.describe("document metadata", () => {
     }
   });
 
-  test("the home description fits a search snippet without truncation", async ({ page }) => {
-    await page.goto("/");
+  test("every title and description fits a search result without truncation", async ({ page }) => {
+    for (const path of PAGE_ROUTES) {
+      await page.goto(path);
 
-    expect((await content(page, "description")).length).toBeLessThanOrEqual(SNIPPET_MAX_CHARACTERS);
+      expect((await page.title()).length, path).toBeLessThanOrEqual(TITLE_MAX_CHARACTERS);
+      expect((await content(page, "description")).length, path).toBeLessThanOrEqual(
+        SNIPPET_MAX_CHARACTERS,
+      );
+    }
   });
 
   test("the not-found page is kept out of search indexes", async ({ page }) => {

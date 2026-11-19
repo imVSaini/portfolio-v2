@@ -6,6 +6,9 @@ export const databasePerformance: PostSource = {
   title: "Database performance: why your application is slow when the code looks perfect",
   excerpt:
     "Clean application code can still issue two hundred queries per request, scan a table for want of one index, or hold a lock while it waits on a network call. Where the time usually goes, how to find it with the query plan instead of a guess, and why a cache comes last.",
+  metaTitle: "Database performance beyond clean code",
+  metaDescription:
+    "Clean code can still fire 200 queries a request or miss one index. Finding where time goes with the query plan, not a guess, and why a cache comes last.",
   topic: "Database",
   date: "2026-10-08",
   tint: "gold",

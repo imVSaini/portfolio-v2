@@ -132,12 +132,28 @@ guide in `node_modules/next/dist/docs/` before using a Next.js API you have not 
 ### Next.js specifics
 
 - Use the global route type helpers (`LayoutProps<"/">`, `PageProps<"/...">`) for route props.
-- Metadata goes through the `metadata` and `viewport` exports, built from `src/data/site.ts`.
+- Metadata goes through the `metadata` and `viewport` exports (or `generateMetadata`), built from
+  `src/data`. See "Metadata and SEO".
 - Fonts are self-hosted with `next/font/local`. Do not add Google Fonts links.
 - Remote images live in the Cloudflare R2 bucket at `site.assetsUrl`. Store bucket paths in
   `src/data` (`"/work/studio.webp"`) and build URLs with `getAssetUrl()` from `@/lib/asset`.
   Never hard-code the domain; `next.config.ts` allows it in `images.remotePatterns` from the same
   value.
+
+### Metadata and SEO
+
+- Every page title is 55 characters or fewer and every meta description 155 or fewer, counted as
+  rendered. The root layout's template appends ` — ${site.name}` (16 characters), so a page's own
+  `title` has 39 at most.
+- Keep search copy apart from display copy. Posts set `metaTitle` and `metaDescription` for the
+  `<title>`, meta description and Open Graph/Twitter text, while `title` and `excerpt` stay the
+  headline, card, RSS and JSON-LD text. Case studies use `summary` as the meta description.
+  Section pages read `description` from their data (`blog`, `caseStudiesPage`, `site`).
+- Open Graph and Twitter titles and descriptions match the page's own title and description.
+- Every indexable page gets a canonical URL (`alternates.canonical`) and a unique title and
+  description, and is listed in `src/app/sitemap.ts` with `lastModified` where a date exists.
+- `e2e/document/metadata.spec.ts` enforces the limits on every route in `PAGE_ROUTES`. Measure new
+  copy before writing it rather than trimming it after a failure.
 
 ### Accessibility
 

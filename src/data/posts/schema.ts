@@ -33,6 +33,10 @@ export type PostSource = {
   slug: string;
   title: string;
   excerpt: string;
+  /** Search-result title, 39 characters at most so it fits 55 with the ` — {site.name}` suffix. */
+  metaTitle: string;
+  /** Meta description and link-preview text, 155 characters at most. */
+  metaDescription: string;
   topic: string;
   /** ISO date, `YYYY-MM-DD`. */
   date: `${number}-${number}-${number}`;

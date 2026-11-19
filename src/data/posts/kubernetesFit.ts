@@ -6,6 +6,9 @@ export const kubernetesFit: PostSource = {
   title: "Kubernetes: do you really need it for your application?",
   excerpt:
     "Kubernetes solves real problems: scheduling many services across many machines, self-healing, rolling deploys and service discovery. It also brings a platform that someone has to run. A way to tell whether you have the problems it solves, and what to use until you do.",
+  metaTitle: "Do you really need Kubernetes?",
+  metaDescription:
+    "Kubernetes solves scheduling, self-healing and rollouts, and brings a platform someone must run. How to tell if you need it, and what to use until you do.",
   topic: "Cloud",
   date: "2026-10-15",
   tint: "red",

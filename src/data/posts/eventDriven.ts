@@ -6,6 +6,9 @@ export const eventDriven: PostSource = {
   title: "Event-driven architecture: when to use Kafka, RabbitMQ or a REST call",
   excerpt:
     "The choice is not really between three products. It is between waiting for an answer and not waiting, and between a queue of jobs and a log of facts. A decision path that starts from what the caller needs, with the costs asynchronous messaging brings: duplicates, ordering and eventual consistency.",
+  metaTitle: "Kafka, RabbitMQ or a REST call?",
+  metaDescription:
+    "Not a choice between three products, but between waiting for an answer or not, and a job queue or a log of facts, with the costs async messaging brings.",
   topic: "Architecture",
   date: "2026-09-17",
   tint: "red",

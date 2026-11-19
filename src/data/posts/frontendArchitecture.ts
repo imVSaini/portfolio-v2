@@ -6,6 +6,9 @@ export const frontendArchitecture: PostSource = {
   title: "Frontend architecture: building applications that stay maintainable",
   excerpt:
     "Frontends rarely collapse from one bad decision. They erode: a shared component grows a twelfth prop, server data gets copied into a global store, and every feature imports every other. The boundaries I set early, which state belongs where, and when a reusable component is the wrong abstraction.",
+  metaTitle: "Maintainable frontend architecture",
+  metaDescription:
+    "Frontends erode rather than collapse. The boundaries I set early, which state belongs where, and when a reusable component is the wrong abstraction.",
   topic: "Frontend",
   date: "2026-10-22",
   tint: "orange",

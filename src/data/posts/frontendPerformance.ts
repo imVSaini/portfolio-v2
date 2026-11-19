@@ -6,6 +6,9 @@ export const frontendPerformance: PostSource = {
   title: "Frontend performance: making web applications fast beyond lazy loading",
   excerpt:
     "Lazy loading moves cost around; it does not remove it. Real speed comes from knowing which metric is failing and why: what blocks the largest paint, what keeps the main thread busy during a click, what shifts the layout. A field-data-first way to work through Core Web Vitals.",
+  metaTitle: "Web performance beyond lazy loading",
+  metaDescription:
+    "Lazy loading moves cost instead of removing it. Core Web Vitals from field data: what blocks the largest paint and what keeps the main thread busy.",
   topic: "Frontend",
   date: "2026-10-01",
   tint: "magenta",

@@ -8,7 +8,7 @@ export const leadCrm: CaseStudy = {
   headline:
     "A multi-tenant lead management CRM: a Postgres schema per workspace, scoped roles, an audit log nobody can edit and leads that flow in from Facebook and Instagram ads.",
   summary:
-    "Building a schema-per-tenant lead management CRM on FastAPI and PostgreSQL: scoped roles, an append-only audit log, Meta Lead Ads ingestion and what each cost.",
+    "A schema-per-tenant lead management CRM on FastAPI and PostgreSQL: scoped roles, an append-only audit log, Meta Lead Ads ingestion and what each cost.",
   date: "2026-11-12",
   tint: "orange",
   art: "pipeline",

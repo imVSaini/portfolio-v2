@@ -6,6 +6,9 @@ export const deliveryPipeline: PostSource = {
   title: "CI/CD is not just automation: building a delivery pipeline you can trust",
   excerpt:
     "Running tests on every push is the easy half. A pipeline earns its keep when a green build means the change is safe to release and a bad release is boring to undo. Short-lived branches, one artefact promoted through every environment, migrations that tolerate a rollback, and a rollback you have actually rehearsed.",
+  metaTitle: "CI/CD is not just automation",
+  metaDescription:
+    "A green build should mean a change is safe to ship and a bad release is boring to undo: short-lived branches, one promoted artefact, a rehearsed rollback.",
   topic: "DevOps",
   date: "2026-10-29",
   tint: "gold",

@@ -6,6 +6,9 @@ export const technicalDebt: PostSource = {
   title: "Technical debt: why good developers sometimes make bad architecture decisions",
   excerpt:
     "Most technical debt is not written by careless people. It comes from sensible decisions made with the information and the deadline of the day, which then outlive both. How to tell deliberate debt from accidental, how to record a shortcut so it can be repaid, and how to refactor without stopping delivery.",
+  metaTitle: "Technical debt from good decisions",
+  metaDescription:
+    "Most technical debt starts as a sensible decision that outlives its deadline. How to tell deliberate debt from accidental, record shortcuts and repay them.",
   topic: "Leadership",
   date: "2026-09-10",
   tint: "orange",

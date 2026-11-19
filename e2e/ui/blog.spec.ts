@@ -32,7 +32,7 @@ test.describe("blog index", () => {
     await page.getByRole("link", { name: post.title, exact: true }).click();
 
     await expect(page).toHaveURL(new RegExp(`${getPostPath(post)}$`));
-    await expect(page).toHaveTitle(`${post.title} — ${site.name}`);
+    await expect(page).toHaveTitle(`${post.metaTitle} — ${site.name}`);
     await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(post.title);
     await expect(page.locator("html")).toHaveAttribute("data-e2e", "kept");
   });

@@ -8,7 +8,7 @@ export const bookkeepingPlatform: CaseStudy = {
   headline:
     "A multi-tenant bookkeeping API for an accounting practice: a double-entry ledger for every client company, bank statements that import without duplicates, supplier bills read by OCR and a client portal opened by magic link.",
   summary:
-    "Building a schema-per-tenant bookkeeping backend on Express and PostgreSQL: a double-entry ledger, repeatable statement import, OCR to bill, AI categorisation and what each cost.",
+    "A schema-per-tenant bookkeeping backend on Express and PostgreSQL: a double-entry ledger, repeatable statement import, OCR to bill and AI categorisation.",
   date: "2026-11-13",
   tint: "gold",
   art: "ledger",

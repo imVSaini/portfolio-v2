@@ -6,6 +6,9 @@ export const systemDesignTradeoffs: PostSource = {
   title: "System design is about trade-offs, not technology",
   excerpt:
     "Monoliths, microservices and event-driven systems are not better or worse than each other. Each one buys something and charges for it. How I choose between them from the constraints of the team and the product, and why “it depends” is only an answer once you say what it depends on.",
+  metaTitle: "System design is about trade-offs",
+  metaDescription:
+    "Monoliths, microservices and event-driven systems each buy something and charge for it. How I choose between them from the constraints of team and product.",
   topic: "System Design",
   date: "2026-11-12",
   tint: "soot",

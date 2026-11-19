@@ -6,6 +6,9 @@ export const productionApis: PostSource = {
   title: "Building backend APIs that survive real production traffic",
   excerpt:
     "An API that passes its tests has only met polite clients. Production sends retries, duplicate submissions, unbounded lists and callers that ignore your documentation. The defaults I build in from the first endpoint: bounded pagination, idempotency keys, layered rate limits and errors a client can act on.",
+  metaTitle: "APIs that survive production traffic",
+  metaDescription:
+    "Production sends retries, duplicates and unbounded lists. The defaults I give every API: bounded pagination, idempotency keys, rate limits, clear errors.",
   topic: "Backend",
   date: "2026-11-05",
   tint: "magenta",

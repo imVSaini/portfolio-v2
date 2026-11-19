@@ -198,7 +198,7 @@ test.describe("moving between pages", () => {
 
     await page.getByRole("link", { name: post.title, exact: true }).first().click();
     await expect(page).toHaveURL(new RegExp(`${getPostPath(post)}$`));
-    await expect(page).toHaveTitle(`${post.title} — ${site.name}`);
+    await expect(page).toHaveTitle(`${post.metaTitle} — ${site.name}`);
 
     await page.goBack();
     await expect(page).toHaveURL(/\/blog$/);

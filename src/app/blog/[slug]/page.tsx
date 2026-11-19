@@ -51,8 +51,8 @@ export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): P
   const url = `/blog/${post.slug}`;
 
   return {
-    title: post.title,
-    description: post.excerpt,
+    title: post.metaTitle,
+    description: post.metaDescription,
     alternates: {
       canonical: url,
       types: { ...feedAlternates, "text/markdown": getPostMarkdownPath(post) },
@@ -60,8 +60,8 @@ export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): P
     openGraph: {
       type: "article",
       url,
-      title: post.title,
-      description: post.excerpt,
+      title: post.metaTitle,
+      description: post.metaDescription,
       siteName: site.name,
       locale: "en_IN",
       publishedTime: post.date,
@@ -70,8 +70,8 @@ export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): P
     },
     twitter: {
       card: "summary_large_image",
-      title: post.title,
-      description: post.excerpt,
+      title: post.metaTitle,
+      description: post.metaDescription,
     },
   };
 }
