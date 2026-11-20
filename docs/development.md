@@ -88,12 +88,13 @@ TypeScript and JavaScript, and `prettier --write` on JSON, CSS and Markdown.
 
 `.github/workflows/ci.yml` runs on every push to `main` and every pull request:
 
-| Job       | Does                                                                                |
-| --------- | ----------------------------------------------------------------------------------- |
-| `quality` | `npm run check` (types, ESLint, Prettier) and commitlint on the pushed commits      |
-| `build`   | One `next build`, with `.next/cache` restored between runs, uploaded as an artifact |
-| `e2e`     | The Playwright suite in four shards against that build                              |
-| `report`  | Merges the shard reports into one HTML report                                       |
+| Job         | Does                                                                                |
+| ----------- | ----------------------------------------------------------------------------------- |
+| `quality`   | `npm run check` (types, ESLint, Prettier) and commitlint on the pushed commits      |
+| `build`     | One `next build`, with `.next/cache` restored between runs, uploaded as an artifact |
+| `e2e`       | The Playwright suite in four shards against that build                              |
+| `report`    | Merges the shard reports into one HTML report                                       |
+| `workflows` | zizmor 1.32.0 audits the workflow files and Dependabot config for security issues   |
 
 `next build` no longer runs ESLint in Next.js 16, so the `quality` job is the only place lint and
 formatting are enforced for every commit; the local `pre-commit` hook only checks staged files and
@@ -105,8 +106,17 @@ Supply chain:
   hijacked tag cannot change what runs.
 - Checkouts use `persist-credentials: false`, and workflows only get `contents: read`.
 - Dependabot (`.github/dependabot.yml`) opens weekly pull requests for npm packages (minor and patch
-  grouped) and for the pinned actions. Their commit bodies do not follow commitlint's line limit,
-  so the commit-message step skips them.
+  grouped) and for the pinned actions, with a seven-day cooldown so a version is only proposed
+  once it has been public for a week. Malicious releases are usually caught and pulled within
+  days. Dependabot's commit bodies do not follow commitlint's line limit, so the commit-message
+  step skips them.
+- Dependency install scripts are allowlisted in `package.json` (`allowScripts`). npm 11 warns about
+  unreviewed scripts and npm 12 blocks them. `unrs-resolver` is denied: its `postinstall` only
+  fetches a native binding that `npm ci` already installs from its optional dependencies. When a
+  new package with an install script appears, review it and record the decision with
+  `npm install-scripts approve <pkg>` or `npm install-scripts deny <pkg>`.
+- The `workflows` job runs zizmor on every push. Check workflow changes locally first with
+  `uvx zizmor@1.32.0 --offline .github`.
 
 `.github/workflows/production.yml` checks the live site every night. See
 [Testing](./testing.md#ci).
@@ -127,6 +137,20 @@ Production is hosted on Vercel and fronted by Cloudflare, at `https://www.imvaib
 
 Assets (cover images) are uploaded to the Cloudflare R2 bucket separately and referenced by bucket
 path in `src/data`.
+
+## Rolling back
+
+Vercel keeps earlier production deployments, and rolling back reroutes traffic to one in seconds
+with no rebuild. When the live site is broken, roll back first and investigate second.
+
+1. In the Vercel project, open **Deployments** and choose the last good production deployment. On
+   the Hobby plan only the deployment immediately before the current one is eligible; Pro and
+   Enterprise can use any earlier production deployment.
+2. Choose **Instant Rollback** from its menu, or run `vercel rollback <deployment-url>`.
+3. Confirm the fix with a manual run of **Production check** from the Actions tab.
+4. Fix forward on `main`. After a rollback Vercel stops assigning production domains to new
+   deployments, so pushes will not go live until you promote a deployment again from its menu,
+   which turns automatic assignment back on.
 
 ## Production checklist
 
