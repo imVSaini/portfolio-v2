@@ -3,12 +3,19 @@
 ## Setup
 
 ```sh
+nvm use                         # Node.js 26, the version in .nvmrc
 npm ci                          # install exact dependencies; also installs the git hooks (husky)
 npx playwright install          # browsers for the end-to-end tests
 npm run dev                     # http://localhost:3000
 ```
 
-CI uses the current Node.js LTS. There are no environment variables to set: site URLs live in
+The project runs on the Node.js 26 LTS line, pinned to the major so security patches arrive
+without a change here. `.nvmrc` sets it for `nvm` and for CI (`node-version-file`). In
+`package.json`, `engines.node` (`26.x`) tells Vercel which runtime to deploy, and `devEngines.runtime`
+(`onFail: "error"`) makes `npm install`, `npm ci` and `npm run` stop with `EBADDEVENGINES` on any
+other major, since npm only warns about `engines`. `@types/node` tracks the same major. Raise all
+four together when moving to a new LTS; an open range such as `>=26` would let Vercel move to a new
+major on its own. There are no environment variables to set: site URLs live in
 `src/data/site.ts`, and `BUILD_YEAR` is injected by `next.config.ts`.
 
 ## Commands
