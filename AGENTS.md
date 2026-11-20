@@ -23,6 +23,7 @@ for accessible primitives.
   case studies).
 - `src/lib`: shared helpers (`cn`, the `gsap` setup, appearance).
 - `src/hooks`, `src/stores`: React hooks and zustand stores.
+- `docs/adr`: architecture decision records. Add one for any change that is expensive to reverse.
 
 ## Commands
 
@@ -76,6 +77,9 @@ The compiler runs `strict` plus `noUncheckedIndexedAccess`, `exactOptionalProper
 - Order groups with a blank line between them: `node:` builtins, packages, then `@/` modules, then
   relative files, alphabetical within a group. ESLint (`import/order`) enforces it and
   `npm run lint:fix` sorts them.
+- Imports flow one way: `src/data`, then `src/lib`, `src/hooks` and `src/stores`, then
+  `src/components`, then `src/app`. `src/data` imports only `src/data`. ESLint
+  (`no-restricted-imports`) rejects the reverse.
 
 ### Naming
 
@@ -105,6 +109,9 @@ guide in `node_modules/next/dist/docs/` before using a Next.js API you have not 
   state, effects, event handlers, DOM refs for animation or browser APIs.
 - Keep the client boundary at the leaves. A section such as `Work.tsx` stays on the server and
   renders client pieces such as `HorizontalSection`.
+- An animated section stays a server component. Its `useGSAP` code lives in a client wrapper beside
+  it that renders the outer element and takes the markup as `children` (`HeroMotion`,
+  `FooterMotion`). Do not add `"use client"` to a section to animate it.
 - Never read `window`, `document` or `localStorage` during render. Do it in effects, `useGSAP`
   or a `useSyncExternalStore` subscription with a server snapshot.
 
@@ -132,6 +139,8 @@ guide in `node_modules/next/dist/docs/` before using a Next.js API you have not 
 ### Next.js specifics
 
 - Use the global route type helpers (`LayoutProps<"/">`, `PageProps<"/...">`) for route props.
+- `typedRoutes` is on, so every `href` must be a real route. Build post and case-study paths with
+  `getPostPath()` and `getCaseStudyPath()`, never by hand.
 - Metadata goes through the `metadata` and `viewport` exports (or `generateMetadata`), built from
   `src/data`. See "Metadata and SEO".
 - Fonts are self-hosted with `next/font/local`. Do not add Google Fonts links.
@@ -150,6 +159,7 @@ guide in `node_modules/next/dist/docs/` before using a Next.js API you have not 
   headline, card, RSS and JSON-LD text. Case studies use `summary` as the meta description.
   Section pages read `description` from their data (`blog`, `caseStudiesPage`, `site`).
 - Open Graph and Twitter titles and descriptions match the page's own title and description.
+  Build page metadata with `buildPageMetadata()` from `@/lib/metadata`, which keeps them in step.
 - Every indexable page gets a canonical URL (`alternates.canonical`) and a unique title and
   description, and is listed in `src/app/sitemap.ts` with `lastModified` where a date exists.
 - `e2e/document/metadata.spec.ts` enforces the limits on every route in `PAGE_ROUTES`. Measure new
@@ -238,6 +248,9 @@ A change is not done until its tests pass.
    Then run again until it passes.
 6. **Confirm** a failure that looks like flakiness by rerunning that spec on its own before
    writing it off, and say so in the report. Finish with `npm run check`.
+
+`e2e/http/budget.spec.ts` caps the gzipped JavaScript each page loads. Raise `SCRIPT_BUDGET_KB` only
+in the commit that needs it, and give the reason in the commit message.
 
 ### Projects
 
