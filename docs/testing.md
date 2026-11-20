@@ -161,3 +161,7 @@ the test, not a regression. It is unresolved.
 - A final job merges the blob reports into one HTML report, kept for 14 days as the
   `playwright-report-attempt-N` artifact (`N` is the run attempt, so a re-run does not collide).
   It is skipped when the build fails and no shard ran.
+- A `required` job (`Required checks`) depends on `check`, `version`, `build` and every shard and
+  fails unless all of them succeeded. It runs with `always()`, because a skipped job counts as a success. It is the one
+  check Vercel's Deployment Checks wait for before production moves to a new build (see
+  [Deployment](./development.md#deployment)); renaming the job means updating that setting.

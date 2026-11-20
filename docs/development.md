@@ -103,10 +103,15 @@ the build. See [Testing](./testing.md#ci).
 Production is hosted on Vercel and fronted by Cloudflare, at `https://www.imvaibhav.com`.
 
 - Pull requests and pushes to `main` run `npm run check` and the Playwright suite in CI.
+- Vercel builds every push to `main` straight away, but Deployment Checks (Project Settings → Build
+  and Deployment → Deployment Checks) hold the build off the production domains until the `CI`
+  workflow's `Required checks` job passes on that commit. The domains then move to it
+  automatically. A failed or cancelled run leaves the previous deployment live; **Force Promote**
+  on the deployment page overrides the hold.
 - A deployment runs `next build`, which prerenders every page and the feeds. Nothing is rendered
   on demand afterwards, so any change, including content, needs a new deployment.
 - Content changes (a new post or case study) are code changes and ship the same way. Dates do not
-  schedule publication; a post is live as soon as the deployment that contains it is.
+  schedule publication; a post is live as soon as the deployment that contains it passes CI.
 
 Assets (cover images) are uploaded to the Cloudflare R2 bucket separately and referenced by bucket
 path in `src/data`.
