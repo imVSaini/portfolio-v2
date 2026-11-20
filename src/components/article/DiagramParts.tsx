@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { ArrowHead, barPath, Label } from "@/components/article/ArtParts";
 import { cn } from "@/lib/cn";
@@ -82,15 +82,33 @@ export type NodeSpec = {
   stack?: boolean;
 };
 
-const CHIP = 28;
+const DEPTH = 5;
 
-function Node({ x, y, w, h = 56, label, sub, icon, accent = false, stack = false }: NodeSpec) {
-  const chipX = stack ? x + (w - CHIP) / 2 : x + (h - CHIP) / 2;
-  const chipY = stack ? y + 15 : y + (h - CHIP) / 2;
-  const textX = chipX + CHIP + 10;
+type SurfaceProps = { x: number; y: number; w: number; h: number; accent: boolean };
 
+function Surface({ x, y, w, h, accent }: SurfaceProps) {
   return (
-    <g data-d="node">
+    <>
+      <rect
+        x={x + DEPTH}
+        y={y + DEPTH}
+        width={w}
+        height={h}
+        rx={12}
+        stroke="none"
+        className="fill-line-strong"
+      />
+      {accent && (
+        <rect
+          x={x}
+          y={y}
+          width={w}
+          height={h}
+          rx={12}
+          stroke="none"
+          className="fill-surface-raised"
+        />
+      )}
       <rect
         x={x}
         y={y}
@@ -100,6 +118,20 @@ function Node({ x, y, w, h = 56, label, sub, icon, accent = false, stack = false
         strokeWidth={1.5}
         className={accent ? PANEL_ACCENT : PANEL}
       />
+    </>
+  );
+}
+
+const CHIP = 28;
+
+function Node({ x, y, w, h = 56, label, sub, icon, accent = false, stack = false }: NodeSpec) {
+  const chipX = stack ? x + (w - CHIP) / 2 : x + (h - CHIP) / 2;
+  const chipY = stack ? y + 15 : y + (h - CHIP) / 2;
+  const textX = chipX + CHIP + 10;
+
+  return (
+    <g data-d="node">
+      <Surface x={x} y={y} w={w} h={h} accent={accent} />
       <rect
         x={chipX}
         y={chipY}
@@ -150,15 +182,49 @@ type LinkSpec = {
   toY?: number;
 };
 
+const START = /^M\s*(-?[\d.]+)[\s,]+(-?[\d.]+)/;
+
+const HOP = /^M\s*(-?[\d.]+)[\s,]+(-?[\d.]+)\s*([HV])\s*(-?[\d.]+)$/;
+
+function wireStart(d: string) {
+  const hop = HOP.exec(d.trim());
+  if (hop) {
+    const [, x, y, axis, end] = hop;
+    if (Math.abs(Number(end) - Number(axis === "H" ? x : y)) < PORT_SPAN) return null;
+  }
+  const match = START.exec(d);
+  return match?.[1] && match[2] ? { x: Number(match[1]), y: Number(match[2]) } : null;
+}
+
+type JointProps = { x1: number; y1: number; x2: number; y2: number };
+
+/** Stands in for an arrow where two cards sit too close for one: a plain line, edge to edge. */
+export function Joint({ x1, y1, x2, y2 }: JointProps) {
+  return <Wire d={`M${x1} ${y1} L${x2} ${y2}`} port={false} bare />;
+}
+
 type WireProps = {
   d: string;
   dashed?: boolean;
+  /** Marks where the connector leaves; off for short hops and lines that start from text. */
+  port?: boolean;
+  /** No arrowhead, so the travelling dot runs the whole length. */
+  bare?: boolean;
   className?: string;
-  children: ReactNode;
+  children?: ReactNode;
 };
 
 /** A connector, the dot that travels along it, and its arrowhead. */
-export function Wire({ d, dashed = false, className, children }: WireProps) {
+export function Wire({
+  d,
+  dashed = false,
+  port = true,
+  bare = false,
+  className,
+  children,
+}: WireProps) {
+  const start = port ? wireStart(d) : null;
+
   return (
     <g strokeWidth={1.5} className={className}>
       <path
@@ -167,21 +233,34 @@ export function Wire({ d, dashed = false, className, children }: WireProps) {
         {...(dashed && { strokeDasharray: "5 5" })}
         className={cn(dashed && "motion-safe:animate-dash-flow")}
       />
-      <circle data-d-packet="" r={3.5} opacity={0} stroke="none" className="fill-accent" />
-      <g data-d="fade">{children}</g>
+      <circle
+        data-d-packet={bare ? "bare" : ""}
+        r={3.5}
+        opacity={0}
+        stroke="none"
+        className="fill-accent"
+      />
+      <g data-d="fade">
+        {start && <circle cx={start.x} cy={start.y} r={3} fill="currentColor" stroke="none" />}
+        {children}
+      </g>
     </g>
   );
 }
 
 export function DownHead({ x, y }: { x: number; y: number }) {
-  return <path d={`M${x - 7} ${y - 9} L${x} ${y} L${x + 7} ${y - 9}`} />;
+  return <path d={`M${x} ${y} L${x - 6} ${y - 10} L${x + 6} ${y - 10} Z`} fill="currentColor" />;
 }
 
 export function UpHead({ x, y }: { x: number; y: number }) {
-  return <path d={`M${x - 7} ${y + 9} L${x} ${y} L${x + 7} ${y + 9}`} />;
+  return <path d={`M${x} ${y} L${x - 6} ${y + 10} L${x + 6} ${y + 10} Z`} fill="currentColor" />;
 }
 
 const HEAD_LEAD = 12;
+
+const PORT_SPAN = 36;
+
+const JOINT_SPAN = 30;
 
 const ELBOW = 10;
 
@@ -197,6 +276,7 @@ function Link({ nodes, link }: { nodes: NodeSpec[]; link: LinkSpec }) {
     const y1 = from.y + fromH;
     const x2 = link.toX ?? to.x + to.w / 2;
     const y2 = to.y - 2;
+    if (x1 === x2 && to.y - y1 < JOINT_SPAN) return <Joint x1={x1} y1={y1} x2={x1} y2={to.y} />;
     const mid = (y1 + y2) / 2;
     const turn = Math.sign(x2 - x1) * ELBOW;
     const route =
@@ -204,7 +284,7 @@ function Link({ nodes, link }: { nodes: NodeSpec[]; link: LinkSpec }) {
         ? `V${y2}`
         : `V${mid - ELBOW} Q${x1} ${mid} ${x1 + turn} ${mid} H${x2 - turn} Q${x2} ${mid} ${x2} ${mid + ELBOW} V${y2}`;
     return (
-      <Wire d={`M${x1} ${y1} ${route}`} dashed={link.dashed ?? false}>
+      <Wire d={`M${x1} ${y1} ${route}`} dashed={link.dashed ?? false} port={y2 - y1 >= PORT_SPAN}>
         <DownHead x={x2} y={y2} />
       </Wire>
     );
@@ -214,12 +294,14 @@ function Link({ nodes, link }: { nodes: NodeSpec[]; link: LinkSpec }) {
   const y1 = link.fromY ?? from.y + fromH / 2;
   const x2 = to.x - 2;
   const y2 = link.toY ?? to.y + toH / 2;
+  if (y1 === y2 && to.x - x1 < JOINT_SPAN) return <Joint x1={x1} y1={y1} x2={to.x} y2={y1} />;
   const bend = x2 - HEAD_LEAD;
   const mid = (x1 + bend) / 2;
   return (
     <Wire
       d={`M${x1} ${y1} C${mid} ${y1} ${mid} ${y2} ${bend} ${y2} H${x2}`}
       dashed={link.dashed ?? false}
+      port={x2 - x1 >= PORT_SPAN}
     >
       <ArrowHead x={x2} y={y2} />
     </Wire>
@@ -278,15 +360,7 @@ type PanelProps = {
 export function Panel({ x, y, w, h, title, meta, accent = false }: PanelProps) {
   return (
     <g data-d="node">
-      <rect
-        x={x}
-        y={y}
-        width={w}
-        height={h}
-        rx={12}
-        strokeWidth={1.5}
-        className={accent ? PANEL_ACCENT : PANEL}
-      />
+      <Surface x={x} y={y} w={w} h={h} accent={accent} />
       <Label x={x + 16} y={y + 23.5} size={10}>
         {title}
       </Label>
@@ -410,8 +484,6 @@ type DiagramCanvasProps = {
 };
 
 export function DiagramCanvas({ height, alt, className, children }: DiagramCanvasProps) {
-  const grid = useId();
-
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -425,12 +497,6 @@ export function DiagramCanvas({ height, alt, className, children }: DiagramCanva
       aria-label={alt}
       className={className}
     >
-      <defs>
-        <pattern id={grid} width={18} height={18} patternUnits="userSpaceOnUse">
-          <circle cx={1.5} cy={1.5} r={1} stroke="none" className="fill-line-strong" />
-        </pattern>
-      </defs>
-      <rect width={WIDTH} height={height} fill={`url(#${grid})`} stroke="none" opacity={0.5} />
       {children}
     </svg>
   );

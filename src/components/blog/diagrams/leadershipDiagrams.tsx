@@ -415,7 +415,7 @@ function ReviewGates() {
       <Remark x={580} y={108} anchor="end">
         Said twice? Make it a rule
       </Remark>
-      <Wire d="M206 300 H99 Q91 300 91 292 V210" dashed className="stroke-red">
+      <Wire d="M206 300 H99 Q91 300 91 292 V210" dashed className="stroke-red text-red">
         <UpHead x={91} y={208} />
       </Wire>
       <Remark x={16} y={352}>

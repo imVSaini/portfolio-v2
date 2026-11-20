@@ -35,7 +35,8 @@ type ArrowHeadProps = {
 export function ArrowHead({ x, y, angle = 0 }: ArrowHeadProps) {
   return (
     <path
-      d={`M${x - 9} ${y - 7} L${x} ${y} L${x - 9} ${y + 7}`}
+      d={`M${x} ${y} L${x - 10} ${y - 6} L${x - 10} ${y + 6} Z`}
+      fill="currentColor"
       {...(angle !== 0 && { transform: `rotate(${angle} ${x} ${y})` })}
     />
   );

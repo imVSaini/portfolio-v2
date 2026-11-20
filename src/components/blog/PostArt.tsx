@@ -13,11 +13,11 @@ const TRAVEL_START = 8;
 
 const TRAVEL_STOP = 18;
 
-function Travel({ d, length }: { d: string; length: number }) {
+function Travel({ d, length, full = false }: { d: string; length: number; full?: boolean }) {
   const travel = {
     offsetPath: `path("${d}")`,
-    "--travel-from": `${((TRAVEL_START / length) * 100).toFixed(2)}%`,
-    "--travel-to": `${((1 - TRAVEL_STOP / length) * 100).toFixed(2)}%`,
+    "--travel-from": full ? "0%" : `${((TRAVEL_START / length) * 100).toFixed(2)}%`,
+    "--travel-to": full ? "100%" : `${((1 - TRAVEL_STOP / length) * 100).toFixed(2)}%`,
   } as CSSProperties;
 
   return (
@@ -63,7 +63,7 @@ function Arrow({ d, length, from, tip, angle = 0, twoWay = false }: ArrowProps) 
   return (
     <>
       <path d={d} opacity={0.6} />
-      {length > 40 && <Travel d={d} length={length} />}
+      <Travel d={d} length={length} full />
       {twoWay ? (
         <Head x={from.x} y={from.y} angle={angle + 180} />
       ) : (
@@ -457,9 +457,18 @@ function ExtensionIcon({ index, cx, cy }: { index: number; cx: number; cy: numbe
   }
   if (index === 2) {
     return (
-      <path
-        d={`M${cx - 10} ${cy + 9} L${cx + 8} ${cy - 9} M${cx + 1} ${cy - 9} H${cx + 8} V${cy - 2} M${cx - 10} ${cy + 9} H${cx + 10} M${cx + 5} ${cy + 5} L${cx + 10} ${cy + 9} L${cx + 5} ${cy + 13}`}
-      />
+      <>
+        <path
+          d={`M${cx - 8} ${cy + 7} L${cx - 3} ${cy - 7} L${cx + 8} ${cy - 3} L${cx + 5} ${cy + 8} Z M${cx - 3} ${cy - 7} L${cx + 5} ${cy + 8}`}
+          opacity={0.6}
+        />
+        <g fill="currentColor" stroke="none">
+          <circle cx={cx - 8} cy={cy + 7} r={3} />
+          <circle cx={cx - 3} cy={cy - 7} r={3} />
+          <circle cx={cx + 8} cy={cy - 3} r={3} />
+          <circle cx={cx + 5} cy={cy + 8} r={3} />
+        </g>
+      </>
     );
   }
   return (

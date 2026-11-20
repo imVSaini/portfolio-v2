@@ -1,8 +1,9 @@
-import { ArrowHead, Label } from "@/components/article/ArtParts";
+import { Label } from "@/components/article/ArtParts";
 import {
   Chip,
   DownHead,
   Graph,
+  Joint,
   Note,
   PANEL,
   PANEL_ACCENT,
@@ -480,7 +481,7 @@ function ModuleBoundaries() {
       {FEATURE_NODES.map(({ id, x }) => (
         <Chip key={id} x={x + 112} y={154} w={76} label="index.ts" tone="accent" />
       ))}
-      <Wire d="M160 222 C160 252 300 252 300 226" dashed className="stroke-red">
+      <Wire d="M160 222 C160 252 300 252 300 226" dashed className="stroke-red text-red">
         <UpHead x={300} y={224} />
       </Wire>
       <path
@@ -560,11 +561,7 @@ function TokenLayers() {
           {column > 0 &&
             rows.map((row, i) => {
               const y = 72 + i * 36 + 13;
-              return (
-                <Wire key={row} d={`M${x - 27} ${y} H${x - 4}`}>
-                  <ArrowHead x={x - 4} y={y} />
-                </Wire>
-              );
+              return <Joint key={row} x1={x - 29} y1={y} x2={x} y2={y} />;
             })}
         </g>
       ))}

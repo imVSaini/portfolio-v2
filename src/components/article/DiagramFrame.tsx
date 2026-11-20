@@ -71,8 +71,9 @@ export function DiagramFrame({ title, caption, children }: DiagramFrameProps) {
           const path = packet.previousElementSibling;
           if (!(path instanceof SVGGeometryElement)) return;
           const length = path.getTotalLength();
-          const start = Math.min(PACKET_START, length);
-          const travel = Math.max(length - PACKET_STOP - start, 0);
+          const bare = packet.dataset.dPacket === "bare";
+          const start = bare ? 0 : Math.min(PACKET_START, length);
+          const travel = bare ? length : Math.max(length - PACKET_STOP - start, 0);
           const duration = gsap.utils.clamp(0.9, 2.6, length / 70);
           const progress = { value: 0 };
           const run = gsap.timeline({ repeat: -1, repeatDelay: 0.4 });
@@ -161,7 +162,7 @@ export function DiagramFrame({ title, caption, children }: DiagramFrameProps) {
           tabIndex={0}
           role="group"
           aria-label={`Diagram: ${caption}`}
-          className="overflow-x-auto p-4 sm:p-6"
+          className="overflow-x-auto diagram-dots p-4 sm:p-6"
         >
           {children}
         </div>

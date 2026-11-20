@@ -2,6 +2,7 @@ import { ArrowHead, Label } from "@/components/article/ArtParts";
 import {
   DownHead,
   Graph,
+  Joint,
   Note,
   PANEL,
   PANEL_ACCENT,
@@ -85,7 +86,7 @@ function CellRouter() {
               h={92}
               label={label}
               meta={failing ? "Failing" : "Healthy"}
-              {...(failing && { className: "stroke-red text-red" })}
+              {...(failing && { className: "stroke-red" })}
             />
             <g opacity={failing ? 0.4 : 1}>
               <Graph
@@ -103,7 +104,7 @@ function CellRouter() {
             </g>
             <Wire
               d={`M356 244 C377 244 377 ${centre} 388 ${centre} H398`}
-              {...(failing && { className: "stroke-red" })}
+              {...(failing && { className: "stroke-red text-red" })}
             >
               <ArrowHead x={398} y={centre} />
             </Wire>
@@ -156,7 +157,7 @@ function ShuffleShards() {
             <Wire
               key={`${name}-${worker}`}
               d={`M${from} 72 C${from} 110 ${to} 110 ${to} 148`}
-              {...(poison && { className: "stroke-red" })}
+              {...(poison && { className: "stroke-red text-red" })}
             >
               <DownHead x={to} y={148} />
             </Wire>
@@ -350,9 +351,7 @@ function JournalReplay() {
         );
       })}
       {[236, 471].map((x) => (
-        <Wire key={x} d={`M${x} 127 H${x + 12}`}>
-          <ArrowHead x={x + 12} y={127} />
-        </Wire>
+        <Joint key={x} x1={x - 2} y1={127} x2={x + 15} y2={127} />
       ))}
       <Note x={360} y={264} anchor="middle">
         Finished steps return their recorded result. The card is charged once.

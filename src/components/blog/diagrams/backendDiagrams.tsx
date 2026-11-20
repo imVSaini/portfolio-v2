@@ -57,7 +57,7 @@ function SkipLocked() {
   return (
     <>
       <Graph nodes={QUEUE_PRODUCERS} links={[]} />
-      <Panel x={222} y={16} w={270} h={262} title="Jobs table" meta="Postgres" />
+      <Panel x={222} y={16} w={246} h={262} title="Jobs table" meta="Postgres" />
       {JOBS.map(({ id, kind, by }, i) => {
         const y = 70 + i * 32;
         return (
@@ -65,7 +65,7 @@ function SkipLocked() {
             <rect
               x={238}
               y={y}
-              width={238}
+              width={214}
               height={24}
               rx={7}
               strokeWidth={1.5}
@@ -75,11 +75,11 @@ function SkipLocked() {
               {`#${id} · ${kind}`}
             </Sub>
             {by ? (
-              <Label x={464} y={y + 16} anchor="end" size={9}>
+              <Label x={440} y={y + 16} anchor="end" size={9}>
                 {`Locked · ${by}`}
               </Label>
             ) : (
-              <Sub x={464} y={y + 16} anchor="end">
+              <Sub x={440} y={y + 16} anchor="end">
                 ready
               </Sub>
             )}
@@ -104,9 +104,9 @@ function SkipLocked() {
       <Graph
         nodes={QUEUE_WORKERS.map((y, i) => ({
           id: `worker${i}`,
-          x: 528,
+          x: 544,
           y,
-          w: 176,
+          w: 160,
           label: `Worker ${i + 1}`,
           sub: "Skip locked rows",
           icon: "refresh",
@@ -117,8 +117,8 @@ function SkipLocked() {
         const from = y + 28;
         const to = jobCentre(i);
         return (
-          <Wire key={y} d={`M528 ${from} C510 ${from} 510 ${to} 496 ${to}`}>
-            <ArrowHead x={494} y={to} angle={180} />
+          <Wire key={y} d={`M544 ${from} C516 ${from} 516 ${to} 487 ${to} H475`}>
+            <ArrowHead x={475} y={to} angle={180} />
           </Wire>
         );
       })}

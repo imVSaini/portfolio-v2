@@ -21,11 +21,13 @@ const CANARY_STAGES = [
   { label: "100%", weight: 100 },
 ];
 
+const CANARY_W = 80;
+
 const CANARY_NODES: NodeSpec[] = CANARY_STAGES.map(({ label, weight }, i) => ({
   id: `stage${i}`,
   x: 16 + i * 100,
   y: 16,
-  w: 86,
+  w: CANARY_W,
   h: 84,
   label,
   icon: weight === undefined ? "shield" : "route",
@@ -46,10 +48,18 @@ const ROLLBACK_NODE: NodeSpec[] = [
 ];
 
 const GATE_DROPS = [
-  { from: 159, to: 260 },
-  { from: 359, to: 360 },
-  { from: 559, to: 460 },
+  { from: 156, to: 260 },
+  { from: 356, to: 356 },
+  { from: 556, to: 460 },
 ];
+
+const DROP_TURN = 8;
+
+function gateDrop(from: number, to: number) {
+  if (from === to) return `M${from} 146 V184`;
+  const turn = Math.sign(to - from) * DROP_TURN;
+  return `M${from} 146 V160 Q${from} 168 ${from + turn} 168 H${to - turn} Q${to} 168 ${to} 176 V184`;
+}
 
 function CanarySteps() {
   return (
@@ -66,7 +76,7 @@ function CanarySteps() {
               <rect
                 x={x}
                 y={112}
-                width={86}
+                width={CANARY_W}
                 height={10}
                 rx={5}
                 strokeWidth={1.5}
@@ -75,7 +85,7 @@ function CanarySteps() {
               <rect
                 x={x}
                 y={112}
-                width={(86 * weight) / 100}
+                width={(CANARY_W * weight) / 100}
                 height={10}
                 rx={5}
                 stroke="none"
@@ -87,7 +97,7 @@ function CanarySteps() {
         return (
           <g key={i} data-d="fade">
             {(checks ?? []).map((check, line) => (
-              <Sub key={check} x={x + 43} y={120 + line * 14} anchor="middle">
+              <Sub key={check} x={x + CANARY_W / 2} y={120 + line * 14} anchor="middle">
                 {check}
               </Sub>
             ))}
@@ -95,12 +105,7 @@ function CanarySteps() {
         );
       })}
       {GATE_DROPS.map(({ from, to }) => (
-        <Wire
-          key={from}
-          d={from === to ? `M${from} 150 V192` : `M${from} 150 C${from} 172 ${to} 170 ${to} 192`}
-          dashed
-          className="stroke-red"
-        >
+        <Wire key={from} d={gateDrop(from, to)} dashed port={false} className="stroke-red text-red">
           <DownHead x={to} y={194} />
         </Wire>
       ))}
@@ -172,7 +177,7 @@ function DeployRelease() {
       <Wire
         d="M624 218 V238 Q624 246 616 246 H104 Q96 246 96 238 V222"
         dashed
-        className="stroke-red"
+        className="stroke-red text-red"
       >
         <UpHead x={96} y={220} />
       </Wire>
@@ -381,7 +386,7 @@ function SupplyChain() {
                 {threat}
               </Sub>
             </g>
-            <Wire d={`M${centre} 72 V106`} dashed className="stroke-red">
+            <Wire d={`M${centre} 72 V106`} dashed className="stroke-red text-red">
               <DownHead x={centre} y={108} />
             </Wire>
             <g data-d="node">

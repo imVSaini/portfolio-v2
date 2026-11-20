@@ -386,6 +386,17 @@ html.dark[data-accent="red"] {
   -webkit-text-stroke: clamp(1px, 0.035em, 1.5px) --value(--color-*);
 }
 
+@utility diagram-dots {
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in oklab, var(--color-line-strong) 50%, transparent) 1px,
+    transparent 1.5px
+  );
+  background-size: 1.125rem 1.125rem;
+  background-repeat: space;
+  background-attachment: local;
+}
+
 @utility container-page {
   margin-inline: auto;
   width: 100%;
