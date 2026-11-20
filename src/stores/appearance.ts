@@ -15,6 +15,8 @@ import {
 
 type AppearanceValues = { theme: Theme; accent: Accent; tone: Tone };
 
+const IS_BROWSER = typeof window !== "undefined";
+
 type AppearanceState = AppearanceValues & {
   setTheme: (theme: Theme) => void;
   setAccent: (accent: Accent) => void;
@@ -77,12 +79,12 @@ export const useAppearance = create<AppearanceState>()(
     }),
     {
       name: "appearance",
-      storage: splitStorage,
+      storage: IS_BROWSER ? splitStorage : undefined,
       partialize: ({ theme, accent, tone }) => ({ theme, accent, tone }),
     },
   ),
 );
 
-if (typeof window !== "undefined") {
+if (IS_BROWSER) {
   useAppearance.subscribe(applyAppearance);
 }
