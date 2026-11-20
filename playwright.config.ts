@@ -16,7 +16,7 @@ export default defineConfig({
   ...(IS_CI && { workers: 2 }),
   timeout: 30_000,
   expect: { timeout: 7_500 },
-  reporter: IS_CI ? [["github"], ["blob"]] : [["list"], ["html", { open: "never" }]],
+  reporter: IS_CI ? [["list"], ["github"], ["blob"]] : [["list"], ["html", { open: "never" }]],
   use: {
     baseURL: BASE_URL,
     trace: "on-first-retry",
