@@ -10,6 +10,6 @@
  * // => "/#work"
  * ```
  */
-export function getHomeHref(href: `#${string}`): `/${string}` {
+export function getHomeHref(href: `#${string}`): "/" | `/#${string}` {
   return href === "#top" ? "/" : `/${href}`;
 }

@@ -5,6 +5,7 @@ import { site } from "./src/data/site";
 const nextConfig: NextConfig = {
   env: { BUILD_YEAR: String(new Date().getFullYear()) },
   poweredByHeader: false,
+  typedRoutes: true,
   images: {
     remotePatterns: [new URL(`${site.assetsUrl}/**`)],
   },
