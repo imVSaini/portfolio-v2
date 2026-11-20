@@ -11,7 +11,7 @@ export const measuringEngineering: PostSource = {
     "Is AI making the team faster? DORA’s five delivery metrics, developer experience signals, the 2025 DORA findings and the vanity numbers to drop.",
   topic: "Leadership",
   date: "2026-09-16",
-  tint: "orange",
+  tint: "magenta",
   art: "gauges",
   body: [
     p(

@@ -11,7 +11,7 @@ export const gracefulDegradation: PostSource = {
     "Outages are usually overload, not breakage. Retry budgets, early load shedding and planned degradation levels that keep the core working when parts can’t.",
   topic: "Architecture",
   date: "2026-09-02",
-  tint: "magenta",
+  tint: "gold",
   art: "shedding",
   body: [
     p(

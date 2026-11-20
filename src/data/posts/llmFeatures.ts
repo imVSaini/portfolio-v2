@@ -11,7 +11,7 @@ export const llmFeatures: PostSource = {
     "The model call is one line. Retrieval, typed tools with confirmation, prompt injection, evals in CI and per-tenant cost decide whether LLM features work.",
   topic: "Backend",
   date: "2026-11-11",
-  tint: "magenta",
+  tint: "gold",
   art: "retrieval",
   body: [
     p(

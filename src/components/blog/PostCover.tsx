@@ -7,11 +7,11 @@ import { getAssetUrl } from "@/lib/asset";
 import { cn } from "@/lib/cn";
 
 const tints: Record<ProjectTint, string> = {
-  orange: "bg-orange text-manila-light",
-  gold: "bg-gold text-faded-black",
-  magenta: "bg-magenta text-manila-light",
-  red: "bg-red text-manila-light",
-  soot: "bg-soot text-manila-light",
+  orange: "bg-orange text-manila-light [--cover-bg:var(--color-orange)]",
+  gold: "bg-gold text-faded-black [--cover-bg:var(--color-gold)]",
+  magenta: "bg-magenta text-manila-light [--cover-bg:var(--color-magenta)]",
+  red: "bg-red text-manila-light [--cover-bg:var(--color-red)]",
+  soot: "bg-soot text-manila-light [--cover-bg:var(--color-soot)]",
 };
 
 const zoom =

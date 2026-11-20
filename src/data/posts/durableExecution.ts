@@ -11,7 +11,7 @@ export const durableExecution: PostSource = {
     "Queues, status columns and cron jobs turn one business process into five parts. How durable execution journals each step, and the rules the code must obey.",
   topic: "Architecture",
   date: "2026-10-07",
-  tint: "magenta",
+  tint: "gold",
   art: "journal",
   body: [
     p(

@@ -11,7 +11,7 @@ export const inpResponsiveness: PostSource = {
     "Many fast-loading React apps fail INP on real phones. Field attribution, the three phases of an interaction, the React Compiler and scheduler.yield().",
   topic: "Frontend",
   date: "2026-09-30",
-  tint: "gold",
+  tint: "orange",
   art: "frames",
   body: [
     p(

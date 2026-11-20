@@ -11,7 +11,7 @@ export const serverComponents: PostSource = {
     "A server tree with client leaves, a prerendered shell with streamed holes, explicit use cache with tags, and server actions treated as public endpoints.",
   topic: "Frontend",
   date: "2026-11-04",
-  tint: "gold",
+  tint: "orange",
   art: "tree",
   body: [
     p(

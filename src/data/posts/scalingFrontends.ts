@@ -11,7 +11,7 @@ export const scalingFrontends: PostSource = {
     "A modular monolith with enforced boundaries, design tokens and modern CSS fixes most team-scaling pain. When micro-frontends are worth their price.",
   topic: "Frontend",
   date: "2026-08-26",
-  tint: "gold",
+  tint: "orange",
   art: "modules",
   body: [
     p(

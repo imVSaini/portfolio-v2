@@ -11,7 +11,7 @@ export const architectureDecisions: PostSource = {
     "Most decisions belong in a pull request; a few need an RFC with one decider. Sizing decisions by reversibility, and ADRs with a revisit trigger.",
   topic: "Leadership",
   date: "2026-08-12",
-  tint: "orange",
+  tint: "magenta",
   art: "doors",
   body: [
     p(

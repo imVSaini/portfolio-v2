@@ -11,7 +11,7 @@ export const aiCodeReview: PostSource = {
     "Agents write more code than people can review. Rules the agent reads, gates before humans, small PRs, and review focused on intent, design and risk.",
   topic: "Leadership",
   date: "2026-10-21",
-  tint: "orange",
+  tint: "magenta",
   art: "review",
   body: [
     p(
