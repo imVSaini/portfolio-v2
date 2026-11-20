@@ -54,6 +54,54 @@ const eslintConfig = defineConfig([
     ],
     rules: { "import/no-default-export": "off" },
   },
+  {
+    files: ["src/data/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/app/**", "@/components/**", "@/hooks/**", "@/lib/**", "@/stores/**"],
+              message: "src/data is plain typed content and imports only other src/data modules.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/{lib,hooks,stores}/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/app/**", "@/components/**"],
+              message: "Helpers, hooks and stores sit below the UI and must not import from it.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/components/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/app/**"],
+              message: "Components are used by routes and must not import route files.",
+            },
+          ],
+        },
+      ],
+    },
+  },
   prettier,
   globalIgnores([
     ".next/**",
