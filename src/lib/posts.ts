@@ -25,6 +25,22 @@ export function formatPostDate(date: Post["date"]): string {
 }
 
 /**
+ * Builds the site-relative URL of a post.
+ *
+ * @param post - The post to link to.
+ * @returns The post's path under `/blog`.
+ *
+ * @example
+ * ```ts
+ * getPostPath(post);
+ * // => "/blog/cell-based-architecture-blast-radius"
+ * ```
+ */
+export function getPostPath(post: Post): `/blog/${string}` {
+  return `/blog/${post.slug}`;
+}
+
+/**
  * Builds the absolute URL of a post's own cover image when one is available.
  *
  * @param post - The post to describe.

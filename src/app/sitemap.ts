@@ -4,6 +4,7 @@ import { caseStudies, caseStudiesPage } from "@/data/caseStudies";
 import { posts } from "@/data/posts";
 import { site } from "@/data/site";
 import { getCaseStudyPath } from "@/lib/caseStudies";
+import { getPostPath } from "@/lib/posts";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -16,7 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     { url: `${site.url}/blog`, changeFrequency: "weekly", priority: 0.8 },
     ...posts.map((post) => ({
-      url: `${site.url}/blog/${post.slug}`,
+      url: `${site.url}${getPostPath(post)}`,
       lastModified: post.updatedAt ?? post.date,
       priority: 0.6,
     })),

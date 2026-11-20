@@ -14,11 +14,12 @@ import { PageShell } from "@/components/layout/PageShell";
 import { RevealText } from "@/components/motion/RevealText";
 import { RollText } from "@/components/motion/RollText";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { feedAlternates } from "@/data/blog";
 import { posts, type Post } from "@/data/posts";
 import { site } from "@/data/site";
 import { getPostJsonLd } from "@/lib/jsonLd";
 import { getPostMarkdownPath } from "@/lib/llms";
+import { buildPageMetadata } from "@/lib/metadata";
+import { getPostPath } from "@/lib/posts";
 
 /** Unlisted slugs wait for the full render, so a missing post returns a real 404 status. */
 export const ensureStatic = "navigation";
@@ -48,32 +49,16 @@ export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): P
   const post = findPost(slug);
   if (!post) return {};
 
-  const url = `/blog/${post.slug}`;
-
-  return {
+  return buildPageMetadata({
     title: post.metaTitle,
     description: post.metaDescription,
-    alternates: {
-      canonical: url,
-      types: { ...feedAlternates, "text/markdown": getPostMarkdownPath(post) },
-    },
-    openGraph: {
-      type: "article",
-      url,
-      title: post.metaTitle,
-      description: post.metaDescription,
-      siteName: site.name,
-      locale: "en_IN",
+    path: getPostPath(post),
+    markdownPath: getPostMarkdownPath(post),
+    article: {
       publishedTime: post.date,
       ...(post.updatedAt && { modifiedTime: post.updatedAt }),
-      authors: [site.name],
     },
-    twitter: {
-      card: "summary_large_image",
-      title: post.metaTitle,
-      description: post.metaDescription,
-    },
-  };
+  });
 }
 
 export default async function PostPage({ params }: PageProps<"/blog/[slug]">) {
@@ -93,7 +78,7 @@ export default async function PostPage({ params }: PageProps<"/blog/[slug]">) {
 }
 
 function PostContent({ post }: { post: Post }) {
-  const url = `${site.url}/blog/${post.slug}`;
+  const url = `${site.url}${getPostPath(post)}`;
   const headings = post.body.flatMap((block) => (block.type === "heading" ? [block.text] : []));
   const related = relatedPosts(post);
 

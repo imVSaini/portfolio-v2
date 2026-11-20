@@ -1,7 +1,7 @@
 import { blog } from "@/data/blog";
 import type { Post, PostBlock } from "@/data/posts";
 import { site } from "@/data/site";
-import { formatPostDate, getPostImageUrl } from "@/lib/posts";
+import { formatPostDate, getPostImageUrl, getPostPath } from "@/lib/posts";
 
 /** Bound the full-content feed as the archive grows. */
 const FEED_ITEM_LIMIT = 20;
@@ -70,7 +70,7 @@ function renderBlock(block: PostBlock): string {
 }
 
 function renderItem(post: Post): string {
-  const url = `${site.url}/blog/${post.slug}`;
+  const url = `${site.url}${getPostPath(post)}`;
   const image = getPostImageUrl(post);
   const content = [
     ...(image ? [`<p><img src="${escapeXml(image)}" alt="" /></p>`] : []),

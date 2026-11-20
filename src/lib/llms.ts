@@ -8,7 +8,7 @@ import { projects } from "@/data/projects";
 import { site } from "@/data/site";
 import { skillGroups } from "@/data/skills";
 import { DECISIONS_HEADING, getCaseStudyPath } from "@/lib/caseStudies";
-import { formatPostDate } from "@/lib/posts";
+import { formatPostDate, getPostPath } from "@/lib/posts";
 
 function absolute(path: `/${string}`) {
   return new URL(path, site.url).href;
@@ -44,7 +44,7 @@ function renderBlock(block: TextBlock | DiagramBlock<string>) {
  * ```
  */
 export function getPostMarkdownPath(post: Post): `/${string}` {
-  return `/blog/${post.slug}/index.md`;
+  return `${getPostPath(post)}/index.md`;
 }
 
 /**
@@ -70,7 +70,7 @@ export function getPostMarkdown(post: Post): string {
     `# ${post.title}`,
     `> ${post.excerpt}`,
     `By ${site.name}, ${site.role}. Published ${formatPostDate(post.date)}${updated}. ${post.topic}, ${post.readMinutes} min read.`,
-    `Canonical: ${absolute(`/blog/${post.slug}`)}`,
+    `Canonical: ${absolute(getPostPath(post))}`,
     ...post.body.map(renderBlock),
   ].join("\n\n");
 }

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PostAuthor } from "@/components/blog/PostAuthor";
@@ -9,33 +8,21 @@ import { PageShell } from "@/components/layout/PageShell";
 import { RevealText } from "@/components/motion/RevealText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SectionLabel } from "@/components/ui/SectionLabel";
-import { blog, feedAlternates } from "@/data/blog";
+import { blog } from "@/data/blog";
 import { posts, type Post } from "@/data/posts";
 import { site } from "@/data/site";
 import { getBlogJsonLd } from "@/lib/jsonLd";
+import { buildPageMetadata } from "@/lib/metadata";
+import { getPostPath } from "@/lib/posts";
 
 const { title, description } = blog;
 
-export const metadata: Metadata = {
+export const metadata = buildPageMetadata({
   title,
   description,
-  alternates: { canonical: "/blog", types: feedAlternates },
-  openGraph: {
-    type: "website",
-    url: "/blog",
-    title: `${title} — ${site.name}`,
-    description,
-    siteName: site.name,
-    locale: "en_IN",
-    images: [site.ogImage],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${title} — ${site.name}`,
-    description,
-    images: [site.ogImage],
-  },
-};
+  path: "/blog",
+  socialTitle: `${title} — ${site.name}`,
+});
 
 function FeaturedPost({ post }: { post: Post }) {
   return (
@@ -53,7 +40,7 @@ function FeaturedPost({ post }: { post: Post }) {
         <PostMeta post={post} />
         <h3 className="text-h3 lg:text-[clamp(1.5rem,2.6vw,2.5rem)]">
           <Link
-            href={`/blog/${post.slug}`}
+            href={getPostPath(post)}
             className="rounded-md transition-colors duration-300 after:absolute after:inset-0 group-intent:text-accent"
           >
             {post.title}

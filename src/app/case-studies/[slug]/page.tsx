@@ -15,12 +15,12 @@ import { PageShell } from "@/components/layout/PageShell";
 import { RevealText } from "@/components/motion/RevealText";
 import { RollText } from "@/components/motion/RollText";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { feedAlternates } from "@/data/blog";
 import { caseStudies, caseStudiesPage, type CaseStudy } from "@/data/caseStudies";
 import { site } from "@/data/site";
 import { getCaseStudyHeadings, getCaseStudyPath, getNextCaseStudy } from "@/lib/caseStudies";
 import { getCaseStudyJsonLd } from "@/lib/jsonLd";
 import { getCaseStudyMarkdownPath } from "@/lib/llms";
+import { buildPageMetadata } from "@/lib/metadata";
 
 /** Unlisted slugs wait for the full render, so a missing study returns a real 404 status. */
 export const ensureStatic = "navigation";
@@ -41,32 +41,13 @@ export async function generateMetadata({
   const study = findCaseStudy(slug);
   if (!study) return {};
 
-  const url = getCaseStudyPath(study);
-  const title = `${study.title} case study`;
-
-  return {
-    title,
+  return buildPageMetadata({
+    title: `${study.title} case study`,
     description: study.summary,
-    alternates: {
-      canonical: url,
-      types: { ...feedAlternates, "text/markdown": getCaseStudyMarkdownPath(study) },
-    },
-    openGraph: {
-      type: "article",
-      url,
-      title,
-      description: study.summary,
-      siteName: site.name,
-      locale: "en_IN",
-      publishedTime: study.date,
-      authors: [site.name],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description: study.summary,
-    },
-  };
+    path: getCaseStudyPath(study),
+    markdownPath: getCaseStudyMarkdownPath(study),
+    article: { publishedTime: study.date },
+  });
 }
 
 export default async function CaseStudyPage({ params }: PageProps<"/case-studies/[slug]">) {

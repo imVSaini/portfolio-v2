@@ -1,37 +1,21 @@
-import type { Metadata } from "next";
-
 import { CaseStudyEntry } from "@/components/caseStudies/CaseStudyEntry";
 import { PageShell } from "@/components/layout/PageShell";
 import { RevealText } from "@/components/motion/RevealText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SectionLabel } from "@/components/ui/SectionLabel";
-import { feedAlternates } from "@/data/blog";
 import { caseStudies, caseStudiesPage } from "@/data/caseStudies";
 import { site } from "@/data/site";
 import { getCaseStudiesJsonLd } from "@/lib/jsonLd";
+import { buildPageMetadata } from "@/lib/metadata";
 
 const { title, description, path } = caseStudiesPage;
 
-export const metadata: Metadata = {
+export const metadata = buildPageMetadata({
   title,
   description,
-  alternates: { canonical: path, types: feedAlternates },
-  openGraph: {
-    type: "website",
-    url: path,
-    title: `${title} — ${site.name}`,
-    description,
-    siteName: site.name,
-    locale: "en_IN",
-    images: [site.ogImage],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${title} — ${site.name}`,
-    description,
-    images: [site.ogImage],
-  },
-};
+  path,
+  socialTitle: `${title} — ${site.name}`,
+});
 
 export default function CaseStudiesPage() {
   return (

@@ -24,7 +24,7 @@ type TextResponseOptions = {
  * ```ts
  * return textResponse(getPostMarkdown(post), {
  *   type: "markdown",
- *   canonical: `/blog/${post.slug}`,
+ *   canonical: getPostPath(post),
  * });
  * ```
  */

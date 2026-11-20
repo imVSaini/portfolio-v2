@@ -4,6 +4,7 @@ import { PostAuthor } from "@/components/blog/PostAuthor";
 import { PostCover } from "@/components/blog/PostCover";
 import { PostMeta } from "@/components/blog/PostMeta";
 import type { Post } from "@/data/posts";
+import { getPostPath } from "@/lib/posts";
 
 export function PostCard({ post }: { post: Post }) {
   return (
@@ -13,7 +14,7 @@ export function PostCard({ post }: { post: Post }) {
       <div className="flex flex-col gap-3">
         <h3 className="text-h4">
           <Link
-            href={`/blog/${post.slug}`}
+            href={getPostPath(post)}
             className="rounded-md transition-colors duration-300 after:absolute after:inset-0 group-intent:text-accent"
           >
             {post.title}

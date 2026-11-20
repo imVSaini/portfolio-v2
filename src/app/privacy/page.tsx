@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import { PageShell } from "@/components/layout/PageShell";
 import { RevealText } from "@/components/motion/RevealText";
 import { SectionLabel } from "@/components/ui/SectionLabel";
-import { feedAlternates } from "@/data/blog";
 import { contact } from "@/data/contact";
 import { site } from "@/data/site";
 import { INTRO_KEY, STORAGE_KEYS } from "@/lib/appearance";
+import { buildPageMetadata } from "@/lib/metadata";
 
 const LAST_UPDATED = "7 November 2026";
 
@@ -17,27 +16,12 @@ const link =
 const title = "Privacy policy";
 const description = `How ${site.name}'s portfolio handles your data: no cookies, no analytics, no tracking.`;
 
-// A page's `openGraph` replaces the layout's wholesale, so the shared fields are repeated here.
-export const metadata: Metadata = {
+export const metadata = buildPageMetadata({
   title,
   description,
-  alternates: { canonical: "/privacy", types: feedAlternates },
-  openGraph: {
-    type: "website",
-    url: "/privacy",
-    title: `${title} — ${site.name}`,
-    description,
-    siteName: site.name,
-    locale: "en_IN",
-    images: [site.ogImage],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${title} — ${site.name}`,
-    description,
-    images: [site.ogImage],
-  },
-};
+  path: "/privacy",
+  socialTitle: `${title} — ${site.name}`,
+});
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (

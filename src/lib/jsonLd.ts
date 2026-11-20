@@ -5,7 +5,7 @@ import { experience } from "@/data/experience";
 import type { Post } from "@/data/posts";
 import { site } from "@/data/site";
 import { getCaseStudyPath } from "@/lib/caseStudies";
-import { getPostImageUrl } from "@/lib/posts";
+import { getPostImageUrl, getPostPath } from "@/lib/posts";
 
 type NodeReference = { "@id": string };
 
@@ -247,7 +247,7 @@ function getBreadcrumbNode(id: string, crumbs: Crumb[]): BreadcrumbNode {
 }
 
 function getPostNode(post: Post): BlogPostingNode {
-  const url = `${site.url}/blog/${post.slug}`;
+  const url = `${site.url}${getPostPath(post)}`;
   const image = getPostImageUrl(post) ?? `${url}/opengraph-image/card`;
 
   return {
