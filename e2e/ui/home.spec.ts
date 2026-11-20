@@ -199,7 +199,10 @@ test.describe("selected work", () => {
       const link = card.getByRole("link");
 
       await expect.poll(() => isArrowSwapped(link)).toBe(false);
-      await hoverWhenSettled(card.locator(":scope > [aria-hidden='true']"));
+      await expect(link).toHaveCSS("transform", "none");
+      const cover = await card.locator(":scope > [aria-hidden='true']").boundingBox();
+      if (!cover) throw new Error("the live card has no visible cover");
+      await page.mouse.move(cover.x + cover.width / 2, cover.y + cover.height / 2);
       await expect.poll(() => isArrowSwapped(link)).toBe(true);
     },
   );
@@ -466,18 +469,33 @@ async function getFirstFullyLitView(page: Page) {
     const isLit = () =>
       words.every((word) => Number(getComputedStyle(word).opacity) > 0.99) &&
       chips.every((chip) => new DOMMatrix(getComputedStyle(chip).transform).a > 0.99);
-    const start = manifesto.getBoundingClientRect().top + window.scrollY - window.innerHeight;
-    for (let y = start; y < start + window.innerHeight * 4; y += 10) {
+    const progress = () =>
+      [...words, ...chips]
+        .map((piece) => getComputedStyle(piece).opacity + getComputedStyle(piece).transform)
+        .join();
+    const settleAt = async (y: number) => {
       window.scrollTo(0, y);
-      for (let frame = 0; frame < 2; frame += 1) {
+      let last = "";
+      for (let still = 0, frame = 0; still < 3 && frame < 60; frame += 1) {
         await new Promise((resolve) => requestAnimationFrame(resolve));
+        const now = `${window.scrollY}|${progress()}`;
+        still = now === last ? still + 1 : 0;
+        last = now;
       }
-      if (!isLit()) continue;
-      const box = (words[0]?.closest("p") ?? manifesto).getBoundingClientRect();
-      const header = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
-      return { top: box.top - header, bottom: window.innerHeight - box.bottom };
+      return isLit();
+    };
+    let unlit = manifesto.getBoundingClientRect().top + window.scrollY - window.innerHeight;
+    let lit = unlit + window.innerHeight * 4;
+    if (!(await settleAt(lit))) return null;
+    while (lit - unlit > 1) {
+      const middle = Math.floor((unlit + lit) / 2);
+      if (await settleAt(middle)) lit = middle;
+      else unlit = middle;
     }
-    return null;
+    await settleAt(lit);
+    const box = (words[0]?.closest("p") ?? manifesto).getBoundingClientRect();
+    const header = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
+    return { top: box.top - header, bottom: window.innerHeight - box.bottom };
   });
 }
 
