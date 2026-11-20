@@ -111,35 +111,77 @@ async function getShownLabel(button: Locator) {
 async function watchMenuReveal(page: Page, phase: "open" | "close") {
   await page.evaluate((phase) => {
     const root = document.documentElement;
-    const sampleFrom = (menu: Element) => {
+    const resolve = (value: string, size: number) => {
+      const fromEnd = /^calc\(100% - ([\d.]+)px\)$/.exec(value);
+      if (fromEnd) return size - Number(fromEnd[1]);
+      if (value.endsWith("%")) return (parseFloat(value) / 100) * size;
+      if (value.endsWith("px")) return parseFloat(value);
+      return Number.NaN;
+    };
+    const covers = (menu: Element, close: Element) => {
+      const box = menu.getBoundingClientRect();
+      const clip = getComputedStyle(menu).clipPath;
+      const [, radius = "", unit, at = ""] = /^circle\(([\d.]+)(px|%) at (.+)\)$/.exec(clip) ?? [];
+      const [x = "", y = ""] = at.match(/calc\([^)]*\)|\S+/g) ?? [];
+      const r =
+        unit === "%"
+          ? (Number(radius) / 100) * (Math.hypot(box.width, box.height) / Math.SQRT2)
+          : Number(radius);
+      const origin = { x: resolve(x, box.width), y: resolve(y, box.height) };
+      if ([r, origin.x, origin.y].some(Number.isNaN)) return `unparsed ${clip}`;
+      const button = close.getBoundingClientRect();
+      const inside = (px: number, py: number) => Math.hypot(px - origin.x, py - origin.y) <= r;
+      const atButton = inside(
+        button.left + button.width / 2 - box.left,
+        button.top + button.height / 2 - box.top,
+      );
+      return `${atButton}/${inside(box.width - 2, box.height - 2)}`;
+    };
+    const sampleFrom = async (menu: Element) => {
       const close = menu.querySelector('[aria-label="Close menu"]');
       if (!close) return;
-      const started = performance.now();
+      const findReveal = () =>
+        menu
+          .getAnimations()
+          .find(
+            (animation): animation is CSSTransition =>
+              animation instanceof CSSTransition && animation.transitionProperty === "clip-path",
+          );
+      let reveal = findReveal();
+      for (let frame = 0; !reveal && frame < 120; frame += 1) {
+        await new Promise((done) => requestAnimationFrame(done));
+        reveal = findReveal();
+      }
+      if (!reveal) {
+        root.dataset.menuReveal = "no clip-path transition";
+        return;
+      }
+      reveal.pause();
+      const duration = Number(reveal.effect?.getComputedTiming().duration);
       const frames: string[] = [];
-      const sample = () => {
-        const button = close.getBoundingClientRect();
-        const atButton = document.elementFromPoint(
-          button.left + button.width / 2,
-          button.top + button.height / 2,
-        );
-        const atCorner = document.elementFromPoint(window.innerWidth - 2, window.innerHeight - 2);
-        frames.push(`${menu.contains(atButton)}/${menu.contains(atCorner)}`);
-        const done = phase === "open" ? performance.now() - started >= 1500 : !menu.isConnected;
-        if (done) root.dataset.menuReveal = frames.join(",");
-        else requestAnimationFrame(sample);
-      };
-      requestAnimationFrame(sample);
+      for (let step = 1; step <= 10; step += 1) {
+        reveal.currentTime = (duration * step) / 10;
+        frames.push(covers(menu, close));
+      }
+      reveal.finish();
+      root.dataset.menuReveal = frames.join(",");
     };
     const open = document.querySelector('[role="dialog"]');
     if (phase === "close" && open) {
-      open.addEventListener("transitionstart", () => sampleFrom(open), { once: true });
+      const onStart = (event: Event) => {
+        if (!(event instanceof TransitionEvent) || event.target !== open) return;
+        if (event.propertyName !== "clip-path") return;
+        open.removeEventListener("transitionstart", onStart);
+        void sampleFrom(open);
+      };
+      open.addEventListener("transitionstart", onStart);
       return;
     }
     const observer = new MutationObserver(() => {
       const menu = document.querySelector('[role="dialog"]');
       if (!menu) return;
       observer.disconnect();
-      sampleFrom(menu);
+      void sampleFrom(menu);
     });
     observer.observe(document.body, { childList: true, subtree: true });
   }, phase);
