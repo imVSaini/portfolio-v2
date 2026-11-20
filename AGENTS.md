@@ -297,6 +297,14 @@ in the commit that needs it, and give the reason in the commit message.
   `e2e/ui/mobile-menu.spec.ts`).
 - To assert that something animates, sample `getAnimations({ subtree: true })` on every frame over
   a short window. A single early sample can run before the transition starts.
+- To assert how something animates (an intermediate state such as a half-open reveal), pause the
+  animation and seek it with the Web Animations API (`animation.pause()`, `currentTime`), then
+  measure computed styles. CI runs Linux browsers in software at a few frames per second, so
+  per-frame sampling and hit testing during an animation miss intermediate states. When waiting
+  for scroll-linked motion, wait until the value stops changing, not for a fixed number of frames.
+- Hover or click a card at its resting state: wait for reveal animations to finish before
+  pointing at it, and use `page.mouse` when an overlay (such as a stretched link) is meant to
+  receive the pointer.
 
 ## Commit messages
 

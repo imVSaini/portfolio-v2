@@ -105,6 +105,14 @@ Import `test` and `expect` from `e2e/fixtures.ts` in UI specs.
   `mobile-menu.spec.ts`).
 - To assert that something animates, sample `getAnimations({ subtree: true })` on every frame over
   a short window; one early sample can run before the transition starts.
+- To assert how something animates (an intermediate state such as a half-open reveal), pause the
+  animation and seek it with the Web Animations API (`animation.pause()`, `currentTime`), then
+  measure computed styles. CI runs Linux browsers in software at a few frames per second, so
+  per-frame sampling and hit testing during an animation miss intermediate states. When waiting
+  for scroll-linked motion, wait until the value stops changing, not for a fixed number of frames.
+- Hover or click a card at its resting state: wait for reveal animations to finish before
+  pointing at it, and use `page.mouse` when an overlay (such as a stretched link) is meant to
+  receive the pointer.
 - A known app defect is documented with `test.fail(condition, reason)`. Use `test.fixme` only for
   timing-dependent defects. Never weaken an assertion to make a defect pass.
 
