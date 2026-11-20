@@ -13,10 +13,28 @@ permissions:
   contents: read
 
 jobs:
+  version:
+    name: Resolve Playwright version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      playwright: ${{ steps.lockfile.outputs.playwright }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - id: lockfile
+        run: |
+          version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")
+          echo "playwright=$version" >> "$GITHUB_OUTPUT"
+
   test:
     name: Playwright (${{ matrix.shard }}/4)
+    needs: version
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    container:
+      image: mcr.microsoft.com/playwright:v${{ needs.version.outputs.playwright }}-noble
+      options: --user 1001
     strategy:
       fail-fast: false
       matrix:
@@ -30,8 +48,6 @@ jobs:
           cache: npm
 
       - run: npm ci
-
-      - run: npx playwright install --with-deps
 
       - run: npx playwright test --shard=${{ matrix.shard }}/4
 

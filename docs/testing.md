@@ -140,7 +140,11 @@ the test, not a regression. It is unresolved.
 
 `.github/workflows/e2e.yml` runs on pushes to `main` and on pull requests:
 
-- Four shards on `ubuntu-latest`, each running `npx playwright test --shard=N/4`.
+- Four shards on `ubuntu-latest`, each running `npx playwright test --shard=N/4` inside the
+  official `mcr.microsoft.com/playwright:v<version>-noble` image. A first job reads the version
+  from `package-lock.json` so the image always matches the installed `@playwright/test`. The image
+  carries the browsers and their system libraries, so there is no `playwright install --with-deps`
+  step: that step once stalled on an apt mirror until the 30-minute job timeout cancelled the run.
 - In CI: two workers, two retries, `forbidOnly`, traces and video on the first retry.
 - A final job merges the blob reports into one HTML report, kept for 14 days as the
   `playwright-report` artifact.
