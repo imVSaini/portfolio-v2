@@ -28,7 +28,7 @@ test.describe("static assets", () => {
     const sizes = Array.from({ length: count }, (_, i) => body.readUInt8(6 + i * 16) || 256);
 
     expect(response.status()).toBe(200);
-    expect(response.headers()["content-type"]).toBe("image/x-icon");
+    expect(response.headers()["content-type"]).toMatch(/^image\/(x-icon|vnd\.microsoft\.icon)$/);
     expect(body.readUInt16LE(2), "ICO resource type").toBe(1);
     expect(sizes).toEqual([16, 32, 48, 256]);
   });

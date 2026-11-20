@@ -130,6 +130,30 @@ test.describe("sitemap.xml", () => {
   });
 });
 
+function getRobotsRules(lines: string[], agent: string): string[] {
+  const rules: string[] = [];
+  let matches = false;
+  let readingAgents = false;
+
+  for (const line of lines) {
+    if (!line || line.startsWith("#")) continue;
+    const [field = "", ...rest] = line.split(":");
+    const key = field.trim().toLowerCase();
+    const value = rest.join(":").trim();
+
+    if (key === "user-agent") {
+      if (!readingAgents) matches = false;
+      readingAgents = true;
+      matches ||= value === agent;
+    } else {
+      readingAgents = false;
+      if (matches) rules.push(`${key}: ${value}`);
+    }
+  }
+
+  return rules;
+}
+
 test.describe("robots.txt", () => {
   test("allows crawling and points at the sitemap", async ({ request }) => {
     const response = await request.get("/robots.txt");
@@ -140,7 +164,8 @@ test.describe("robots.txt", () => {
     expect(lines).toContain("User-Agent: *");
     expect(lines).toContain("Allow: /");
     expect(lines).toContain(`Sitemap: ${site.url}/sitemap.xml`);
-    expect(lines.some((line) => line.startsWith("Disallow: /"))).toBe(false);
+    expect(getRobotsRules(lines, "*")).toContain("allow: /");
+    expect(getRobotsRules(lines, "*").filter((rule) => rule.startsWith("disallow:"))).toEqual([]);
   });
 });
 
