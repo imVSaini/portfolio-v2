@@ -9,12 +9,13 @@ const eslintConfig = defineConfig([
   ...fixupConfigRules([...nextVitals, ...nextTs]),
   {
     files: ["**/*.{ts,tsx}"],
-    plugins: { "better-tailwindcss": betterTailwind },
+    extends: [betterTailwind.configs.recommended],
     settings: {
       "better-tailwindcss": { entryPoint: "src/app/globals.css", rootFontSize: 16 },
     },
     rules: {
-      ...betterTailwind.configs.recommended.rules,
+      "react/jsx-uses-react": "off",
+      "react/jsx-uses-vars": "off",
       // Prettier (prettier-plugin-tailwindcss) owns ordering and wrapping.
       "better-tailwindcss/enforce-consistent-class-order": "off",
       "better-tailwindcss/enforce-consistent-line-wrapping": "off",

@@ -130,8 +130,14 @@ The upstream fix (import-js/eslint-plugin-import#3230) is merged but not release
 **Consequences.**
 
 - Lint results match ESLint 9 rule for rule, autofix included. Lint time is unchanged.
-- `npm install` prints `ERESOLVE overriding peer dependency` warnings for the three plugins. They are
-  expected and do not fail `npm ci`.
-- Remove `@eslint/compat` and the wrapper once `eslint-config-next` ships plugin releases that
-  declare ESLint 10. Before removing it, lint a file with a misordered import: a clean tree passes
+- `package.json` `overrides` scopes `"eslint": "$eslint"` to `eslint-plugin-import`,
+  `eslint-plugin-jsx-a11y` and `eslint-plugin-react`, the documented npm way to point a child's
+  dependency at a direct dependency's spec. It accepts ESLint 10 as their peer, so installs print
+  no `ERESOLVE overriding peer dependency` warnings. It is safe only because the shim makes those
+  plugins work on ESLint 10.
+- `react/jsx-uses-vars` and `react/jsx-uses-react` are off. ESLint 10 counts a JSX tag as a
+  reference to its variable, which the v10 migration guide says makes `jsx-uses-vars` redundant,
+  and the automatic JSX runtime never needs `React` in scope. These stay off after the shim goes.
+- Remove `@eslint/compat`, the wrapper and the three overrides together once `eslint-config-next`
+  ships plugin releases that declare ESLint 10. Before removing it, lint a file with a misordered import: a clean tree passes
   even while the rule is broken.
