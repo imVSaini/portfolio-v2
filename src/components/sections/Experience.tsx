@@ -1,65 +1,13 @@
-"use client";
-
-import { useRef } from "react";
-
 import { RevealText } from "@/components/motion/RevealText";
+import { ExperienceMotion } from "@/components/sections/experience/ExperienceMotion";
 import { RoleEntry } from "@/components/sections/experience/RoleEntry";
 import { RoleNext } from "@/components/sections/experience/RoleNext";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { experience } from "@/data/experience";
-import { gsap, MOTION_QUERY, useGSAP } from "@/lib/gsap";
 
 export function Experience() {
-  const ref = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-      mm.add(MOTION_QUERY, () => {
-        // Accent spine draws down as the timeline scrolls past.
-        gsap.fromTo(
-          "[data-xp-line]",
-          { scaleY: 0 },
-          {
-            scaleY: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: "[data-xp-list]",
-              start: "top 70%",
-              end: "bottom 70%",
-              scrub: true,
-            },
-          },
-        );
-
-        gsap.utils.toArray<HTMLElement>("[data-xp-role]").forEach((role) => {
-          gsap.from(role.querySelectorAll("[data-xp-item]"), {
-            y: 32,
-            opacity: 0,
-            duration: 0.9,
-            ease: "expo.out",
-            stagger: 0.06,
-            scrollTrigger: { trigger: role, start: "top 78%", once: true },
-          });
-          gsap.to(role.querySelector("[data-xp-dot]"), {
-            backgroundColor: "var(--color-accent)",
-            scale: 1.4,
-            scrollTrigger: {
-              trigger: role,
-              start: "top 70%",
-              toggleActions: "play none none reverse",
-            },
-          });
-        });
-      });
-      return () => mm.revert();
-    },
-    { scope: ref },
-  );
-
   return (
-    <section
-      ref={ref}
+    <ExperienceMotion
       id="experience"
       aria-labelledby="experience-title"
       className="relative container-page py-16 md:py-40"
@@ -94,6 +42,6 @@ export function Experience() {
 
         <RoleNext />
       </ol>
-    </section>
+    </ExperienceMotion>
   );
 }
