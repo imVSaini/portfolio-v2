@@ -92,8 +92,9 @@ TypeScript and JavaScript, and `prettier --write` on JSON, CSS and Markdown.
 
 ## Continuous integration
 
-`.github/workflows/e2e.yml` runs the full Playwright suite on every push to `main` and every pull
-request, in four shards, then merges the reports. The suite includes the metadata limits, the
+`.github/workflows/ci.yml` runs `npm run check` and the full Playwright suite on every push to
+`main` and every pull request. It builds once, runs the suite in four shards against that build,
+then merges the reports. The suite includes the metadata limits, the
 no-JavaScript document checks and the per-page script budget, so a regression in any of them fails
 the build. See [Testing](./testing.md#ci).
 

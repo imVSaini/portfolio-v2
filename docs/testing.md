@@ -140,7 +140,7 @@ the test, not a regression. It is unresolved.
 
 ## CI
 
-`.github/workflows/e2e.yml` runs on pushes to `main` and on pull requests:
+`.github/workflows/ci.yml` runs on pushes to `main` and on pull requests:
 
 - A `check` job runs `npx next typegen` (route types, without a build) and `npm run check`.
 - A `build` job runs `next build` once and uploads `.next`, without `.next/cache`, as the
