@@ -23,7 +23,10 @@ for accessible primitives.
   case studies).
 - `src/lib`: shared helpers (`cn`, the `gsap` setup, appearance).
 - `src/hooks`, `src/stores`: React hooks and zustand stores.
-- `docs/adr`: architecture decision records. Add one for any change that is expensive to reverse.
+- `docs`: how the system works (architecture, content, SEO, design system, motion, state,
+  performance, testing, development) and the decision log. Update the matching guide with any
+  change that alters how something works, and add a `docs/decisions.md` entry for any change that
+  is expensive to reverse.
 
 ## Commands
 
