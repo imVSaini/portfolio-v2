@@ -33,6 +33,7 @@ export function SmoothScroll() {
     }
 
     const locomotive = new LocomotiveScroll({
+      autoStart: false,
       lenisOptions: { lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.95, anchors: false },
       scrollCallback: ({ scroll, direction, progress }) => {
         ScrollTrigger.update();
@@ -42,7 +43,7 @@ export function SmoothScroll() {
       destroyCustomTicker: (render) => gsap.ticker.remove(render),
     });
     gsap.ticker.lagSmoothing(0);
-    locomotive.stop();
+    locomotive.lenisInstance?.stop();
     const stopWaiting = whenIntroDone(() => locomotive.start());
 
     useScroll.setState({

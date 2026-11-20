@@ -58,10 +58,6 @@ test.describe("intro on the first visit", () => {
   });
 
   test("holds the page still until it is done", { tag: "@desktop" }, async ({ page }) => {
-    test.fail(
-      true,
-      "SmoothScroll stops Locomotive before it auto-starts on the next frame, so the stop is lost",
-    );
     const { status } = getParts(page);
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(status).toHaveText("Loading");
@@ -71,6 +67,10 @@ test.describe("intro on the first visit", () => {
     await page.waitForTimeout(300);
 
     expect(await scrollY(page)).toBe(0);
+
+    await expectHandedOver(page);
+    await page.mouse.wheel(0, 900);
+    await expect.poll(() => scrollY(page)).toBeGreaterThan(0);
   });
 
   test("leaves a working page behind", async ({ page, layout }) => {
