@@ -222,7 +222,7 @@ test.describe("post code samples", () => {
       const button = figures.nth(index).getByRole("button");
 
       await expect(button).toHaveText("Copy");
-      await button.click();
+      await clickWhenSettled(button);
 
       await expect(button).toHaveText("Copied");
       expect(await clipboard.read()).toBe(sample.code);
@@ -250,7 +250,13 @@ test.describe("post code samples", () => {
     await page.addInitScript(() => {
       Object.defineProperty(navigator, "clipboard", {
         configurable: true,
-        value: { writeText: () => Promise.reject(new Error("denied")) },
+        value: {
+          writeText: () => {
+            const root = document.documentElement;
+            root.dataset.copyAttempts = String(Number(root.dataset.copyAttempts ?? 0) + 1);
+            return Promise.reject(new Error("denied"));
+          },
+        },
       });
     });
     await visit(PATH);
@@ -260,7 +266,8 @@ test.describe("post code samples", () => {
       .first()
       .getByRole("button");
 
-    await button.click();
+    await clickWhenSettled(button);
+    await expect(page.locator("html")).toHaveAttribute("data-copy-attempts", "1");
     await page.waitForTimeout(500);
 
     await expect(button).toHaveText("Copy");
@@ -353,7 +360,7 @@ test.describe("post sharing", () => {
     const button = page.getByRole("button", { name: "Copy link" });
 
     await expect(button.locator("[aria-live]")).toHaveText("");
-    await button.click();
+    await clickWhenSettled(button);
 
     await expect(button.locator("[aria-live]")).toHaveText("Copied");
     expect(await clipboard.read()).toBe(`${site.url}${PATH}`);
