@@ -252,8 +252,8 @@ A change is not done until its tests pass.
 6. **Confirm** a failure that looks like flakiness by rerunning that spec on its own before
    writing it off, and say so in the report. Finish with `npm run check`.
 
-`e2e/http/budget.spec.ts` caps the gzipped JavaScript each page loads. Raise `SCRIPT_BUDGET_KB` only
-in the commit that needs it, and give the reason in the commit message.
+`e2e/http/script-budget.spec.ts` caps the gzipped JavaScript each page loads. Raise
+`SCRIPT_BUDGET_KB` only in the commit that needs it, and give the reason in the commit message.
 
 ### Projects
 

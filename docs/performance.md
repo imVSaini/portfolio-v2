@@ -5,9 +5,10 @@ levers are keeping code on the server and keeping the shared JavaScript small.
 
 ## Script budget
 
-`e2e/http/budget.spec.ts` reads every page's `<script src>` tags from the server HTML, downloads
-each script, gzips it and fails when a page's total goes over `SCRIPT_BUDGET_KB` (**330 KB**). It
-runs in the `http` project, so it needs no browser and runs on every push and pull request in CI.
+`e2e/http/script-budget.spec.ts` reads every page's `<script src>` tags from the server HTML,
+downloads each script, gzips it and fails when a page's total goes over `SCRIPT_BUDGET_KB`
+(**330 KB**). It runs in the `http` project, so it needs no browser and runs on every push and pull
+request in CI.
 
 Measured on 20 November 2026:
 

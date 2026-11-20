@@ -96,7 +96,7 @@ each page are the easiest to break without noticing.
 **Decision.**
 
 - ESLint `no-restricted-imports` enforces `data → lib, hooks, stores → components → app`.
-- `e2e/http/budget.spec.ts` fails any page above 330 KB of gzipped script, in CI.
+- `e2e/http/script-budget.spec.ts` fails any page above 330 KB of gzipped script, in CI.
 - `typedRoutes` makes a link to a missing route a type error.
 - `buildPageMetadata()`, `getPostPath()` and `getCaseStudyPath()` are the only ways pages build
   metadata and article URLs.
