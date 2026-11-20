@@ -1,6 +1,6 @@
 import { useId, type ReactNode } from "react";
 
-import { ArrowHead, Label } from "@/components/article/ArtParts";
+import { ArrowHead, barPath, Label } from "@/components/article/ArtParts";
 import { cn } from "@/lib/cn";
 
 /*
@@ -30,6 +30,17 @@ const ICONS = {
   layout: "M3 4h18v16H3z M3 9h18 M9 9v11",
   globe: "M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18Z M3 12h18 M12 3c3 3 3 15 0 18 M12 3c-3 3-3 15 0 18",
   layers: "M12 3l9 5-9 5-9-5z M3 13l9 5 9-5",
+  users:
+    "M9 11a4 4 0 1 0 0-8a4 4 0 0 0 0 8Z M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7 M16 3.5a4 4 0 0 1 0 7.5 M18 14.5c2.4.9 4 3.3 4 6.5",
+  flag: "M5 21V4 M5 4h11l-2 4 2 4H5",
+  branch:
+    "M6 3v12 M6 21a3 3 0 1 0 0-6a3 3 0 0 0 0 6Z M18 9a3 3 0 1 0 0-6a3 3 0 0 0 0 6Z M18 9a9 9 0 0 1-9 9",
+  lock: "M5 11h14v10H5z M8 11V7a4 4 0 0 1 8 0v4",
+  clock: "M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18Z M12 7v5l3 3",
+  doc: "M6 3h9l4 4v14H6z M14 3v5h5 M9 13h7 M9 17h7",
+  spark: "M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z",
+  cloud: "M7 18a5 5 0 1 1 .9-9.9A6 6 0 0 1 19 10a4 4 0 0 1 0 8z",
+  check: "M5 12l5 5 9-10",
 } as const;
 
 type SubProps = {
@@ -162,7 +173,7 @@ export function Wire({ d, dashed = false, className, children }: WireProps) {
   );
 }
 
-function DownHead({ x, y }: { x: number; y: number }) {
+export function DownHead({ x, y }: { x: number; y: number }) {
   return <path d={`M${x - 7} ${y - 9} L${x} ${y} L${x + 7} ${y - 9}`} />;
 }
 
@@ -225,6 +236,168 @@ export function Graph({ nodes, links }: { nodes: NodeSpec[]; links: LinkSpec[] }
         <Link key={`${link.from}-${link.to}`} nodes={nodes} link={link} />
       ))}
     </>
+  );
+}
+
+/** A drawing and the height of its 720-wide canvas. */
+export type DiagramArt = { height: number; Art: () => ReactNode };
+
+type BarProps = {
+  x: number;
+  w: number;
+  h: number;
+  /** Baseline the bar grows up from. */
+  axis: number;
+  r?: number;
+  className?: string;
+};
+
+export function Bar({ x, w, h, axis, r = 6, className = PANEL }: BarProps) {
+  return (
+    <path
+      data-d="rise"
+      d={barPath({ x, top: axis - h, bottom: axis - 0.75, w, r })}
+      strokeWidth={1.5}
+      strokeLinecap="butt"
+      className={className}
+    />
+  );
+}
+
+type PanelProps = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  title: string;
+  meta?: string;
+  accent?: boolean;
+};
+
+/** A card with a title row, for one stage, state or side of a comparison. */
+export function Panel({ x, y, w, h, title, meta, accent = false }: PanelProps) {
+  return (
+    <g data-d="node">
+      <rect
+        x={x}
+        y={y}
+        width={w}
+        height={h}
+        rx={12}
+        strokeWidth={1.5}
+        className={accent ? PANEL_ACCENT : PANEL}
+      />
+      <Label x={x + 16} y={y + 23.5} size={10}>
+        {title}
+      </Label>
+      {meta && (
+        <Label x={x + w - 16} y={y + 23.5} anchor="end" size={10}>
+          {meta}
+        </Label>
+      )}
+      <path d={`M${x} ${y + 40} H${x + w}`} strokeWidth={1.5} className="stroke-line-strong" />
+    </g>
+  );
+}
+
+type ZoneProps = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  label: string;
+  meta?: string;
+  className?: string;
+};
+
+/** A dashed boundary around nodes that share a host, a team or a fate. */
+export function Zone({ x, y, w, h, label, meta, className }: ZoneProps) {
+  return (
+    <g data-d="fade" className={className}>
+      <rect
+        x={x}
+        y={y}
+        width={w}
+        height={h}
+        rx={14}
+        strokeWidth={1.5}
+        strokeDasharray="5 5"
+        className={cn(!className && "stroke-line-strong")}
+      />
+      <Label x={x + 14} y={y + 20} size={10}>
+        {label}
+      </Label>
+      {meta && (
+        <Label x={x + w - 14} y={y + 20} anchor="end" size={10}>
+          {meta}
+        </Label>
+      )}
+    </g>
+  );
+}
+
+type NoteProps = {
+  x: number;
+  y: number;
+  anchor?: "start" | "middle" | "end";
+  children: string;
+};
+
+/** A short label that fades in with the drawing. */
+export function Note({ x, y, anchor = "start", children }: NoteProps) {
+  return (
+    <g data-d="fade">
+      <Label x={x} y={y} anchor={anchor} size={10}>
+        {children}
+      </Label>
+    </g>
+  );
+}
+
+/** A sentence of explanation, set smaller and muted. */
+export function Remark({ x, y, anchor = "start", children }: NoteProps) {
+  return (
+    <g data-d="fade">
+      <Sub x={x} y={y} anchor={anchor}>
+        {children}
+      </Sub>
+    </g>
+  );
+}
+
+type ChipProps = {
+  x: number;
+  y: number;
+  w: number;
+  label: string;
+  tone?: "plain" | "accent" | "red" | "ghost";
+};
+
+const CHIP_TONES = {
+  plain: PANEL,
+  accent: "fill-accent stroke-accent",
+  red: "fill-red/15 stroke-red",
+  ghost: "fill-none stroke-line-strong",
+} as const;
+
+/** A pill with a short uppercase label, for a status, a value or a step. */
+export function Chip({ x, y, w, label, tone = "plain" }: ChipProps) {
+  return (
+    <g data-d="node" className={cn(tone === "accent" && "text-faded-black")}>
+      <rect
+        x={x}
+        y={y}
+        width={w}
+        height={24}
+        rx={12}
+        strokeWidth={1.5}
+        {...(tone === "ghost" && { strokeDasharray: "5 5" })}
+        className={CHIP_TONES[tone]}
+      />
+      <Label x={x + w / 2} y={y + 16} anchor="middle" size={9}>
+        {label}
+      </Label>
+    </g>
   );
 }
 

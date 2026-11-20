@@ -40,7 +40,7 @@ function renderBlock(block: TextBlock | DiagramBlock<string>) {
  * @example
  * ```ts
  * getPostMarkdownPath(post);
- * // => "/blog/system-design-is-trade-offs/index.md"
+ * // => "/blog/cell-based-architecture-blast-radius/index.md"
  * ```
  */
 export function getPostMarkdownPath(post: Post): `/${string}` {

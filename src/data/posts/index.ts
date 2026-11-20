@@ -1,11 +1,15 @@
-import { databasePerformance } from "@/data/posts/databasePerformance";
-import { deliveryPipeline } from "@/data/posts/deliveryPipeline";
-import { eventDriven } from "@/data/posts/eventDriven";
-import { frontendArchitecture } from "@/data/posts/frontendArchitecture";
-import { frontendPerformance } from "@/data/posts/frontendPerformance";
-import { kubernetesFit } from "@/data/posts/kubernetesFit";
-import { observability } from "@/data/posts/observability";
-import { productionApis } from "@/data/posts/productionApis";
+import { aiCodeReview } from "@/data/posts/aiCodeReview";
+import { architectureDecisions } from "@/data/posts/architectureDecisions";
+import { cellArchitecture } from "@/data/posts/cellArchitecture";
+import { durableExecution } from "@/data/posts/durableExecution";
+import { gracefulDegradation } from "@/data/posts/gracefulDegradation";
+import { inpResponsiveness } from "@/data/posts/inpResponsiveness";
+import { llmFeatures } from "@/data/posts/llmFeatures";
+import { measuringEngineering } from "@/data/posts/measuringEngineering";
+import { platformEngineering } from "@/data/posts/platformEngineering";
+import { postgresDefault } from "@/data/posts/postgresDefault";
+import { progressiveDelivery } from "@/data/posts/progressiveDelivery";
+import { scalingFrontends } from "@/data/posts/scalingFrontends";
 import type {
   Post,
   PostArtName,
@@ -13,8 +17,9 @@ import type {
   PostDiagramName,
   PostSource,
 } from "@/data/posts/schema";
-import { systemDesignTradeoffs } from "@/data/posts/systemDesignTradeoffs";
-import { technicalDebt } from "@/data/posts/technicalDebt";
+import { serverComponents } from "@/data/posts/serverComponents";
+import { supplyChainSecurity } from "@/data/posts/supplyChainSecurity";
+import { zeroDowntimeMigrations } from "@/data/posts/zeroDowntimeMigrations";
 
 export type { Post, PostArtName, PostBlock, PostDiagramName };
 
@@ -33,16 +38,21 @@ function readMinutes(source: PostSource) {
 }
 
 const sources: PostSource[] = [
-  systemDesignTradeoffs,
-  productionApis,
-  deliveryPipeline,
-  frontendArchitecture,
-  kubernetesFit,
-  databasePerformance,
-  frontendPerformance,
-  observability,
-  eventDriven,
-  technicalDebt,
+  cellArchitecture,
+  llmFeatures,
+  serverComponents,
+  supplyChainSecurity,
+  aiCodeReview,
+  postgresDefault,
+  durableExecution,
+  inpResponsiveness,
+  progressiveDelivery,
+  measuringEngineering,
+  zeroDowntimeMigrations,
+  gracefulDegradation,
+  scalingFrontends,
+  platformEngineering,
+  architectureDecisions,
 ];
 
 /** Newest first. The first post is featured on the blog index. */
