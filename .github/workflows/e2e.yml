@@ -13,6 +13,24 @@ permissions:
   contents: read
 
 jobs:
+  check:
+    name: Typecheck, lint and format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx next typegen
+
+      - run: npm run check
+
   version:
     name: Resolve Playwright version
     runs-on: ubuntu-latest
@@ -20,16 +38,52 @@ jobs:
     outputs:
       playwright: ${{ steps.lockfile.outputs.playwright }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - id: lockfile
         run: |
           version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")
           echo "playwright=$version" >> "$GITHUB_OUTPUT"
 
+  build:
+    name: Build
+    needs: version
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/playwright:v${{ needs.version.outputs.playwright }}-noble
+      options: --user 1001
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - uses: actions/cache@v6
+        with:
+          path: .next/cache
+          key: nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**', 'public/**', 'next.config.ts') }}
+          restore-keys: |
+            nextjs-${{ hashFiles('package-lock.json') }}-
+
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: next-build
+          path: |
+            .next
+            !.next/cache
+          include-hidden-files: true
+          retention-days: 1
+
   test:
     name: Playwright (${{ matrix.shard }}/4)
-    needs: version
+    needs: [version, build]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     container:
@@ -40,18 +94,25 @@ jobs:
       matrix:
         shard: [1, 2, 3, 4]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
 
       - run: npm ci
 
-      - run: npx playwright test --shard=${{ matrix.shard }}/4
+      - uses: actions/download-artifact@v8
+        with:
+          name: next-build
+          path: .next
 
-      - uses: actions/upload-artifact@v4
+      - run: npx playwright test --shard=${{ matrix.shard }}/4
+        env:
+          PLAYWRIGHT_PREBUILT: 1
+
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: blob-report-${{ matrix.shard }}
@@ -60,21 +121,21 @@ jobs:
 
   report:
     name: Merge reports
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && needs.test.result != 'skipped' }}
     needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
 
       - run: npm ci
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           path: all-blob-reports
           pattern: blob-report-*
@@ -82,8 +143,8 @@ jobs:
 
       - run: npx playwright merge-reports --reporter html ./all-blob-reports
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
-          name: playwright-report
+          name: playwright-report-attempt-${{ github.run_attempt }}
           path: playwright-report
           retention-days: 14

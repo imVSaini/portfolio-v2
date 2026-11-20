@@ -31,6 +31,8 @@ lsof -ti tcp:3200 | xargs kill
 ```
 
 Set `PLAYWRIGHT_BASE_URL` to run the suite against another deployment instead of a local build.
+Set `PLAYWRIGHT_PREBUILT=1` to skip `next build` and only run `next start` on an existing `.next`,
+as CI does.
 
 ## Projects
 
@@ -140,13 +142,22 @@ the test, not a regression. It is unresolved.
 
 `.github/workflows/e2e.yml` runs on pushes to `main` and on pull requests:
 
-- Four shards on `ubuntu-latest`, each running `npx playwright test --shard=N/4` inside the
-  official `mcr.microsoft.com/playwright:v<version>-noble` image. A first job reads the version
-  from `package-lock.json` so the image always matches the installed `@playwright/test`. The image
+- A `check` job runs `npx next typegen` (route types, without a build) and `npm run check`.
+- A `build` job runs `next build` once and uploads `.next`, without `.next/cache`, as the
+  `next-build` artifact. `.next/cache` is kept between runs with `actions/cache`, keyed on the
+  lockfile and the source, as the Next.js CI caching guide recommends. The build runs in the same
+  image as the shards so the paths recorded in `.next` match.
+- Four shards on `ubuntu-latest`, each downloading `next-build` and running
+  `npx playwright test --shard=N/4` with `PLAYWRIGHT_PREBUILT=1`, so the web server only runs
+  `next start`. Build and shards run inside the official
+  `mcr.microsoft.com/playwright:v<version>-noble` image. A first job reads the version from
+  `package-lock.json` so the image always matches the installed `@playwright/test`. The image
   carries the browsers and their system libraries, so there is no `playwright install --with-deps`
   step: that step once stalled on an apt mirror until the 30-minute job timeout cancelled the run.
-- In CI: two workers, two retries, `forbidOnly`, traces and video on the first retry. The `list`
-  reporter prints one line per test in the job log; without it the `github` and `blob` reporters
-  leave Playwright on its CI default, `dot`.
+- In CI: two workers, two retries, `forbidOnly`, traces and video on the first retry, and a
+  25-minute `globalTimeout` inside the 30-minute job timeout, so a stuck run still ends with a
+  report. The `list` reporter prints one line per test in the job log; without it the `github` and
+  `blob` reporters leave Playwright on its CI default, `dot`.
 - A final job merges the blob reports into one HTML report, kept for 14 days as the
-  `playwright-report` artifact.
+  `playwright-report-attempt-N` artifact (`N` is the run attempt, so a re-run does not collide).
+  It is skipped when the build fails and no shard ran.

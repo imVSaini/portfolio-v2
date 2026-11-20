@@ -101,7 +101,7 @@ the build. See [Testing](./testing.md#ci).
 
 Production is hosted on Vercel and fronted by Cloudflare, at `https://www.imvaibhav.com`.
 
-- Pull requests and pushes to `main` run the Playwright suite in CI.
+- Pull requests and pushes to `main` run `npm run check` and the Playwright suite in CI.
 - A deployment runs `next build`, which prerenders every page and the feeds. Nothing is rendered
   on demand afterwards, so any change, including content, needs a new deployment.
 - Content changes (a new post or case study) are code changes and ship the same way. Dates do not
