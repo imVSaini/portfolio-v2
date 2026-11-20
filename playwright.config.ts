@@ -3,6 +3,8 @@ import { defineConfig, devices } from "@playwright/test";
 const PORT = 3200;
 const IS_CI = Boolean(process.env.CI);
 const EXTERNAL_BASE_URL = process.env.PLAYWRIGHT_BASE_URL;
+const PREBUILT = Boolean(process.env.PLAYWRIGHT_PREBUILT);
+const START = `npm run start -- --port ${PORT}`;
 const BASE_URL = EXTERNAL_BASE_URL ?? `http://localhost:${PORT}`;
 const DESKTOP_ONLY = /@desktop/;
 const MOBILE_ONLY = /@mobile/;
@@ -12,6 +14,7 @@ export default defineConfig({
   outputDir: "./test-results",
   fullyParallel: true,
   forbidOnly: IS_CI,
+  failOnFlakyTests: IS_CI,
   retries: IS_CI ? 2 : 0,
   ...(IS_CI && { workers: 2 }),
   timeout: 30_000,
@@ -66,7 +69,7 @@ export default defineConfig({
   ],
   ...(!EXTERNAL_BASE_URL && {
     webServer: {
-      command: `npm run build && npm run start -- --port ${PORT}`,
+      command: PREBUILT ? START : `npm run build && ${START}`,
       url: BASE_URL,
       reuseExistingServer: !IS_CI,
       timeout: 240_000,

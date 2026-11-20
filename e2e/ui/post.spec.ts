@@ -115,6 +115,38 @@ test.describe("post table of contents", () => {
     );
   });
 
+  test(
+    "lands on a section tapped while the contents panel is still opening",
+    { tag: "@mobile" },
+    async ({ page, visit }) => {
+      await visit(PATH);
+      const heading = await pickRoomyHeading(page);
+      const target = page.locator(`[id="${getHeadingId(heading)}"]`);
+      const toggle = page.getByRole("button", { name: "On this page" });
+      const contents = page.getByRole("navigation", { name: "On this page" });
+
+      const headerHeight = await page
+        .getByRole("banner")
+        .evaluate((element) => element.getBoundingClientRect().height);
+
+      await toggle.click();
+      await contents.getByRole("link", { name: heading }).click();
+
+      await expect
+        .poll(() =>
+          target.evaluate(
+            (element, expected) => Math.abs(element.getBoundingClientRect().top - expected),
+            headerHeight,
+          ),
+        )
+        .toBeLessThanOrEqual(2);
+      await expect(contents.getByRole("link", { name: heading })).toHaveAttribute(
+        "aria-current",
+        "location",
+      );
+    },
+  );
+
   test("stays beside the article on desktop", { tag: "@desktop" }, async ({ page, visit }) => {
     await visit(PATH);
     const contents = page.getByRole("navigation", { name: "On this page" });

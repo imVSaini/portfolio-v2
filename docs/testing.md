@@ -120,19 +120,26 @@ Import `test` and `expect` from `e2e/fixtures.ts` in UI specs.
 6. **Confirm** suspected flakiness by rerunning the spec on its own (`--repeat-each`) before writing
    it off, and say so. Finish with `npm run check`.
 
-## Known flaky test
+## Flaky tests fail CI
 
-`post.spec.ts` › "post table of contents › travels to a section, records it and moves focus there"
-fails about two runs in ten on `mobile-chrome`. The clicked link sometimes does not get
-`aria-current="location"`. It fails at the same rate on unchanged `main`, so it is a timing issue in
-the table of contents (`ArticleToc` marks the active heading with an `IntersectionObserver`) or in
-the test, not a regression. It is unresolved.
+CI retries a failed test twice, but `failOnFlakyTests` is on there, so a test that fails and then
+passes on retry still fails the run. A flaky test is a bug in the app or the test; fix it rather
+than retrying it. Reproduce one locally with `--repeat-each=20` on the project that failed.
 
 ## CI
 
-`.github/workflows/e2e.yml` runs on pushes to `main` and on pull requests:
+`.github/workflows/ci.yml` runs on pushes to `main` and on pull requests:
 
-- Four shards on `ubuntu-latest`, each running `npx playwright test --shard=N/4`.
-- In CI: two workers, two retries, `forbidOnly`, traces and video on the first retry.
+- The `build` job runs `next build` once and uploads `.next` (without its cache) as an artifact.
+- Four `e2e` shards download that build and run `npx playwright test --shard=N/4` with
+  `PLAYWRIGHT_PREBUILT=1`, which makes the web server skip the build and only run `next start`.
+- In CI: two workers, two retries, `forbidOnly`, `failOnFlakyTests`, traces and video on the
+  first retry.
 - A final job merges the blob reports into one HTML report, kept for 14 days as the
   `playwright-report` artifact.
+
+`.github/workflows/production.yml` runs every night (and on demand) against the live site with
+`PLAYWRIGHT_BASE_URL=https://www.imvaibhav.com`: the whole `http` project, then `smoke.spec.ts` on
+all five browser and device projects (every page loads, hydrates and scrolls through with no
+console errors or failed requests, and missing routes return their own 404). It catches what a build cannot, such as CDN, certificate or asset-bucket
+problems, including ones that only affect one browser.

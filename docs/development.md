@@ -8,7 +8,8 @@ npx playwright install          # browsers for the end-to-end tests
 npm run dev                     # http://localhost:3000
 ```
 
-CI uses the current Node.js LTS. There are no environment variables to set: site URLs live in
+Use the Node.js version in `.nvmrc` (26); CI reads the same file. There are no environment
+variables to set: site URLs live in
 `src/data/site.ts`, and `BUILD_YEAR` is injected by `next.config.ts`.
 
 ## Commands
@@ -85,16 +86,40 @@ TypeScript and JavaScript, and `prettier --write` on JSON, CSS and Markdown.
 
 ## Continuous integration
 
-`.github/workflows/e2e.yml` runs the full Playwright suite on every push to `main` and every pull
-request, in four shards, then merges the reports. The suite includes the metadata limits, the
-no-JavaScript document checks and the per-page script budget, so a regression in any of them fails
-the build. See [Testing](./testing.md#ci).
+`.github/workflows/ci.yml` runs on every push to `main` and every pull request:
+
+| Job       | Does                                                                                |
+| --------- | ----------------------------------------------------------------------------------- |
+| `quality` | `npm run check` (types, ESLint, Prettier) and commitlint on the pushed commits      |
+| `build`   | One `next build`, with `.next/cache` restored between runs, uploaded as an artifact |
+| `e2e`     | The Playwright suite in four shards against that build                              |
+| `report`  | Merges the shard reports into one HTML report                                       |
+
+`next build` no longer runs ESLint in Next.js 16, so the `quality` job is the only place lint and
+formatting are enforced for every commit; the local `pre-commit` hook only checks staged files and
+can be skipped.
+
+Supply chain:
+
+- Every action is pinned to a full commit SHA, with the release in a trailing comment. A moved or
+  hijacked tag cannot change what runs.
+- Checkouts use `persist-credentials: false`, and workflows only get `contents: read`.
+- Dependabot (`.github/dependabot.yml`) opens weekly pull requests for npm packages (minor and patch
+  grouped) and for the pinned actions. Their commit bodies do not follow commitlint's line limit,
+  so the commit-message step skips them.
+
+`.github/workflows/production.yml` checks the live site every night. See
+[Testing](./testing.md#ci).
 
 ## Deployment
 
 Production is hosted on Vercel and fronted by Cloudflare, at `https://www.imvaibhav.com`.
 
-- Pull requests and pushes to `main` run the Playwright suite in CI.
+- Pushes to `main` and pull requests run the CI workflow.
+- Production deployments should wait for CI. In the Vercel project, open **Settings → Deployment
+  Checks**, add **GitHub** as the provider and select the `CI` workflow as required. A production
+  deployment is then held until it passes, and promoted automatically when it does.
+  **Force Promote** on the deployment page bypasses the checks in an emergency.
 - A deployment runs `next build`, which prerenders every page and the feeds. Nothing is rendered
   on demand afterwards, so any change, including content, needs a new deployment.
 - Content changes (a new post or case study) are code changes and ship the same way. Dates do not

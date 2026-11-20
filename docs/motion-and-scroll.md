@@ -100,7 +100,10 @@ useScroll.getState().scrollTo("#contact");
 ```
 
 The store's `scrollTo` jumps natively until Locomotive boots, then is replaced with an eased glide
-that offsets for the fixed header. `ScrollLink` also moves keyboard focus to the target and
+that offsets for the fixed header. Lenis fixes an element's destination when the glide starts, so
+if the layout above the target changes during the glide (a panel still opening, a late image), the
+scroll would stop short. When a glide to an element ends away from its target, one short corrective
+glide follows. `ScrollLink` also moves keyboard focus to the target and
 updates the URL hash, as native fragment navigation would (`scrollToAnchor` in `src/lib`).
 
 ## The intro

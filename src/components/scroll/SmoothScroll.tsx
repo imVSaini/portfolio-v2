@@ -46,13 +46,26 @@ export function SmoothScroll() {
     const stopWaiting = whenIntroDone(() => locomotive.start());
 
     useScroll.setState({
-      scrollTo: (target, options) =>
+      scrollTo: (target, options) => {
+        const offset = options?.offset ?? (typeof target === "number" ? 0 : HEADER_OFFSET);
+        const element =
+          typeof target === "string" ? document.querySelector<HTMLElement>(target) : target;
+        const easing = (t: number) => 1 - Math.pow(1 - t, 4);
+
         locomotive.scrollTo(target, {
-          offset: options?.offset ?? (typeof target === "number" ? 0 : HEADER_OFFSET),
+          offset,
           duration: 1.4,
           immediate: options?.immediate ?? false,
-          easing: (t) => 1 - Math.pow(1 - t, 4),
-        }),
+          easing,
+          ...(typeof element === "object" &&
+            element && {
+              onComplete: () => {
+                if (Math.abs(element.getBoundingClientRect().top + offset) <= 1) return;
+                locomotive.scrollTo(element, { offset, duration: 0.6, easing });
+              },
+            }),
+        });
+      },
     });
 
     // Webfonts change line boxes; re-measure every trigger once they land.

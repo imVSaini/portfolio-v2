@@ -22,6 +22,7 @@ type AppearanceState = AppearanceValues & {
 };
 
 function read<T extends string>(key: string, allowed: readonly T[], fallback: T): T {
+  if (typeof window === "undefined") return fallback;
   try {
     const value = localStorage.getItem(key);
     return allowed.includes(value as T) ? (value as T) : fallback;
