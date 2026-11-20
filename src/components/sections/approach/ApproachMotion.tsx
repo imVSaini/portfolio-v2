@@ -4,6 +4,9 @@ import { useRef, type ComponentPropsWithoutRef } from "react";
 
 import { DESKTOP_MOTION_QUERY, gsap, MOTION_QUERY, useGSAP } from "@/lib/gsap";
 
+/** Space kept between the header and the manifesto when it finishes lighting up on phones, in px. */
+const HEADER_GAP = 16;
+
 type ApproachMotionProps = ComponentPropsWithoutRef<"section">;
 
 /** The approach section element: scrubs the manifesto words in and stacks the principle cards. */
@@ -25,7 +28,21 @@ export function ApproachMotion({ children, ...props }: ApproachMotionProps) {
         const fill = gsap.timeline({
           scrollTrigger: desktop
             ? { trigger: block, start: "center center", end: "+=110%", pin: true, scrub: true }
-            : { trigger: block, start: "top 75%", end: "center center", scrub: true },
+            : {
+                trigger: block,
+                start: "top 75%",
+                end: () => {
+                  const top = block.getBoundingClientRect().top + window.scrollY;
+                  const paragraph = block.querySelector("[data-word]")?.closest("p") ?? block;
+                  const paragraphTop = paragraph.getBoundingClientRect().top + window.scrollY;
+                  const header = document.querySelector("header")?.offsetHeight ?? 0;
+                  return Math.min(
+                    top + block.offsetHeight / 2 - window.innerHeight / 2,
+                    paragraphTop - header - HEADER_GAP,
+                  );
+                },
+                scrub: true,
+              },
         });
         fill.fromTo(words, { opacity: 0.2 }, { opacity: 1, ease: "none", stagger: step }, 0);
         gsap.utils.toArray<HTMLElement>("[data-chip]").forEach((chip) => {
