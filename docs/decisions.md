@@ -7,13 +7,14 @@ old entry; mark it superseded and add a new one.
 Entries 1 to 3 were recorded on 20 November 2026, after the decisions were made. They describe
 what the code does and the trade-offs it carries, not the original discussion.
 
-| #   | Decision                                                                                       | Status   |
-| --- | ---------------------------------------------------------------------------------------------- | -------- |
-| 1   | [Content is typed TypeScript blocks](#1-content-is-typed-typescript-blocks)                    | Accepted |
-| 2   | [Every page is prerendered; CSP avoids nonces](#2-every-page-is-prerendered-csp-avoids-nonces) | Accepted |
-| 3   | [Locomotive Scroll runs on GSAP's ticker](#3-locomotive-scroll-runs-on-gsaps-ticker)           | Accepted |
-| 4   | [Animated sections stay on the server](#4-animated-sections-stay-on-the-server)                | Accepted |
-| 5   | [Architecture rules are enforced by tooling](#5-architecture-rules-are-enforced-by-tooling)    | Accepted |
+| #   | Decision                                                                                                               | Status   |
+| --- | ---------------------------------------------------------------------------------------------------------------------- | -------- |
+| 1   | [Content is typed TypeScript blocks](#1-content-is-typed-typescript-blocks)                                            | Accepted |
+| 2   | [Every page is prerendered; CSP avoids nonces](#2-every-page-is-prerendered-csp-avoids-nonces)                         | Accepted |
+| 3   | [Locomotive Scroll runs on GSAP's ticker](#3-locomotive-scroll-runs-on-gsaps-ticker)                                   | Accepted |
+| 4   | [Animated sections stay on the server](#4-animated-sections-stay-on-the-server)                                        | Accepted |
+| 5   | [Architecture rules are enforced by tooling](#5-architecture-rules-are-enforced-by-tooling)                            | Accepted |
+| 6   | [ESLint 10 runs the Next.js presets through a compat shim](#6-eslint-10-runs-the-nextjs-presets-through-a-compat-shim) | Accepted |
 
 ---
 
@@ -106,3 +107,31 @@ each page are the easiest to break without noticing.
 - Layer breaks, heavy dependencies and broken links fail `npm run check` or CI instead of review.
 - The budget sits about 3% above the heaviest page (322 KB). Raising it is a deliberate change in
   the commit that needs it, with the reason in the message.
+
+## 6. ESLint 10 runs the Next.js presets through a compat shim
+
+- Date: 21 November 2026
+
+**Context.** ESLint 9 reached end of life on 6 August 2026 and npm marks it deprecated.
+`eslint-config-next` supports ESLint 10 from 16.4.0, but it bundles `eslint-plugin-import` 2.32.0,
+whose `import/order` calls `sourceCode.getTokenOrCommentAfter()`. ESLint 10 removed that method, so
+the rule crashes the whole lint run as soon as it has an import to report. A clean tree hides it.
+The upstream fix (import-js/eslint-plugin-import#3230) is merged but not released.
+`eslint-plugin-react` and `eslint-plugin-jsx-a11y` also still cap their peer range at ESLint 9.
+
+**Decision.**
+
+- Run ESLint 10 and wrap the `eslint-config-next` presets in `fixupConfigRules()` from
+  `@eslint/compat`, the ESLint team's shim that restores the removed APIs for older plugins.
+- Keep `eslint-plugin-import` and every `import/*` rule name. `eslint-plugin-import-x` was the
+  alternative, but it renames every rule, needs its own resolver setup, and `eslint-config-next`
+  would still load the original plugin.
+
+**Consequences.**
+
+- Lint results match ESLint 9 rule for rule, autofix included. Lint time is unchanged.
+- `npm install` prints `ERESOLVE overriding peer dependency` warnings for the three plugins. They are
+  expected and do not fail `npm ci`.
+- Remove `@eslint/compat` and the wrapper once `eslint-config-next` ships plugin releases that
+  declare ESLint 10. Before removing it, lint a file with a misordered import: a clean tree passes
+  even while the rule is broken.
