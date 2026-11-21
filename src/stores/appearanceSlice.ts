@@ -1,9 +1,7 @@
-import { create } from "zustand";
-import { persist, type PersistStorage } from "zustand/middleware";
+import type { PersistStorage } from "zustand/middleware";
 
 import {
   ACCENTS,
-  applyAppearance,
   DEFAULTS,
   STORAGE_KEYS,
   THEMES,
@@ -13,11 +11,11 @@ import {
   type Tone,
 } from "@/lib/appearance";
 
-type AppearanceValues = { theme: Theme; accent: Accent; tone: Tone };
+import type { AppSlice } from "./index";
 
-const IS_BROWSER = typeof window !== "undefined";
+export type AppearanceValues = { theme: Theme; accent: Accent; tone: Tone };
 
-type AppearanceState = AppearanceValues & {
+export type AppearanceSlice = AppearanceValues & {
   setTheme: (theme: Theme) => void;
   setAccent: (accent: Accent) => void;
   setTone: (tone: Tone) => void;
@@ -32,20 +30,28 @@ function read<T extends string>(key: string, allowed: readonly T[], fallback: T)
   }
 }
 
+function sameAppearance(a: AppearanceValues, b: AppearanceValues) {
+  return a.theme === b.theme && a.accent === b.accent && a.tone === b.tone;
+}
+
+let stored: AppearanceValues | undefined;
+
 /**
  * Each preference lives under its own plain-string key (not one JSON blob) so the
  * pre-paint script in <head> can read them without parsing.
  */
-const splitStorage: PersistStorage<AppearanceValues> = {
-  getItem: () => ({
-    state: {
+export const splitStorage: PersistStorage<AppearanceValues> = {
+  getItem: () => {
+    stored = {
       theme: read(STORAGE_KEYS.theme, THEMES, DEFAULTS.theme),
       accent: read(STORAGE_KEYS.accent, ACCENTS, DEFAULTS.accent),
       tone: read(STORAGE_KEYS.tone, TONES, DEFAULTS.tone),
-    },
-    version: 0,
-  }),
+    };
+    return { state: stored, version: 0 };
+  },
   setItem: (_name, { state }) => {
+    if (stored && sameAppearance(stored, state)) return;
+    stored = { theme: state.theme, accent: state.accent, tone: state.tone };
     try {
       localStorage.setItem(STORAGE_KEYS.theme, state.theme);
       localStorage.setItem(STORAGE_KEYS.accent, state.accent);
@@ -55,36 +61,26 @@ const splitStorage: PersistStorage<AppearanceValues> = {
     }
   },
   removeItem: () => {
+    stored = undefined;
     for (const key of Object.values(STORAGE_KEYS)) localStorage.removeItem(key);
   },
 };
 
 /**
- * The visitor's theme, accent and tone, saved to `localStorage` and applied to the document on
- * every change.
+ * The visitor's theme, accent and tone. The store persists them through `splitStorage` and
+ * applies them to the document whenever one changes.
+ *
+ * @returns The appearance slice of `useAppStore`.
  *
  * @example
  * ```ts
- * const setTheme = useAppearance((state) => state.setTheme);
+ * const setTheme = useAppStore((state) => state.setTheme);
  * setTheme("dark");
  * ```
  */
-export const useAppearance = create<AppearanceState>()(
-  persist(
-    (set) => ({
-      ...DEFAULTS,
-      setTheme: (theme) => set({ theme }),
-      setAccent: (accent) => set({ accent }),
-      setTone: (tone) => set({ tone }),
-    }),
-    {
-      name: "appearance",
-      storage: IS_BROWSER ? splitStorage : undefined,
-      partialize: ({ theme, accent, tone }) => ({ theme, accent, tone }),
-    },
-  ),
-);
-
-if (IS_BROWSER) {
-  useAppearance.subscribe(applyAppearance);
-}
+export const createAppearanceSlice: AppSlice<AppearanceSlice> = (set) => ({
+  ...DEFAULTS,
+  setTheme: (theme) => set({ theme }),
+  setAccent: (accent) => set({ accent }),
+  setTone: (tone) => set({ tone }),
+});

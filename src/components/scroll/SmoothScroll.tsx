@@ -4,8 +4,7 @@ import LocomotiveScroll from "locomotive-scroll";
 import { useEffect } from "react";
 
 import { gsap, MOTION_QUERY, ScrollTrigger } from "@/lib/gsap";
-import { whenIntroDone } from "@/stores/intro";
-import { useScroll } from "@/stores/scroll";
+import { useAppStore, whenIntroDone } from "@/stores";
 
 const HEADER_OFFSET = -72;
 
@@ -20,7 +19,7 @@ export function SmoothScroll() {
 
     const onNativeScroll = () => {
       const limit = root.scrollHeight - window.innerHeight;
-      useScroll.getState().report({
+      useAppStore.getState().report({
         scroll: window.scrollY,
         direction: 0,
         progress: limit > 0 ? window.scrollY / limit : 0,
@@ -37,7 +36,7 @@ export function SmoothScroll() {
       lenisOptions: { lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.95, anchors: false },
       scrollCallback: ({ scroll, direction, progress }) => {
         ScrollTrigger.update();
-        useScroll.getState().report({ scroll, direction, progress });
+        useAppStore.getState().report({ scroll, direction, progress });
       },
       initCustomTicker: (render) => gsap.ticker.add(render),
       destroyCustomTicker: (render) => gsap.ticker.remove(render),
@@ -46,7 +45,7 @@ export function SmoothScroll() {
     locomotive.lenisInstance?.stop();
     const stopWaiting = whenIntroDone(() => locomotive.start());
 
-    useScroll.setState({
+    useAppStore.setState({
       scrollTo: (target, options) =>
         locomotive.scrollTo(target, {
           offset: options?.offset ?? (typeof target === "number" ? 0 : HEADER_OFFSET),

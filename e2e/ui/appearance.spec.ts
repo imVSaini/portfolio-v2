@@ -2,7 +2,7 @@ import type { Locator, Page } from "@playwright/test";
 
 import { ACCENTS, DEFAULTS, STORAGE_KEYS, THEME_COLORS } from "@/lib/appearance";
 
-import { expect, openAppearance, openSiteNav, test } from "../fixtures";
+import { expect, openAppearance, openSiteNav, scrollToEnd, test } from "../fixtures";
 
 type Applied = {
   dark: boolean;
@@ -55,6 +55,16 @@ async function readStored(page: Page): Promise<Stored> {
   );
 }
 
+async function readProgress(page: Page): Promise<number> {
+  return page
+    .locator('header > div[aria-hidden="true"]')
+    .first()
+    .evaluate((element) => {
+      const match = /scaleX\(([\d.]+)\)/.exec(element.style.transform);
+      return match?.[1] === undefined ? -1 : Number(match[1]);
+    });
+}
+
 async function readColors(page: Page): Promise<{ accent: string; surface: string }> {
   return page.evaluate(() => {
     const probe = document.createElement("span");
@@ -105,6 +115,18 @@ test.describe("appearance", () => {
     await expect(
       page.getByRole("radiogroup", { name: "Accent color" }).getByRole("radio"),
     ).toHaveCount(ACCENTS.length);
+  });
+
+  test("scrolling and the intro never write the stored appearance", async ({ page, visit }) => {
+    await visit("/");
+    await scrollToEnd(page);
+    await expect.poll(() => readProgress(page)).toBeGreaterThan(0.999);
+    expect(await readStored(page)).toEqual(UNSET);
+
+    await page.evaluate((key) => localStorage.setItem(key, "dark"), STORAGE_KEYS.theme);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect.poll(() => readProgress(page)).toBe(0);
+    expect(await readStored(page)).toEqual({ ...UNSET, theme: "dark" });
   });
 
   test("switches between light, dark and the two dark tones", async ({ page, visit, layout }) => {

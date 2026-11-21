@@ -1,12 +1,13 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 import { useIsHydrated } from "@/hooks/useIsHydrated";
 import { usePrefersDark } from "@/hooks/usePrefersDark";
 import { ACCENTS, type Accent, type Theme, type Tone } from "@/lib/appearance";
 import { cn } from "@/lib/cn";
-import { useAppearance } from "@/stores/appearance";
+import { useAppStore } from "@/stores";
 
 import { CheckIcon, MonitorIcon, MoonIcon, SunIcon } from "./icons";
 import { SegmentedControl, type SegmentedOption } from "./SegmentedControl";
@@ -40,7 +41,16 @@ function Group({ label, children }: { label: string; children: ReactNode }) {
 
 export function AppearanceControls({ className }: { className?: string }) {
   const hydrated = useIsHydrated();
-  const { theme, accent, tone, setTheme, setAccent, setTone } = useAppearance();
+  const { theme, accent, tone, setTheme, setAccent, setTone } = useAppStore(
+    useShallow(({ theme, accent, tone, setTheme, setAccent, setTone }) => ({
+      theme,
+      accent,
+      tone,
+      setTheme,
+      setAccent,
+      setTone,
+    })),
+  );
   const systemDark = usePrefersDark();
   const isDark = hydrated && (theme === "system" ? systemDark : theme === "dark");
 

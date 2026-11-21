@@ -6,7 +6,7 @@ import { wordmark } from "@/components/ui/wordmark";
 import { useIsHydrated } from "@/hooks/useIsHydrated";
 import { cn } from "@/lib/cn";
 import { gsap, useGSAP } from "@/lib/gsap";
-import { useIntro } from "@/stores/intro";
+import { useAppStore } from "@/stores";
 
 /** Seconds the proof rests in outline after first paint. */
 const HOLD_S = 0.2;
@@ -46,7 +46,7 @@ export function Preloader() {
       if (!el || !mark || !sheet || !rule || !bar || !count || !contextSafe) return;
       if (!fresh || !root.classList.contains("motion-ok") || root.dataset.intro !== "play") {
         gsap.set(el, { display: "none" });
-        useIntro.getState().finish();
+        useAppStore.getState().finish();
         return;
       }
 
@@ -88,7 +88,7 @@ export function Preloader() {
         root.removeAttribute("data-intro");
         setInert(false);
         setStatus("Loaded");
-        useIntro.getState().finish(handoff);
+        useAppStore.getState().finish(handoff);
       };
 
       const leave = contextSafe(() => {

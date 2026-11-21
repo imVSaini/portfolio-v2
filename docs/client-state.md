@@ -3,39 +3,68 @@
 The site has very little client state, and none of it comes from a server. It falls into three
 kinds: visitor preferences, page-wide motion state, and values that only exist in the browser.
 
-## Stores
+## The store
 
-Shared client state uses zustand stores in `src/stores`, created with `create<State>()(...)`.
-Components select only the slice they need:
+Shared client state lives in one zustand store, `useAppStore` (`src/stores/index.ts`), built with
+the [slices pattern](https://zustand.docs.pmnd.rs/learn/guides/slices-pattern). Each feature owns
+one file holding its state type, its initial values and its actions:
 
-```ts
-const scrolled = useScroll((s) => s.scrolled);
+```
+src/stores/
+  index.ts            useAppStore, AppStore, AppSlice, whenIntroDone()
+  appearanceSlice.ts  theme, accent, tone; the split localStorage adapter
+  introSlice.ts       preloader handover
+  logoSlice.ts        header logo fold
+  scrollSlice.ts      scroll state and scrollTo()
 ```
 
-| Store           | State                                             | Written by                 | Read by                                          |
-| --------------- | ------------------------------------------------- | -------------------------- | ------------------------------------------------ |
-| `useAppearance` | `theme`, `accent`, `tone` and their setters       | Appearance menu and drawer | `AppearanceControls`; applies itself to `<html>` |
-| `useIntro`      | `done`, `handoff`, `finish()`                     | `Preloader`                | `whenIntroDone()` in hero and reveal motion      |
-| `useScroll`     | `direction`, `scrolled`, `progress`, `scrollTo()` | `SmoothScroll`             | `Header`, `ScrollProgress`, `ScrollLink`         |
-| `useLogo`       | `folded`                                          | Header `Logo` on scroll    | The mobile menu's copy of the logo               |
+| Slice        | State                                             | Written by                 | Read by                                     |
+| ------------ | ------------------------------------------------- | -------------------------- | ------------------------------------------- |
+| `appearance` | `theme`, `accent`, `tone` and their setters       | Appearance menu and drawer | `AppearanceControls`; applied to `<html>`   |
+| `intro`      | `done`, `handoff`, `finish()`                     | `Preloader`                | `whenIntroDone()` in hero and reveal motion |
+| `scroll`     | `direction`, `scrolled`, `progress`, `scrollTo()` | `SmoothScroll`             | `Header`, `ScrollProgress`, `ScrollLink`    |
+| `logo`       | `folded`                                          | Header `Logo` on scroll    | The mobile menu's copy of the logo          |
+
+Components select one field per call, or several through `useShallow`. The store changes on
+every scroll frame, so `useAppStore()` with no selector would re-render on every frame:
+
+```ts
+const scrolled = useAppStore((s) => s.scrolled);
+const { theme, setTheme } = useAppStore(useShallow(({ theme, setTheme }) => ({ theme, setTheme })));
+```
 
 Outside React (inside GSAP callbacks or helpers), read and write with `getState()`:
 
 ```ts
-useScroll.getState().scrollTo("#work");
+useAppStore.getState().scrollTo("#work");
 const stopWaiting = whenIntroDone(() => intro.play());
 ```
 
+### Adding a slice
+
+1. Create `src/stores/thingSlice.ts` exporting `type ThingSlice` and
+   `createThingSlice: AppSlice<ThingSlice>`. `AppSlice` types `set` and `get` against the whole
+   store, so a slice can read another slice's state.
+2. Add `ThingSlice` to `AppStore` and spread `createThingSlice(...a)` into `useAppStore`.
+3. Keep field names distinct across slices: the store is flat, and a repeated key silently
+   overwrites the earlier slice's.
+4. Put middleware on the combined store only. Zustand warns that middleware inside a slice can
+   lead to unexpected issues.
+
 ### Appearance
 
-`useAppearance` persists through zustand's `persist` middleware with a custom storage that writes
+`useAppStore` persists the appearance values through zustand's `persist` middleware
+(`partialize` keeps only `theme`, `accent` and `tone`) with a custom storage that writes
 each value under its own plain-string key (`vks-theme`, `vks-accent`, `vks-tone`) instead of one
 JSON blob, so the pre-paint script can read them without parsing. Values are validated against
 `THEMES`, `ACCENTS` and `TONES` on read; anything else falls back to the defaults
 (`system`, `gold`, `deep`). Blocked storage (private mode) keeps the choice in memory.
 
-On every change the store calls `applyAppearance()`, which toggles `.dark`, sets `data-accent`
-and `data-tone`, and updates `<meta name="theme-color">`.
+`persist` calls the storage after every change to the store, scroll reports included, so the
+adapter remembers what it last wrote and skips writes when the three values have not changed.
+
+When `theme`, `accent` or `tone` changes, the store calls `applyAppearance()`, which toggles
+`.dark`, sets `data-accent` and `data-tone`, and updates `<meta name="theme-color">`.
 
 ### Why there is an inline script
 

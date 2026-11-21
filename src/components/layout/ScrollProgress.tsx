@@ -1,9 +1,9 @@
 "use client";
 
-import { useScroll } from "@/stores/scroll";
+import { useAppStore } from "@/stores";
 
 export function ScrollProgress() {
-  const progress = useScroll((s) => s.progress);
+  const progress = useAppStore((s) => s.progress);
   return (
     <div
       aria-hidden="true"

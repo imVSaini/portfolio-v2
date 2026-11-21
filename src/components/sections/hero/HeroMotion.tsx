@@ -3,7 +3,7 @@
 import { useRef, type ComponentPropsWithoutRef } from "react";
 
 import { gsap, MOTION_QUERY, useGSAP } from "@/lib/gsap";
-import { whenIntroDone } from "@/stores/intro";
+import { whenIntroDone } from "@/stores";
 
 type HeroMotionProps = ComponentPropsWithoutRef<"section">;
 

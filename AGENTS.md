@@ -22,7 +22,7 @@ for accessible primitives.
 - `src/data`: typed site content (projects, experience, skills, contact, site meta, blog posts,
   case studies).
 - `src/lib`: shared helpers (`cn`, the `gsap` setup, appearance).
-- `src/hooks`, `src/stores`: React hooks and zustand stores.
+- `src/hooks`, `src/stores`: React hooks and the zustand store (one slice file per feature).
 - `docs`: how the system works (architecture, content, SEO, design system, motion, state,
   performance, testing, development) and the decision log. Update the matching guide with any
   change that alters how something works, and add a `docs/decisions.md` entry for any change that
@@ -54,7 +54,7 @@ The compiler runs `strict` plus `noUncheckedIndexedAccess`, `exactOptionalProper
   `(typeof THEMES)[number]` when the values are also needed at runtime.
 - No `any`, `@ts-ignore` or `@ts-expect-error`. Take `unknown` and narrow it.
 - Avoid `as`. It is fine only after a runtime check has proven the type (see `read()` in
-  `src/stores/appearance.ts`). Never use `!` to silence a possible `undefined`.
+  `src/stores/appearanceSlice.ts`). Never use `!` to silence a possible `undefined`.
 - Index access (`list[0]`, `record[key]`) can be `undefined`. Handle it with a guard, `?.` or `??`.
 - With `exactOptionalPropertyTypes`, `prop?: T` does not accept an explicit `undefined`. Omit the
   key, or spread it in conditionally: `...(on === "scroll" && { scrollTrigger })`.
@@ -136,8 +136,12 @@ guide in `node_modules/next/dist/docs/` before using a Next.js API you have not 
 
 - Custom hooks live in `src/hooks`. Subscribe to browser state with `useSyncExternalStore`
   (see `usePrefersReducedMotion`).
-- Shared client state uses zustand stores in `src/stores`, created with `create<State>()(...)`.
-  Select only the slice a component needs.
+- Shared client state lives in one zustand store, `useAppStore` in `src/stores/index.ts`,
+  combined from one slice per feature (`appearanceSlice.ts`, `scrollSlice.ts`, ...). A new feature
+  adds a `createThingSlice` typed `AppSlice<ThingSlice>` and spreads it into the store. Middleware
+  (`persist`) goes on the combined store only, never inside a slice.
+- Select one field per call, or wrap a multi-field selector in `useShallow`. Never call
+  `useAppStore()` without a selector: the store changes on every scroll frame.
 
 ### Next.js specifics
 
@@ -218,8 +222,8 @@ There is no `tailwind.config`. The design system lives in `src/app/globals.css` 
 - Content must be readable and usable with motion off. Do not hide something in CSS that only an
   animation can reveal unless the reduced-motion path shows it too.
 - For motion GSAP does not drive (CSS, SVG), respect `usePrefersReducedMotion`.
-- Scroll programmatically through `useScroll().scrollTo` or the `ScrollLink` component, never
-  `window.scrollTo` directly. The store swaps in the smooth scroller when it boots.
+- Scroll programmatically through `useAppStore.getState().scrollTo` or the `ScrollLink` component,
+  never `window.scrollTo` directly. The store swaps in the smooth scroller when it boots.
 - Animate `transform` and `opacity`. Avoid animating layout properties.
 
 ## End-to-end tests (Playwright)

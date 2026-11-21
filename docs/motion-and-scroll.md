@@ -91,12 +91,12 @@ frame loop. `gsap.ticker.lagSmoothing(0)` keeps them in step.
 
 ### Scrolling from code
 
-Never call `window.scrollTo`. Use `useScroll().scrollTo(target, { offset, immediate })` or the
+Never call `window.scrollTo`. Use `useAppStore.getState().scrollTo(target, { offset, immediate })` or the
 `ScrollLink` component:
 
 ```tsx
 <ScrollLink href="#work">Work</ScrollLink>;
-useScroll.getState().scrollTo("#contact");
+useAppStore.getState().scrollTo("#contact");
 ```
 
 The store's `scrollTo` jumps natively until Locomotive boots, then is replaced with an eased glide
@@ -115,7 +115,7 @@ When it plays:
    `html[data-intro="play"]`. Later loads in the session skip it, and so does a session that
    started on another page.
 3. While it plays, the header, `main` and footer are `inert`.
-4. It ends by calling `useIntro.getState().finish(handoff)`. Page motion that must wait, such as
+4. It ends by calling `useAppStore.getState().finish(handoff)`. Page motion that must wait, such as
    the hero fade and `RevealText on="load"`, uses `whenIntroDone()`.
 
 Safety net: if `data-motion-ready` has not appeared four seconds after first paint, the pre-paint

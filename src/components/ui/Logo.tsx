@@ -4,8 +4,7 @@ import { useId, useRef } from "react";
 
 import { cn } from "@/lib/cn";
 import { gsap, MOTION_QUERY, ScrollTrigger, useGSAP } from "@/lib/gsap";
-import { useIntro, whenIntroDone } from "@/stores/intro";
-import { useLogo } from "@/stores/logo";
+import { useAppStore, whenIntroDone } from "@/stores";
 
 import { wordmark } from "./wordmark";
 
@@ -54,7 +53,7 @@ export function Logo({ condense = false, mirror = false, className }: LogoProps)
         const stopWaiting = mirror
           ? () => {}
           : whenIntroDone(() => {
-              if (useIntro.getState().handoff) rise.progress(1);
+              if (useAppStore.getState().handoff) rise.progress(1);
               else rise.play();
             });
 
@@ -97,7 +96,7 @@ export function Logo({ condense = false, mirror = false, className }: LogoProps)
         };
         const foldTo = (on: boolean) => {
           settle();
-          useLogo.getState().setFolded(on);
+          useAppStore.getState().setFolded(on);
           if (on) fold.play();
           else fold.reverse();
         };
@@ -111,12 +110,12 @@ export function Logo({ condense = false, mirror = false, className }: LogoProps)
               onLeaveBack: () => foldTo(false),
               onRefresh: (self) => {
                 if (self.progress <= 0) return;
-                useLogo.getState().setFolded(true);
+                useAppStore.getState().setFolded(true);
                 fold.play();
               },
             })
           : null;
-        const startFolded = mirror && useLogo.getState().folded;
+        const startFolded = mirror && useAppStore.getState().folded;
         if (startFolded) fold.progress(1);
         const isFolded = () => startFolded || (folded?.progress ?? 0) > 0;
 

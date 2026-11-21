@@ -12,7 +12,7 @@ import { contact } from "@/data/contact";
 import { nav, site } from "@/data/site";
 import { cn } from "@/lib/cn";
 import { getHomeHref } from "@/lib/nav";
-import { useScroll } from "@/stores/scroll";
+import { useAppStore } from "@/stores";
 
 import { MobileMenu } from "./MobileMenu";
 import { ScrollProgress } from "./ScrollProgress";
@@ -21,7 +21,7 @@ const NAV_LINK_CLASS_NAME =
   "group flex rounded-md px-3 py-2 font-display text-p4 font-medium tracking-wide uppercase";
 
 export function Header() {
-  const scrolled = useScroll((s) => s.scrolled);
+  const scrolled = useAppStore((s) => s.scrolled);
   const pathname = usePathname();
   const onHome = pathname === "/";
 

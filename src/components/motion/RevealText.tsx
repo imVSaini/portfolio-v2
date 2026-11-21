@@ -3,7 +3,7 @@
 import { useRef, type ElementType, type ReactNode } from "react";
 
 import { gsap, MOTION_QUERY, SplitText, useGSAP } from "@/lib/gsap";
-import { whenIntroDone } from "@/stores/intro";
+import { whenIntroDone } from "@/stores";
 
 type RevealTextProps = {
   as?: ElementType;

@@ -15,6 +15,7 @@ what the code does and the trade-offs it carries, not the original discussion.
 | 4   | [Animated sections stay on the server](#4-animated-sections-stay-on-the-server)                                        | Accepted |
 | 5   | [Architecture rules are enforced by tooling](#5-architecture-rules-are-enforced-by-tooling)                            | Accepted |
 | 6   | [ESLint 10 runs the Next.js presets through a compat shim](#6-eslint-10-runs-the-nextjs-presets-through-a-compat-shim) | Accepted |
+| 7   | [Client state is one store built from slices](#7-client-state-is-one-store-built-from-slices)                          | Accepted |
 
 ---
 
@@ -141,3 +142,36 @@ The upstream fix (import-js/eslint-plugin-import#3230) is merged but not release
 - Remove `@eslint/compat`, the wrapper and the three overrides together once `eslint-config-next`
   ships plugin releases that declare ESLint 10. Before removing it, lint a file with a misordered import: a clean tree passes
   even while the rule is broken.
+
+## 7. Client state is one store built from slices
+
+- Date: 21 November 2026
+
+**Context.** Client state lived in four separate zustand stores (`useAppearance`, `useIntro`,
+`useLogo`, `useScroll`), one file each. The alternative layout seen in other projects splits each
+store by kind (`actions.ts`, `selectors.ts`, `state.ts`, `types.ts`), which spreads one feature
+across five files.
+
+**Decision.** One store, `useAppStore`, combined from one slice file per feature, following
+zustand's slices pattern and its advice that global state belongs in a single store. Each slice is
+an `AppSlice<Slice>` (a `StateCreator` typed against the whole store). `persist` wraps the combined
+store and `partialize` keeps only the appearance values.
+
+**Consequences.**
+
+- A feature's state, actions and types stay in one file; a new feature is one file plus two lines
+  in `index.ts`.
+- Every `set` notifies every subscriber, and `persist` calls the storage after every `set`,
+  including per-frame scroll reports. The appearance adapter skips unchanged writes, the
+  `applyAppearance` subscriber compares the three values, and components must select one field or
+  use `useShallow`. `e2e/ui/appearance.spec.ts` checks that scrolling never writes storage.
+- The store is flat, so field names must be unique across slices.
+- The store stays a module-level `create()` store rather than zustand's Next.js per-request
+  provider. That guide guards against request data leaking between visitors through a server
+  module; this store holds only browser state, is never written during a server render, and is read
+  through `getState()` outside React (GSAP callbacks, `scrollToAnchor`, `whenIntroDone`), which a
+  context-scoped store would not allow. Revisit if server data ever seeds the store.
+- Slices type themselves with `[["zustand/persist", unknown]]`; the precise persisted type does not
+  infer through `create<AppStore>()(persist(...))`, which zustand's TypeScript guide anticipates.
+- Revisit if a slice needs its own middleware or lifecycle, for example a separately persisted
+  slice. That slice would move back to its own store.

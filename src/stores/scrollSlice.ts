@@ -1,8 +1,8 @@
-import { create } from "zustand";
+import type { AppSlice } from "./index";
 
 export type ScrollTarget = number | string | HTMLElement;
 
-type ScrollState = {
+export type ScrollSlice = {
   /** 1 = down, -1 = up. */
   direction: 1 | -1;
   /** True once the page has left the very top. */
@@ -33,12 +33,14 @@ function nativeScrollTo(target: ScrollTarget, options?: { offset?: number }) {
  * `scrollTo` jumps natively until the smooth scroller boots and replaces it, so always call it
  * rather than `window.scrollTo`.
  *
+ * @returns The scroll slice of `useAppStore`.
+ *
  * @example
  * ```ts
- * useScroll.getState().scrollTo("#work", { offset: -80 });
+ * useAppStore.getState().scrollTo("#work", { offset: -80 });
  * ```
  */
-export const useScroll = create<ScrollState>()((set, get) => ({
+export const createScrollSlice: AppSlice<ScrollSlice> = (set, get) => ({
   direction: 1,
   scrolled: false,
   progress: 0,
@@ -56,4 +58,4 @@ export const useScroll = create<ScrollState>()((set, get) => ({
       set({ direction: nextDirection, scrolled, progress });
     }
   },
-}));
+});

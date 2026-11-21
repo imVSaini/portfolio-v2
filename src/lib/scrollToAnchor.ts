@@ -1,4 +1,4 @@
-import { useScroll } from "@/stores/scroll";
+import { useAppStore } from "@/stores";
 
 /**
  * Scrolls to an in-page anchor and moves keyboard focus there, as native fragment navigation
@@ -13,7 +13,7 @@ import { useScroll } from "@/stores/scroll";
  */
 export function scrollToAnchor(href: `#${string}`): void {
   const toTop = href === "#top";
-  useScroll.getState().scrollTo(toTop ? 0 : href);
+  useAppStore.getState().scrollTo(toTop ? 0 : href);
 
   const target = toTop ? document.body : document.getElementById(href.slice(1));
   if (!target) return;

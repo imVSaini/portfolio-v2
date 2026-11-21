@@ -1,6 +1,6 @@
-import { create } from "zustand";
+import type { AppSlice } from "./index";
 
-type LogoState = {
+export type LogoSlice = {
   /** True while the header logo is folded to its monogram by scrolling. */
   folded: boolean;
   setFolded: (folded: boolean) => void;
@@ -9,12 +9,14 @@ type LogoState = {
 /**
  * The header logo's scroll fold, so copies of the logo (such as the mobile menu's) can match it.
  *
+ * @returns The logo slice of `useAppStore`.
+ *
  * @example
  * ```ts
- * const startFolded = useLogo.getState().folded;
+ * const startFolded = useAppStore.getState().folded;
  * ```
  */
-export const useLogo = create<LogoState>()((set) => ({
+export const createLogoSlice: AppSlice<LogoSlice> = (set) => ({
   folded: false,
   setFolded: (folded) => set({ folded }),
-}));
+});

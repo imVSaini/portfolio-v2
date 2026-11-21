@@ -166,15 +166,15 @@ Everything else, including `RollText`, renders on the server.
 
 ## Cross-cutting helpers
 
-| Concern                | Where                                   | Use it for                                          |
-| ---------------------- | --------------------------------------- | --------------------------------------------------- |
-| Page metadata          | `buildPageMetadata()` in `lib/metadata` | every page's `metadata` or `generateMetadata`       |
-| Post and study paths   | `getPostPath()`, `getCaseStudyPath()`   | every link, canonical, feed and JSON-LD URL         |
-| Asset URLs             | `getAssetUrl()` in `lib/asset`          | images in the R2 bucket; never hard-code the domain |
-| Class names            | `cn()` in `lib/cn`                      | conditional or overriding Tailwind classes          |
-| GSAP and plugins       | `lib/gsap`                              | the only place GSAP is imported from                |
-| Programmatic scrolling | `useScroll().scrollTo`, `ScrollLink`    | never `window.scrollTo`                             |
-| Text responses         | `textResponse()` in `lib/http`          | Markdown, plain text and RSS routes                 |
+| Concern                | Where                                           | Use it for                                          |
+| ---------------------- | ----------------------------------------------- | --------------------------------------------------- |
+| Page metadata          | `buildPageMetadata()` in `lib/metadata`         | every page's `metadata` or `generateMetadata`       |
+| Post and study paths   | `getPostPath()`, `getCaseStudyPath()`           | every link, canonical, feed and JSON-LD URL         |
+| Asset URLs             | `getAssetUrl()` in `lib/asset`                  | images in the R2 bucket; never hard-code the domain |
+| Class names            | `cn()` in `lib/cn`                              | conditional or overriding Tailwind classes          |
+| GSAP and plugins       | `lib/gsap`                                      | the only place GSAP is imported from                |
+| Programmatic scrolling | `useAppStore.getState().scrollTo`, `ScrollLink` | never `window.scrollTo`                             |
+| Text responses         | `textResponse()` in `lib/http`                  | Markdown, plain text and RSS routes                 |
 
 ## Hosting
 

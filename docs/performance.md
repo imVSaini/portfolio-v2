@@ -74,7 +74,7 @@ s-maxage=3600`.
   change every frame.
 - One frame loop: Locomotive runs on `gsap.ticker`, so scrolling and ScrollTrigger never compete.
 - Scroll state is pushed to the store only when it changes meaningfully (`report()` in
-  `src/stores/scroll.ts`), so subscribed components do not re-render every frame.
+  `src/stores/scrollSlice.ts`), so subscribed components do not re-render every frame.
 - Heavy effects (pins, parallax, overscroll) only run on md-and-up viewports with motion allowed.
 
 ## Not yet measured
