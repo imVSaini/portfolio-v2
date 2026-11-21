@@ -161,10 +161,14 @@ the test, not a regression. It is unresolved.
 - A final job merges the blob reports into one HTML report, kept for 14 days as the
   `playwright-report-attempt-N` artifact (`N` is the run attempt, so a re-run does not collide).
   It is skipped when the build fails and no shard ran.
-- A `gate` job (`Open deploy gate`) sets a `deploy-gate` commit status to `pending` on the commit
-  as soon as the run starts. A `required` job (`Required checks`) depends on `gate`, `check`,
-  `version`, `build` and every shard, sets `deploy-gate` to `success` or `failure`, and fails
-  unless all of them succeeded. It runs with `always()`, because a skipped job counts as a
+- On a push, a `gate` job (`Open deploy gate`) sets a `deploy-gate` commit status to `pending`
+  on the pushed commit as soon as the run starts. A `required` job (`Required checks`) depends on
+  `gate`, `check`, `version`, `build` and every shard, sets `deploy-gate` to `success` or
+  `failure` on a push, and fails unless all of them succeeded. Pull request runs leave
+  `deploy-gate` alone, so each commit gets the status from one run only, as Vercel asks, and only
+  production deployments, which come from pushes to `main`, are gated. The status is written with
+  `gh api` rather than `vercel/repository-dispatch/actions/status`, which Vercel needs only for
+  workflows triggered by `repository_dispatch`. It runs with `always()`, because a skipped job counts as a
   success, so a cancelled run also closes the gate as `failure`. `deploy-gate` is the one check
   Vercel's Deployment Checks wait for before production moves to a new build (see
   [Deployment](./development.md#deployment)); renaming the context means updating that setting.

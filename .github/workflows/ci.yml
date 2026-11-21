@@ -21,10 +21,11 @@ jobs:
       statuses: write
     steps:
       - name: Mark the deploy gate pending
+        if: ${{ github.event_name == 'push' }}
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          SHA: ${{ github.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: >-
           gh api "repos/$REPO/statuses/$SHA"
@@ -175,18 +176,22 @@ jobs:
     timeout-minutes: 5
     permissions:
       statuses: write
+    env:
+      FAILED: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped') }}
     steps:
       - name: Close the deploy gate
+        if: ${{ github.event_name == 'push' }}
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          SHA: ${{ github.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          FAILED: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped') }}
         run: |
           state=success
           if [ "$FAILED" = "true" ]; then state=failure; fi
           gh api "repos/$REPO/statuses/$SHA" \
             -f state="$state" -f context=deploy-gate \
             -f description="CI $state" -f target_url="$RUN_URL"
-          [ "$state" = success ]
+
+      - name: Fail unless every job succeeded
+        run: '[ "$FAILED" != "true" ]'
