@@ -161,7 +161,13 @@ the test, not a regression. It is unresolved.
 - A final job merges the blob reports into one HTML report, kept for 14 days as the
   `playwright-report-attempt-N` artifact (`N` is the run attempt, so a re-run does not collide).
   It is skipped when the build fails and no shard ran.
-- A `required` job (`Required checks`) depends on `check`, `version`, `build` and every shard and
-  fails unless all of them succeeded. It runs with `always()`, because a skipped job counts as a success. It is the one
-  check Vercel's Deployment Checks wait for before production moves to a new build (see
-  [Deployment](./development.md#deployment)); renaming the job means updating that setting.
+- A `gate` job (`Open deploy gate`) sets a `deploy-gate` commit status to `pending` on the commit
+  as soon as the run starts. A `required` job (`Required checks`) depends on `gate`, `check`,
+  `version`, `build` and every shard, sets `deploy-gate` to `success` or `failure`, and fails
+  unless all of them succeeded. It runs with `always()`, because a skipped job counts as a
+  success, so a cancelled run also closes the gate as `failure`. `deploy-gate` is the one check
+  Vercel's Deployment Checks wait for before production moves to a new build (see
+  [Deployment](./development.md#deployment)); renaming the context means updating that setting.
+  The `Required checks` job itself cannot be the gate: GitHub creates a job's check run only when
+  its `needs` finish, about twenty minutes after the push. Vercel finishes building in under a
+  minute, and with only that check selected it promoted builds while their tests were still running.

@@ -105,7 +105,9 @@ Production is hosted on Vercel and fronted by Cloudflare, at `https://www.imvaib
 - Pull requests and pushes to `main` run `npm run check` and the Playwright suite in CI.
 - Vercel builds every push to `main` straight away, but Deployment Checks (Project Settings → Build
   and Deployment → Deployment Checks) hold the build off the production domains until the `CI`
-  workflow's `Required checks` job passes on that commit. The domains then move to it
+  workflow's `deploy-gate` commit status turns `success` on that commit. CI sets it to `pending`
+  when the run starts and settles it once every job has finished (see
+  [Testing](./testing.md#ci)). The domains then move to it
   automatically. A failed or cancelled run leaves the previous deployment live; **Force Promote**
   on the deployment page overrides the hold.
 - A deployment runs `next build`, which prerenders every page and the feeds. Nothing is rendered
