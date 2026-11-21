@@ -1,6 +1,6 @@
 import type { AppSlice } from "./index";
 
-export type ScrollTarget = number | string | HTMLElement;
+type ScrollTarget = number | string | HTMLElement;
 
 export type ScrollSlice = {
   /** 1 = down, -1 = up. */

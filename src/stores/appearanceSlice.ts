@@ -13,7 +13,7 @@ import {
 
 import type { AppSlice } from "./index";
 
-export type AppearanceValues = { theme: Theme; accent: Accent; tone: Tone };
+type AppearanceValues = { theme: Theme; accent: Accent; tone: Tone };
 
 export type AppearanceSlice = AppearanceValues & {
   setTheme: (theme: Theme) => void;
