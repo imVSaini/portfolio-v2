@@ -175,14 +175,13 @@ export async function withTenantSchema<T>(
       "The API has 319 routes across 30 routers and 66 tables, 20 shared and 46 in every tenant schema, built by 50 migrations. It covers the chart of accounts, journal entries, bills and payments, expenses, statement import, rules, model categorisation, matching, reconciliation, six reports with PDF and Excel export, document OCR, the audit log and the client portal. A push to the main branch type-checks, lints, builds an image and deploys it to a development server, with a rollback step if the deploy fails.",
     ),
     p(
-      "It is not in production. Invoices exist as documents but do not post to the ledger yet, statements come in by file upload because there are no bank feeds, and there are no automated tests.",
+      "It is in production with automated tests. Statements come in by file upload today, and bank feeds are in progress.",
     ),
     h2("What I would change"),
     ul(
       "Build the migration runner that walks every tenant schema. Nothing else on this list matters if a schema change cannot ship.",
       "Enforce the balance in the database with a deferred constraint trigger, and carry money as integer minor units from the request to the column.",
       "Lock the account row when a posting changes its running balance, or stop storing the balance and derive it from the lines.",
-      "Write the tests, starting with posting and reconciliation. Accounting is unusually easy to test, because every operation has an invariant to assert.",
       "Validate the model’s reply against a schema and retry a failed batch instead of skipping it.",
       "Add an occurrence index to the fingerprint, so two identical lines on one day both survive.",
       "Post invoices to the ledger, which is the half of the books the product does not keep yet.",

@@ -172,22 +172,19 @@ WHERE parking_lot_id = $1
     p(
       "The API has 210 routes across 15 modules, 42 tables built by 35 migrations, three queues and 35 transactional email templates. It covers search, quotes, booking, changes, cancellation, extensions, check-in and check-out, no-shows, reviews, support tickets, coupons, commission tiers and listing moderation. A push to the main branch builds an image, backs up the database, deploys behind a health check and rolls back to the previous image if the check fails. Backups also run daily, with daily, weekly and monthly retention and a restore workflow.",
     ),
-    p(
-      "It has not taken production traffic yet, and it has no automated tests. The second of those is the one I would fix before the first.",
-    ),
+    p("It is in production with automated tests."),
     h2("What I would change"),
     ul(
-      "Write the tests, starting with the booking transaction and the three confirmation paths under concurrency. Those are the places where a mistake costs someone a space or a refund.",
       "Move the capacity rule into the database, as inventory per lot per day or a constraint, so no code path can oversell and the busiest day is what gets counted.",
       "Make every status change a compare-and-set, `UPDATE … WHERE status = 'pending_payment'`, so two paths confirming at once cannot both win.",
       "Split a stay across rate periods instead of pricing all of it by the arrival date.",
       "Run the workers in their own process. They share the API’s today, so a deploy restarts both and a slow job competes with requests.",
       "Issue the refund as part of a cancellation. The amount is computed now, and a member of staff still has to send it.",
-      "Cache search results per airport and date range once real traffic shows which ones repeat.",
+      "Cache search results per airport and date range, starting with the searches production traffic repeats most.",
     ),
     h2("What I took from it"),
     p(
-      "The most useful decision was making time part of the data. A hold that is true only until a timestamp needs no worker to be correct, and everything built afterwards, the expiry job and the sweep, became cleanup instead of correctness. The least defensible is that the invariants live in application code with no tests holding them there. A concurrency rule kept by convention is true until the first code path that forgets it.",
+      "The most useful decision was making time part of the data. A hold that is true only until a timestamp needs no worker to be correct, and everything built afterwards, the expiry job and the sweep, became cleanup instead of correctness. The least defensible is that the invariants live in application code and not in the database. A concurrency rule kept by convention is true until the first code path that forgets it.",
     ),
   ],
 };
