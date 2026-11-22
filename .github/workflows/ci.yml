@@ -66,12 +66,8 @@ jobs:
 
   build:
     name: Build
-    needs: version
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    container:
-      image: mcr.microsoft.com/playwright:v${{ needs.version.outputs.playwright }}-noble
-      options: --user 1001
     steps:
       - uses: actions/checkout@v7
 
@@ -85,9 +81,9 @@ jobs:
       - uses: actions/cache@v6
         with:
           path: .next/cache
-          key: nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**', 'public/**', 'next.config.ts') }}
+          key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**', 'public/**', 'next.config.ts') }}
           restore-keys: |
-            nextjs-${{ hashFiles('package-lock.json') }}-
+            nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
 
       - run: npm run build
 

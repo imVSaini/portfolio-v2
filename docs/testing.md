@@ -145,11 +145,12 @@ the test, not a regression. It is unresolved.
 - A `check` job runs `npx next typegen` (route types, without a build) and `npm run check`.
 - A `build` job runs `next build` once and uploads `.next`, without `.next/cache`, as the
   `next-build` artifact. `.next/cache` is kept between runs with `actions/cache`, keyed on the
-  lockfile and the source, as the Next.js CI caching guide recommends. The build runs in the same
-  image as the shards so the paths recorded in `.next` match.
+  lockfile and the source, as the Next.js CI caching guide recommends. The build runs straight on
+  `ubuntu-latest`, not in the Playwright image, so it starts with the other jobs instead of waiting
+  for the version lookup and the image pull (see [decision 8](./decisions.md)).
 - Four shards on `ubuntu-latest`, each downloading `next-build` and running
   `npx playwright test --shard=N/4` with `PLAYWRIGHT_PREBUILT=1`, so the web server only runs
-  `next start`. Build and shards run inside the official
+  `next start`. The shards run inside the official
   `mcr.microsoft.com/playwright:v<version>-noble` image. A first job reads the version from
   `package-lock.json` so the image always matches the installed `@playwright/test`. The image
   carries the browsers and their system libraries, so there is no `playwright install --with-deps`

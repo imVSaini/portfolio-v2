@@ -16,6 +16,7 @@ what the code does and the trade-offs it carries, not the original discussion.
 | 5   | [Architecture rules are enforced by tooling](#5-architecture-rules-are-enforced-by-tooling)                            | Accepted |
 | 6   | [ESLint 10 runs the Next.js presets through a compat shim](#6-eslint-10-runs-the-nextjs-presets-through-a-compat-shim) | Accepted |
 | 7   | [Client state is one store built from slices](#7-client-state-is-one-store-built-from-slices)                          | Accepted |
+| 8   | [CI builds outside the Playwright image](#8-ci-builds-outside-the-playwright-image)                                    | Accepted |
 
 ---
 
@@ -175,3 +176,28 @@ store and `partialize` keeps only the appearance values.
   infer through `create<AppStore>()(persist(...))`, which zustand's TypeScript guide anticipates.
 - Revisit if a slice needs its own middleware or lifecycle, for example a separately persisted
   slice. That slice would move back to its own store.
+
+---
+
+## 8. CI builds outside the Playwright image
+
+- Date: 22 November 2026
+
+**Context.** The `build` job ran inside `mcr.microsoft.com/playwright:v<version>-noble`, so it
+needed the `version` job first and then pulled the browser image, only to run `next build`. The
+reason given was that `.next` records absolute paths, which differ between the runner
+(`/home/runner/work/...`) and the container (`/__w/...`). The only production files that record
+them are `required-server-files.json` and `.js`, which only the standalone server reads;
+`next start` does not. A build served from a different absolute path passed the `http`,
+`document`, smoke and navigation suites.
+
+**Decision.** `build` runs on `ubuntu-latest` with no `needs`. The shards stay in the Playwright
+image and still need `version` and `build`. The `.next/cache` key carries `runner.os`, so the
+first run does not restore a cache written inside the container.
+
+**Consequences.**
+
+- `build` starts alongside `gate`, `check` and `version`, without the image pull.
+- Build and shards share Node (`.nvmrc`), Ubuntu 24.04 and the lockfile, but not the exact image.
+- Revisit if the build starts producing native or path-bound output, such as
+  `output: "standalone"`. Move `build` back into the image then.
