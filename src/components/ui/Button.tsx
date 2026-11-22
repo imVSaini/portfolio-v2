@@ -1,3 +1,6 @@
+import type { Route } from "next";
+import Link from "next/link";
+
 import { RollText } from "@/components/motion/RollText";
 import { ScrollLink } from "@/components/scroll/ScrollLink";
 import { ArrowSwap } from "@/components/ui/ArrowSwap";
@@ -17,31 +20,39 @@ type ButtonProps = {
   variant?: keyof typeof variants;
   children: string;
   className?: string;
-} & ({ href: `#${string}`; external?: never } | { href: string; external: true });
+} & (
+  | { href: `#${string}`; external?: never; route?: never }
+  | { href: Route; route: true; external?: never }
+  | { href: string; external: true; route?: never }
+);
 
-export function Button({ variant = "solid", children, className, href, external }: ButtonProps) {
+export function Button({ variant = "solid", children, className, ...link }: ButtonProps) {
+  const classes = cn(base, variants[variant], className);
   const content = (
     <>
       <RollText text={children} accent={false} />
-      <ArrowSwap direction={external ? "up-right" : "right"} />
+      <ArrowSwap direction={link.external ? "up-right" : "right"} />
     </>
   );
 
-  if (external) {
+  if (link.external) {
     return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noreferrer"
-        className={cn(base, variants[variant], className)}
-      >
+      <a href={link.href} target="_blank" rel="noreferrer" className={classes}>
         {content}
       </a>
     );
   }
 
+  if (link.route) {
+    return (
+      <Link href={link.href} className={classes}>
+        {content}
+      </Link>
+    );
+  }
+
   return (
-    <ScrollLink href={href as `#${string}`} className={cn(base, variants[variant], className)}>
+    <ScrollLink href={link.href} className={classes}>
       {content}
     </ScrollLink>
   );

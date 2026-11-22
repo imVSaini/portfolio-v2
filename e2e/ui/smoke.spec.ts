@@ -1,5 +1,7 @@
 import type { Page } from "@playwright/test";
 
+import { notFound } from "@/data/notFound";
+
 import { expect, scrollThrough, test } from "../fixtures";
 import { MISSING_ROUTES, PAGE_ROUTES } from "../routes";
 
@@ -41,7 +43,7 @@ test.describe("smoke", () => {
       const problems = watch(page);
 
       await visit(path);
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Nothing\s*here\./);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(notFound.heading);
 
       expect(problems.responses).toEqual([`404 ${path}`]);
       expect(problems.errors.filter((error) => !error.includes("404"))).toEqual([]);

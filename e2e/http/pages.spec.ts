@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { notFound } from "@/data/notFound";
+
 import { MISSING_ROUTES, PAGE_ROUTES } from "../routes";
 
 const SECURITY_HEADERS = {
@@ -34,7 +36,7 @@ test.describe("page responses", () => {
   test("an unmatched path server-renders the not-found page", async ({ request }) => {
     const html = await (await request.get("/nope")).text();
 
-    expect(html).toContain("Error 404");
+    expect(html).toContain(notFound.heading);
     expect(html).toContain('<meta name="robots" content="noindex"/>');
   });
 

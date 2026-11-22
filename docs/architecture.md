@@ -70,6 +70,7 @@ src/
 │   ├── scroll/              SmoothScroll, ScrollLink, HorizontalSection
 │   ├── article/             Body, contents, share and diagram parts shared by posts and studies
 │   ├── blog/, caseStudies/  Cards, covers, diagrams and art for each content type
+│   ├── notFound/            The 404 page's motion wrapper
 │   ├── appearance/          Theme, accent and tone controls
 │   ├── seo/                 JsonLd and the Open Graph card
 │   └── ui/                  Primitives: Button, TextLink, Logo, Seal, icons

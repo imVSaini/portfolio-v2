@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 import { caseStudies } from "@/data/caseStudies";
 import { contact } from "@/data/contact";
 import { experience } from "@/data/experience";
+import { notFound } from "@/data/notFound";
 import { posts } from "@/data/posts";
 import { projects } from "@/data/projects";
 import { nav, site } from "@/data/site";
@@ -373,9 +374,12 @@ test.describe("not found without JavaScript", () => {
     await page.goto("/nope");
     const main = page.locator("main");
 
-    await expect(main).toContainText("Error 404");
-    await expect(page.locator("h1")).toHaveText(/Nothing\s*here\./);
-    await expect(main.getByRole("link", { name: "Back to home" })).toHaveAttribute("href", "/");
+    await expect(page.locator("h1")).toHaveText(notFound.heading);
+    await expect(main).toContainText(notFound.description);
+    await expect(main.getByRole("link", { name: notFound.cta.label })).toHaveAttribute(
+      "href",
+      notFound.cta.href,
+    );
   });
 
   test("an unknown post renders the same page on the server", async ({ page }) => {
@@ -387,6 +391,6 @@ test.describe("not found without JavaScript", () => {
 
     await page.goto("/blog/nope");
 
-    await expect(page.locator("h1")).toHaveText(/Nothing\s*here\./, { timeout: 2_000 });
+    await expect(page.locator("h1")).toHaveText(notFound.heading, { timeout: 2_000 });
   });
 });

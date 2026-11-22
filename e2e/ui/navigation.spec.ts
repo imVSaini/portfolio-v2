@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test";
 
 import { contact } from "@/data/contact";
+import { notFound } from "@/data/notFound";
 import { nav, site } from "@/data/site";
 
 import {
@@ -311,12 +312,22 @@ test.describe("pages that do not exist", () => {
       await visit(path);
       const main = page.getByRole("main");
 
-      await expect(main.getByText("Error 404")).toBeVisible();
-      await expect(main.getByRole("heading", { level: 1 })).toHaveText(/Nothing\s*here\./);
-      await main.getByRole("link", { name: "Back to home" }).click();
+      await expect(main.getByRole("heading", { level: 1 })).toHaveText(notFound.heading);
+      await main.getByRole("link", { name: notFound.cta.label }).click();
 
       await expect(page).toHaveURL(/\/$/);
       await expect(page.getByRole("region", { name: "Introduction" })).toBeVisible();
     });
   }
+
+  test("the way home works from the keyboard", async ({ page, visit }) => {
+    await visit("/nope");
+    const cta = page.getByRole("main").getByRole("link", { name: notFound.cta.label });
+
+    await cta.focus();
+    await expect(cta).toBeFocused();
+    await page.keyboard.press("Enter");
+
+    await expect(page).toHaveURL(/\/$/);
+  });
 });

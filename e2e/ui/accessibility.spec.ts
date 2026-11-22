@@ -1,6 +1,7 @@
 import type { Locator, Page } from "@playwright/test";
 
 import { contact } from "@/data/contact";
+import { notFound } from "@/data/notFound";
 import { nav, site } from "@/data/site";
 
 import {
@@ -131,11 +132,10 @@ test.describe("page structure", () => {
 
     await expect(page.getByRole("main")).toMatchAriaSnapshot(`
       - main:
-        - paragraph: Error 404
-        - heading "Nothing here." [level=1]
-        - paragraph
-        - link "Back to home":
-          - /url: /
+        - heading "${notFound.heading}" [level=1]
+        - paragraph: ${notFound.description}
+        - link "${notFound.cta.label}":
+          - /url: ${notFound.cta.href}
     `);
   });
 });

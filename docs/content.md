@@ -17,6 +17,7 @@ for adding a post or a case study.
 | `src/data/article.ts`    | Block types and helpers shared by posts and case studies         |
 | `src/data/posts/`        | One file per post, the `schema.ts` types and the `index.ts` list |
 | `src/data/caseStudies/`  | One file per study, `schema.ts` and the `index.ts` list          |
+| `src/data/notFound.ts`   | 404 copy, the way-home link and the seal phrases                 |
 
 `src/data` may only import other `src/data` modules (enforced by ESLint), so content stays plain
 data that any renderer, test or feed can read.

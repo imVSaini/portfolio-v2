@@ -130,3 +130,13 @@ and `Cache-Control: public, max-age=3600, s-maxage=3600`.
 `sitemap.ts` lists the home page, the section pages, every case study (with `lastModified` from its
 date), every post (`updatedAt` or `date`) and `/privacy`. `robots.ts` allows everything and points
 to the sitemap. The 404 page is marked `noindex`.
+
+## Not-found page
+
+`src/app/not-found.tsx` renders every unknown URL and every `notFound()` call. Its header and
+`main` fill exactly one small-viewport height (`min-h-svh`, with the header inside the top padding),
+so the footer starts just below the fold. The "4 ◎ 4" numeral, the heading, the message and the "Go to homepage" button sit
+centred in one column, the numeral sized by the smaller of the viewport's width and height so it
+fits short screens; anything shorter still lets `main` grow rather than clip. Its copy comes from
+`src/data/notFound.ts`, and `e2e/ui/not-found.spec.ts` checks the centring and the one-screen fit
+at common sizes.
