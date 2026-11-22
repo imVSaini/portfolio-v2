@@ -16,6 +16,7 @@ import { getFirstPost, getPostPath, MISSING_ROUTES } from "../routes";
 
 const SECTION_LINKS = nav.filter((item) => item.kind === "section" && item.href !== "#top");
 const BLOG_HEADING = /Notes\s*from\s*production\./;
+const SCROLL_SAVE_MS = 500;
 
 function getSlitScales(page: Page): Promise<number[]> {
   return page
@@ -98,6 +99,70 @@ test.describe("site navigation on the home page", () => {
 
     await page.getByRole("link", { name: `${site.name}, back to top` }).hover();
     await expect.poll(() => getSlitScales(page)).toEqual([0, 0]);
+  });
+
+  test("a reload part-way down shows the folded VS at once, with no rise or fold", async ({
+    page,
+    visit,
+  }) => {
+    await visit("/");
+    await page.addInitScript(() => {
+      const counts = { frames: 0, moving: 0 };
+      Object.assign(window, { logoCounts: counts });
+      const matrixOf = (node: Element) =>
+        node instanceof SVGGraphicsElement ? node.transform.baseVal.consolidate()?.matrix : null;
+      const sample = () => {
+        const svg = document.querySelector("header [data-logo]");
+        if (svg instanceof SVGSVGElement && getComputedStyle(svg).visibility === "visible") {
+          const below = svg.viewBox.baseVal.height;
+          const rising = [...svg.querySelectorAll("[data-letter]")].some((letter) => {
+            const y = Math.abs(matrixOf(letter)?.f ?? 0);
+            return y > 0.5 && y < below - 0.5;
+          });
+          const folding = [...svg.querySelectorAll("[data-slit]")].some((slit) => {
+            const scale = matrixOf(slit)?.a ?? 1;
+            return scale > 0.01 && scale < 0.99;
+          });
+          counts.frames += 1;
+          if (rising || folding) counts.moving += 1;
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+
+    await expect(async () => {
+      await page.evaluate(() => window.scrollTo(0, window.innerHeight * 2));
+      await expect.poll(() => getSlitScales(page)).toEqual([1, 1]);
+      await page.waitForTimeout(SCROLL_SAVE_MS);
+      await page.reload();
+      await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "");
+      await expect.poll(() => scrollY(page), { timeout: 2000 }).toBeGreaterThan(0);
+    }).toPass();
+
+    await expect.poll(() => getSlitScales(page)).toEqual([1, 1]);
+    await expect
+      .poll(() =>
+        page
+          .locator("header [data-logo] [data-letter]")
+          .evaluateAll((letters: SVGPathElement[]) =>
+            letters.every(
+              (letter) => Math.abs(letter.transform.baseVal.consolidate()?.matrix.f ?? 0) < 0.5,
+            ),
+          ),
+      )
+      .toBe(true);
+    const counts = await page.evaluate(() => {
+      const value: unknown = Reflect.get(window, "logoCounts");
+      return typeof value === "object" && value !== null
+        ? {
+            frames: Number(Reflect.get(value, "frames")),
+            moving: Number(Reflect.get(value, "moving")),
+          }
+        : { frames: 0, moving: -1 };
+    });
+    expect(counts.frames).toBeGreaterThan(0);
+    expect(counts.moving).toBe(0);
   });
 
   test('the footer\'s "Back to top" returns to the top', async ({ page, visit }) => {

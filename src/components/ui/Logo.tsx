@@ -94,11 +94,21 @@ export function Logo({ condense = false, mirror = false, className }: LogoProps)
             if (path) gsap.set(path, { morphSVG: letter.regular });
           });
         };
+        let wantFolded = false;
+        const showFold = () => {
+          if (rise.progress() === 0) {
+            fold.progress(wantFolded ? 1 : 0);
+            if (wantFolded) rise.progress(1);
+          } else if (rise.isActive()) return;
+          else if (wantFolded) fold.play();
+          else fold.reverse();
+        };
+        rise.eventCallback("onComplete", showFold);
         const foldTo = (on: boolean) => {
           settle();
+          wantFolded = on;
           useAppStore.getState().setFolded(on);
-          if (on) fold.play();
-          else fold.reverse();
+          showFold();
         };
         const folded = condense
           ? ScrollTrigger.create({
@@ -109,9 +119,7 @@ export function Logo({ condense = false, mirror = false, className }: LogoProps)
               onEnterBack: () => foldTo(true),
               onLeaveBack: () => foldTo(false),
               onRefresh: (self) => {
-                if (self.progress <= 0) return;
-                useAppStore.getState().setFolded(true);
-                fold.play();
+                if (self.progress > 0) foldTo(true);
               },
             })
           : null;

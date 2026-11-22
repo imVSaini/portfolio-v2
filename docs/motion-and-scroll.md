@@ -121,6 +121,20 @@ When it plays:
 Safety net: if `data-motion-ready` has not appeared four seconds after first paint, the pre-paint
 script removes `motion-ok`, so hidden reveal targets show even if JavaScript failed.
 
+## The header logo
+
+`Logo condense` rises in once the intro is done, then folds to the slit "VS" monogram past 120px
+of scroll and unfolds back at the top. The rise and the fold never run together:
+
+- Before the rise has started moving (waiting on the intro or its delay), a fold change is set
+  instantly. A page that loads past the fold point, such as a reload mid-page, also skips the
+  rise, so the monogram is static from the first frame, like the nav. WebKit restores the scroll
+  position about when the page hydrates, which is still before the rise moves.
+- While the rise is moving, a fold change waits for it to finish, then animates.
+- After that, the fold animates on scroll as usual.
+
+The mobile menu's `Logo mirror` reads `folded` from the store and starts in the same state.
+
 ## Reduced motion checklist
 
 - GSAP effects sit inside `MOTION_QUERY` or `DESKTOP_MOTION_QUERY`.
