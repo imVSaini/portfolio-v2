@@ -22,7 +22,7 @@ type PageMeta = {
   description?: string;
 };
 
-const HOME_TITLE = `${site.name} — ${site.role}`;
+const HOME_TITLE = site.title;
 const DEFAULT_CARD = `${site.url}${site.ogImage.url}`;
 const FEED_TITLE = `${blog.title} — ${site.name}`;
 const CASE_STUDIES_TITLE = `${caseStudiesPage.title} — ${site.name}`;
@@ -107,6 +107,8 @@ test.describe("document metadata", () => {
 
       test("describes itself to link previews", async ({ page }) => {
         const pageDescription = await content(page, "description");
+
+        expect(pageDescription).not.toContain(site.fullName);
 
         await expect(meta(page, "og:title")).toHaveAttribute("content", socialTitle);
         await expect(meta(page, "og:description")).toHaveAttribute("content", pageDescription);

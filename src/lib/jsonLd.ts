@@ -284,7 +284,7 @@ export function getHomeJsonLd(): JsonLdNode[] {
       "@type": "ProfilePage",
       "@id": site.url,
       url: site.url,
-      name: `${site.name} — ${site.role}`,
+      name: site.title,
       description: site.description,
       inLanguage: "en-IN",
       isPartOf: { "@id": JSON_LD_IDS.website },

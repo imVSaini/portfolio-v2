@@ -103,7 +103,7 @@ test.describe("structured data", () => {
       "@type": "ProfilePage",
       "@id": site.url,
       url: site.url,
-      name: `${site.name} — ${site.role}`,
+      name: site.title,
       description: site.description,
       inLanguage: "en-IN",
       isPartOf: { "@id": WEBSITE_ID },

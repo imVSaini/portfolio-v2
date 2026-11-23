@@ -30,7 +30,7 @@ const satoshi = localFont({
   ],
 });
 
-const title = `${site.name} — ${site.role}`;
+const title = site.title;
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),

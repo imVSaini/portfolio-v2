@@ -17,8 +17,9 @@ export const site = {
   timeZone: "Asia/Kolkata",
   url: "https://www.imvaibhav.com",
   assetsUrl: "https://assets.imvaibhav.com",
+  title: "Vaibhav Saini — Full Stack Developer in Bengaluru",
   description:
-    "Vaibhav Kumar Saini is a full stack developer in Bengaluru who crafts web and mobile products with Python, FastAPI, Node.js, React and Next.js.",
+    "I’m Vaibhav. I’ve built SaaS since 2020 and now lead multi-tenant CRM and AI products from architecture to production with FastAPI, PostgreSQL and Next.js.",
   /** Link-preview card, served from `public/`. */
   ogImage: {
     url: "/og.png",
