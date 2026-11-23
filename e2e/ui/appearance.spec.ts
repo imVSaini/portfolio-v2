@@ -248,7 +248,7 @@ test.describe("appearance", () => {
     await expect(toneButton(page, "Soft")).toHaveAttribute("aria-pressed", "true");
     await expect(accentRadio(page, "Magenta")).toBeChecked();
     await page.keyboard.press("Escape");
-    if (layout === "phone") {
+    if (layout !== "desktop") {
       await expect(page.getByRole("dialog", { name: "Appearance" })).toBeHidden();
       await page.keyboard.press("Escape");
       await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
@@ -364,11 +364,11 @@ test.describe("appearance", () => {
 });
 
 test.describe("appearance popover", () => {
-  test("lives in the header from tablet width up", async ({ page, visit, layout }) => {
+  test("lives in the header from desktop width up", async ({ page, visit, layout }) => {
     await visit("/");
     const trigger = page.getByRole("button", { name: "Appearance" });
 
-    if (layout === "phone") {
+    if (layout !== "desktop") {
       await expect(trigger).toBeHidden();
       return;
     }

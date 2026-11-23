@@ -678,6 +678,19 @@ test.describe("mobile menu on a tablet", () => {
     await expect.poll(() => getBox(menu)).toEqual([0, 0, 800, 900]);
   });
 
+  test("carries the appearance and social icons instead of the header", async ({ page, visit }) => {
+    await visit("/");
+    const header = page.getByRole("banner");
+    const names = contact.links.map((link) => `${link.label} (opens in a new tab)`);
+
+    await expect(header.getByRole("button", { name: "Appearance" })).toBeHidden();
+    for (const name of names) await expect(header.getByRole("link", { name })).toBeHidden();
+
+    const menu = await openMenu(page);
+    await expect(menu.getByRole("button", { name: "Appearance" })).toBeVisible();
+    for (const name of names) await expect(menu.getByRole("link", { name })).toBeVisible();
+  });
+
   test("puts the close button exactly over the trigger", async ({ page, visit }) => {
     await visit("/");
     const trigger = await getBox(page.getByRole("button", { name: "Open menu" }));

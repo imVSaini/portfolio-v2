@@ -1,3 +1,4 @@
+import { contact } from "@/data/contact";
 import { projects } from "@/data/projects";
 
 import { expect, getOverflow, openMenu, scrollThrough, test } from "../fixtures";
@@ -14,10 +15,10 @@ const SIZES = [
 ] as const;
 
 const HEADER_STEPS = [
-  { width: 767, navigation: false, menu: true, appearance: false },
-  { width: 768, navigation: false, menu: true, appearance: true },
-  { width: 1023, navigation: false, menu: true, appearance: true },
-  { width: 1024, navigation: true, menu: false, appearance: true },
+  { width: 767, navigation: false, menu: true, icons: false },
+  { width: 768, navigation: false, menu: true, icons: false },
+  { width: 1023, navigation: false, menu: true, icons: false },
+  { width: 1024, navigation: true, menu: false, icons: true },
 ] as const;
 
 test.describe("each page at this device's size", () => {
@@ -116,8 +117,13 @@ test.describe("header breakpoints", { tag: "@desktop" }, () => {
           visible: step.menu,
         });
         await expect(header.getByRole("button", { name: "Appearance" })).toBeVisible({
-          visible: step.appearance,
+          visible: step.icons,
         });
+        for (const link of contact.links) {
+          await expect(
+            header.getByRole("link", { name: `${link.label} (opens in a new tab)` }),
+          ).toBeVisible({ visible: step.icons });
+        }
       });
     });
   }

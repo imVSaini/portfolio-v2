@@ -77,8 +77,8 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-1">
-          {/* Icon row from md up; below that it lives in the menu. */}
-          <div className="hidden md:flex">
+          {/* Icon row from lg up; below that it lives in the menu. */}
+          <div className="hidden lg:flex">
             <AppearanceMenu />
             {contact.links.map((link) => {
               const Icon = socialIcons[link.label];
