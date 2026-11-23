@@ -135,8 +135,15 @@ to the sitemap. The 404 page is marked `noindex`.
 
 `src/app/not-found.tsx` renders every unknown URL and every `notFound()` call. Its header and
 `main` fill exactly one small-viewport height (`min-h-svh`, with the header inside the top padding),
-so the footer starts just below the fold. The "4 ◎ 4" numeral, the heading, the message and the "Go to homepage" button sit
-centred in one column, the numeral sized by the smaller of the viewport's width and height so it
-fits short screens; anything shorter still lets `main` grow rather than clip. Its copy comes from
-`src/data/notFound.ts`, and `e2e/ui/not-found.spec.ts` checks the centring and the one-screen fit
-at common sizes.
+so the footer starts just below the fold. The layout is mobile-first and follows Android's adaptive
+guidance (one pane on compact and medium widths, two on expanded): below `lg` the "4 ◎ 4" numeral
+sits above the heading, the message and the "Back to home" button in one start-aligned column, with
+the button full width below `sm` so it is an easy thumb target; at `lg` the numeral spans the page
+above a row with the heading in 5 columns and the message and button in 7; from `xl` numeral (7
+columns) and copy (5) sit side by side, centred against each other. The numeral's column is a size
+container and the numeral is set in `cqi`, so it fills its pane at any width, capped by the
+viewport height so it fits short screens. Below `lg` the heading uses the `h2` size capped at
+`9svh`, so a landscape phone's short screen keeps it smaller than the numeral; anything shorter
+still lets `main` grow rather than clip. Spacing stays on the 4/8px grid. Its copy comes from
+`src/data/notFound.ts`, and `e2e/ui/not-found.spec.ts` checks the arrangement at every breakpoint
+and the one-screen fit at common sizes.

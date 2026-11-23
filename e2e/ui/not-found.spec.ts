@@ -4,6 +4,19 @@ import { notFound } from "@/data/notFound";
 
 import { expect, getOverflow, test } from "../fixtures";
 
+const SM = 640;
+const LG = 1024;
+const XL = 1280;
+
+const ARRANGEMENT_SIZES = [
+  { width: 360, height: 740 },
+  { width: 640, height: 900 },
+  { width: 768, height: 1024 },
+  { width: 1024, height: 768 },
+  { width: 1279, height: 800 },
+  { width: 1440, height: 900 },
+] as const;
+
 const FIT_SIZES = [
   { width: 320, height: 568 },
   { width: 375, height: 553 },
@@ -47,6 +60,71 @@ async function expectOneScreen(page: Page) {
   await expect(page.getByRole("contentinfo")).not.toBeInViewport();
 }
 
+async function readParts(page: Page) {
+  const main = page.getByRole("main");
+  await expect
+    .poll(() =>
+      main.evaluate((el) =>
+        [...el.querySelectorAll("[data-nf-fade], [data-nf-seal]")].every((node) => {
+          const style = getComputedStyle(node);
+          return style.opacity === "1" && new DOMMatrixReadOnly(style.transform).isIdentity;
+        }),
+      ),
+    )
+    .toBe(true);
+
+  const [numeral, heading, description, link, copy] = await Promise.all(
+    [
+      main.locator("p[aria-hidden]"),
+      main.getByRole("heading", { level: 1 }),
+      main.getByText(notFound.description),
+      main.getByRole("link", { name: notFound.cta.label }),
+      main.locator("[data-nf-copy]"),
+    ].map((part) => part.boundingBox()),
+  );
+  if (!numeral || !heading || !description || !link || !copy) {
+    throw new Error("not-found parts did not render");
+  }
+  return { numeral, heading, description, link, copy };
+}
+
+/**
+ * Below `lg` one start-aligned column with a full-width button on compact widths; at `lg` the
+ * numeral spans the page above a heading | message row; from `xl` numeral and copy sit side by side.
+ */
+async function expectArrangement(page: Page) {
+  const width = page.viewportSize()?.width ?? Number.NaN;
+  const { numeral, heading, description, link, copy } = await readParts(page);
+  const bottom = (box: { y: number; height: number }) => box.y + box.height;
+
+  expect(bottom(description)).toBeLessThanOrEqual(link.y);
+
+  if (width >= XL) {
+    expect(numeral.x + numeral.width).toBeLessThan(heading.x);
+    expect(bottom(heading)).toBeLessThanOrEqual(description.y);
+    for (const box of [description, link])
+      expect(Math.abs(box.x - heading.x)).toBeLessThanOrEqual(1);
+    const copyMiddle = (heading.y + bottom(link)) / 2;
+    expect(Math.abs(copyMiddle - (numeral.y + numeral.height / 2))).toBeLessThanOrEqual(1);
+    return;
+  }
+
+  expect(bottom(numeral)).toBeLessThan(heading.y);
+  expect(Math.abs(numeral.x - heading.x)).toBeLessThanOrEqual(1);
+
+  if (width >= LG) {
+    expect(heading.x + heading.width).toBeLessThan(description.x);
+    expect(Math.abs(heading.y - description.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(link.x - description.x)).toBeLessThanOrEqual(1);
+    return;
+  }
+
+  expect(bottom(heading)).toBeLessThanOrEqual(description.y);
+  for (const box of [description, link]) expect(Math.abs(box.x - heading.x)).toBeLessThanOrEqual(1);
+  if (width < SM) expect(Math.abs(link.width - copy.width)).toBeLessThanOrEqual(1);
+  else expect(link.width).toBeLessThan(copy.width / 2);
+}
+
 test.describe("the not-found page", () => {
   test("fits the header and page into one screen, with the footer just below", async ({
     page,
@@ -58,37 +136,22 @@ test.describe("the not-found page", () => {
     expect(await getOverflow(page)).toBe(0);
   });
 
-  test("centres the numeral above the heading, the message and the way home", async ({
-    page,
-    visit,
-  }) => {
+  test("arranges the numeral and the copy for the screen's width", async ({ page, visit }) => {
     await visit("/nope");
-    const main = page.getByRole("main");
-    const parts = [
-      main.locator("p[aria-hidden]"),
-      main.getByRole("heading", { level: 1 }),
-      main.getByText(notFound.description),
-      main.getByRole("link", { name: notFound.cta.label }),
-    ];
 
-    await expect
-      .poll(async () => {
-        const width = page.viewportSize()?.width ?? Number.NaN;
-        const offsets = await Promise.all(
-          parts.map(async (part) => {
-            const box = await part.boundingBox();
-            return box ? Math.abs(box.x + box.width / 2 - width / 2) : Number.POSITIVE_INFINITY;
-          }),
-        );
-        return Math.max(...offsets);
-      })
-      .toBeLessThanOrEqual(1);
+    await expectArrangement(page);
+  });
 
-    const boxes = await Promise.all(parts.map((part) => part.boundingBox()));
-    for (const [index, box] of boxes.entries()) {
-      const below = boxes[index + 1];
-      if (below) expect(box && box.y + box.height <= below.y).toBe(true);
-    }
+  test("fills the numeral's column without spilling out of it", async ({ page, visit }) => {
+    await visit("/nope");
+
+    const spill = await page.locator("[data-nf-numeral]").evaluate((column) => {
+      const edge = column.getBoundingClientRect().right;
+      const glyphs = [...column.querySelectorAll("p > span")];
+      return Math.max(...glyphs.map((glyph) => glyph.getBoundingClientRect().right)) - edge;
+    });
+    expect(spill).toBeLessThanOrEqual(0);
+    expect(spill).toBeGreaterThan(-0.1 * (page.viewportSize()?.width ?? 0));
   });
 });
 
@@ -100,6 +163,18 @@ test.describe("the not-found page at common screen sizes", { tag: "@desktop" }, 
 
       await expectOneScreen(page);
       expect(await getOverflow(page)).toBe(0);
+    });
+  }
+
+  for (const size of ARRANGEMENT_SIZES) {
+    test(`arranges the numeral and the copy at ${size.width}×${size.height}`, async ({
+      page,
+      visit,
+    }) => {
+      await page.setViewportSize(size);
+      await visit("/nope");
+
+      await expectArrangement(page);
     });
   }
 
@@ -117,6 +192,9 @@ test.describe("the not-found page at common screen sizes", { tag: "@desktop" }, 
       })
       .toBe(true);
     expect(await getOverflow(page)).toBe(0);
+
+    const { numeral, heading } = await readParts(page);
+    expect(heading.height).toBeLessThan(numeral.height / 2);
   });
 });
 
