@@ -702,6 +702,25 @@ test.describe("mobile menu on a tablet", () => {
   });
 });
 
+test.describe("mobile menu on a small laptop", () => {
+  test.use({ viewport: { width: 1100, height: 800 } });
+
+  test("still replaces the primary navigation and icons", async ({ page, visit }) => {
+    await visit("/");
+    const header = page.getByRole("banner");
+    const names = contact.links.map((link) => `${link.label} (opens in a new tab)`);
+
+    await expect(header.getByRole("navigation", { name: "Primary" })).toBeHidden();
+    await expect(header.getByRole("button", { name: "Appearance" })).toBeHidden();
+    for (const name of names) await expect(header.getByRole("link", { name })).toBeHidden();
+
+    const menu = await openMenu(page);
+    await expect(menu.getByRole("navigation", { name: "Mobile" })).toBeVisible();
+    await expect(menu.getByRole("button", { name: "Appearance" })).toBeVisible();
+    for (const name of names) await expect(menu.getByRole("link", { name })).toBeVisible();
+  });
+});
+
 test.describe("mobile menu on a desktop", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 

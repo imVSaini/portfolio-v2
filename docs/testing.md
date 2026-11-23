@@ -61,6 +61,10 @@ browser projects.
 Branch on the `layout` fixture rather than on a project name. It is derived from the viewport:
 `phone` below 768px, `tablet` below 1024px, `desktop` from 1024px.
 
+The header has its own breakpoint: the primary nav and the appearance and social icons show from
+1280px (`xl`), and below that everything sits in the menu. `openSiteNav()` and `openAppearance()`
+follow it, and `hasHeaderNav(page)` tells a test which header the viewport gets.
+
 A test that only makes sense on one kind of device carries a tag instead of a runtime skip:
 
 | Tag        | Runs on                          | For                                                |

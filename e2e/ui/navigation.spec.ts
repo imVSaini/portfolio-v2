@@ -31,9 +31,9 @@ function getSlitScales(page: Page): Promise<number[]> {
 
 test.describe("site navigation on the home page", () => {
   for (const { label, href } of SECTION_LINKS) {
-    test(`"${label}" travels to ${href}`, async ({ page, visit, layout }) => {
+    test(`"${label}" travels to ${href}`, async ({ page, visit }) => {
       await visit("/");
-      const navigation = await openSiteNav(page, layout);
+      const navigation = await openSiteNav(page);
 
       await navigation.getByRole("link", { name: label, exact: true }).click();
 
@@ -61,11 +61,11 @@ test.describe("site navigation on the home page", () => {
 
   test('"Home" returns to the top and clears the hash', async ({ page, visit, layout }) => {
     await visit("/");
-    const navigation = await openSiteNav(page, layout);
+    const navigation = await openSiteNav(page);
     await navigation.getByRole("link", { name: "Contact", exact: true }).click();
     await expectScrolledTo(page, "#contact");
 
-    const again = await openSiteNav(page, layout);
+    const again = await openSiteNav(page);
     await again.getByRole("link", { name: "Home", exact: true }).click();
 
     await expect.poll(() => scrollY(page)).toBe(0);
@@ -196,10 +196,10 @@ test.describe("the logo with reduced motion", () => {
 });
 
 test.describe("moving between pages", () => {
-  test('"Blog" opens the blog without a full page load', async ({ page, visit, layout }) => {
+  test('"Blog" opens the blog without a full page load', async ({ page, visit }) => {
     await visit("/");
     await page.evaluate(() => document.documentElement.setAttribute("data-e2e", "kept"));
-    const navigation = await openSiteNav(page, layout);
+    const navigation = await openSiteNav(page);
 
     await navigation.getByRole("link", { name: "Blog", exact: true }).click();
 
@@ -209,9 +209,9 @@ test.describe("moving between pages", () => {
     await expect.poll(() => scrollY(page)).toBe(0);
   });
 
-  test("marks the current page in the navigation", async ({ page, visit, layout }) => {
+  test("marks the current page in the navigation", async ({ page, visit }) => {
     await visit("/blog");
-    const navigation = await openSiteNav(page, layout);
+    const navigation = await openSiteNav(page);
 
     await expect(navigation.getByRole("link", { name: "Blog", exact: true })).toHaveAttribute(
       "aria-current",
@@ -220,13 +220,9 @@ test.describe("moving between pages", () => {
     await expect(navigation.locator("[aria-current]")).toHaveCount(1);
   });
 
-  test("a section link on another page lands on that section of home", async ({
-    page,
-    visit,
-    layout,
-  }) => {
+  test("a section link on another page lands on that section of home", async ({ page, visit }) => {
     await visit("/blog");
-    const navigation = await openSiteNav(page, layout);
+    const navigation = await openSiteNav(page);
 
     await navigation.getByRole("link", { name: "Work", exact: true }).click();
 
@@ -255,10 +251,10 @@ test.describe("moving between pages", () => {
     await expect(page).toHaveTitle(`Privacy policy — ${site.name}`);
   });
 
-  test("back and forward retrace home, blog and a post", async ({ page, visit, layout }) => {
+  test("back and forward retrace home, blog and a post", async ({ page, visit }) => {
     const post = getFirstPost();
     await visit("/");
-    const navigation = await openSiteNav(page, layout);
+    const navigation = await openSiteNav(page);
     await navigation.getByRole("link", { name: "Blog", exact: true }).click();
     await expect(page).toHaveURL(/\/blog$/);
 

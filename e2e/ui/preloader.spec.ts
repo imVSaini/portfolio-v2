@@ -73,10 +73,10 @@ test.describe("intro on the first visit", () => {
     await expect.poll(() => scrollY(page)).toBeGreaterThan(0);
   });
 
-  test("leaves a working page behind", async ({ page, layout }) => {
+  test("leaves a working page behind", async ({ page }) => {
     await page.goto("/");
     await expectHandedOver(page);
-    const navigation = await openSiteNav(page, layout);
+    const navigation = await openSiteNav(page);
 
     await navigation.getByRole("link", { name: "Contact", exact: true }).click();
 
@@ -97,11 +97,11 @@ test.describe("intro on the first visit", () => {
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
-  test("does not play again when coming back from another page", async ({ page, layout }) => {
+  test("does not play again when coming back from another page", async ({ page }) => {
     const { sheet, main } = getParts(page);
     await page.goto("/");
     await expectHandedOver(page);
-    const navigation = await openSiteNav(page, layout);
+    const navigation = await openSiteNav(page);
     await navigation.getByRole("link", { name: "Blog", exact: true }).click();
     await expect(page).toHaveURL(/\/blog$/);
 

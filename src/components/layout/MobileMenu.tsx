@@ -22,7 +22,7 @@ import { cn } from "@/lib/cn";
 import { getHomeHref } from "@/lib/nav";
 import { scrollToAnchor } from "@/lib/scrollToAnchor";
 
-const DESKTOP_NAV_QUERY = "(min-width: 64rem)";
+const DESKTOP_NAV_QUERY = "(min-width: 80rem)";
 
 const TOGGLE_CLASS_NAME =
   "flex h-11 cursor-pointer items-center gap-3 rounded-md px-2 font-display text-p4 font-medium tracking-wide uppercase corner-squircle";

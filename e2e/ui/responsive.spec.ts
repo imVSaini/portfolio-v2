@@ -18,7 +18,9 @@ const HEADER_STEPS = [
   { width: 767, navigation: false, menu: true, icons: false },
   { width: 768, navigation: false, menu: true, icons: false },
   { width: 1023, navigation: false, menu: true, icons: false },
-  { width: 1024, navigation: true, menu: false, icons: true },
+  { width: 1024, navigation: false, menu: true, icons: false },
+  { width: 1279, navigation: false, menu: true, icons: false },
+  { width: 1280, navigation: true, menu: false, icons: true },
 ] as const;
 
 test.describe("each page at this device's size", () => {
@@ -124,6 +126,21 @@ test.describe("header breakpoints", { tag: "@desktop" }, () => {
             header.getByRole("link", { name: `${link.label} (opens in a new tab)` }),
           ).toBeVisible({ visible: step.icons });
         }
+      });
+
+      test("fits its controls on one row without squeezing them", async ({ page, visit }) => {
+        await visit("/");
+        const spill = await page.getByRole("banner").evaluate((header) => {
+          const row = header.querySelector("[data-header-row]");
+          if (!row) return null;
+          const shown = [...row.children].filter(
+            (child) => getComputedStyle(child).display !== "none",
+          );
+          return [row, ...shown].map((element) => element.scrollWidth - element.clientWidth);
+        });
+
+        expect(spill).not.toBeNull();
+        for (const overflow of spill ?? []) expect(overflow).toBeLessThanOrEqual(0);
       });
     });
   }

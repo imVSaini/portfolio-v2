@@ -4,6 +4,7 @@ import { INTRO_KEY } from "@/lib/appearance";
 
 const MD = 768;
 const LG = 1024;
+const XL = 1280;
 const MUTED_OPACITY_FLOOR = 0.5;
 
 export type Layout = "phone" | "tablet" | "desktop";
@@ -95,8 +96,12 @@ export async function openMenu(page: Page): Promise<Locator> {
   return menu;
 }
 
-export async function openSiteNav(page: Page, layout: Layout): Promise<Locator> {
-  if (layout === "desktop") return page.getByRole("navigation", { name: "Primary" });
+export function hasHeaderNav(page: Page): boolean {
+  return (page.viewportSize()?.width ?? XL) >= XL;
+}
+
+export async function openSiteNav(page: Page): Promise<Locator> {
+  if (hasHeaderNav(page)) return page.getByRole("navigation", { name: "Primary" });
   const menu = await openMenu(page);
   return menu.getByRole("navigation", { name: "Mobile" });
 }
@@ -109,8 +114,8 @@ export async function openArticleAside(page: Page, layout: Layout): Promise<void
   await expect(page.getByRole("button", { name: "Copy link" })).toBeVisible();
 }
 
-export async function openAppearance(page: Page, layout: Layout): Promise<Locator> {
-  if (layout !== "desktop") {
+export async function openAppearance(page: Page): Promise<Locator> {
+  if (!hasHeaderNav(page)) {
     const menu = await openMenu(page);
     await menu.getByRole("button", { name: "Appearance" }).click();
     const drawer = page.getByRole("dialog", { name: "Appearance" });

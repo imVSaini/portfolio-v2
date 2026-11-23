@@ -106,13 +106,9 @@ test.describe("page structure", () => {
     },
   );
 
-  test("the appearance controls expose their groups and choices", async ({
-    page,
-    visit,
-    layout,
-  }) => {
+  test("the appearance controls expose their groups and choices", async ({ page, visit }) => {
     await visit("/");
-    const controls = await openAppearance(page, layout);
+    const controls = await openAppearance(page);
 
     await expect(controls.getByRole("group", { name: "Color theme" })).toMatchAriaSnapshot(`
       - button "System" [pressed]
@@ -178,14 +174,9 @@ test.describe("skip link", () => {
     });
   }
 
-  test("still reaches the content after moving between pages", async ({
-    page,
-    visit,
-    layout,
-    tabKey,
-  }) => {
+  test("still reaches the content after moving between pages", async ({ page, visit, tabKey }) => {
     await visit("/");
-    const navigation = await openSiteNav(page, layout);
+    const navigation = await openSiteNav(page);
     await navigation.getByRole("link", { name: "Blog", exact: true }).click();
     await expect(page).toHaveURL(/\/blog$/);
     await expect(page.getByRole("region", { name: "Latest posts" })).toBeVisible();
@@ -316,9 +307,9 @@ test.describe("reduced motion", () => {
     });
   }
 
-  test("in-page links jump straight to their section", async ({ page, visit, layout }) => {
+  test("in-page links jump straight to their section", async ({ page, visit }) => {
     await visit("/");
-    const navigation = await openSiteNav(page, layout);
+    const navigation = await openSiteNav(page);
 
     await navigation.getByRole("link", { name: "Contact", exact: true }).click();
 

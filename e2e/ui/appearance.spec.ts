@@ -2,7 +2,7 @@ import type { Locator, Page } from "@playwright/test";
 
 import { ACCENTS, DEFAULTS, STORAGE_KEYS, THEME_COLORS } from "@/lib/appearance";
 
-import { expect, openAppearance, openSiteNav, scrollToEnd, test } from "../fixtures";
+import { expect, hasHeaderNav, openAppearance, openSiteNav, scrollToEnd, test } from "../fixtures";
 
 type Applied = {
   dark: boolean;
@@ -92,11 +92,7 @@ async function store(page: Page, values: Record<keyof Stored, string>): Promise<
 }
 
 test.describe("appearance", () => {
-  test("starts on the system theme, gold accent and nothing stored", async ({
-    page,
-    visit,
-    layout,
-  }) => {
+  test("starts on the system theme, gold accent and nothing stored", async ({ page, visit }) => {
     await visit("/");
 
     expect(await readApplied(page)).toEqual({
@@ -107,7 +103,7 @@ test.describe("appearance", () => {
     });
     expect(await readStored(page)).toEqual(UNSET);
 
-    await openAppearance(page, layout);
+    await openAppearance(page);
     await expect(themeButton(page, "System")).toHaveAttribute("aria-pressed", "true");
     await expect(themeButton(page, "Light")).toHaveAttribute("aria-pressed", "false");
     await expect(themeButton(page, "Dark")).toHaveAttribute("aria-pressed", "false");
@@ -129,10 +125,10 @@ test.describe("appearance", () => {
     expect(await readStored(page)).toEqual({ ...UNSET, theme: "dark" });
   });
 
-  test("switches between light, dark and the two dark tones", async ({ page, visit, layout }) => {
+  test("switches between light, dark and the two dark tones", async ({ page, visit }) => {
     await visit("/");
     await stopTransitions(page);
-    await openAppearance(page, layout);
+    await openAppearance(page);
     const light = await readColors(page);
 
     await themeButton(page, "Dark").click();
@@ -161,13 +157,9 @@ test.describe("appearance", () => {
     expect((await readColors(page)).surface).toBe(light.surface);
   });
 
-  test("the dark tone is only adjustable while the page is dark", async ({
-    page,
-    visit,
-    layout,
-  }) => {
+  test("the dark tone is only adjustable while the page is dark", async ({ page, visit }) => {
     await visit("/");
-    await openAppearance(page, layout);
+    await openAppearance(page);
 
     for (const name of ["Soft", "Deep"]) await expect(toneButton(page, name)).toBeDisabled();
 
@@ -180,14 +172,10 @@ test.describe("appearance", () => {
   });
 
   for (const theme of ["light", "dark"] as const) {
-    test(`every accent repaints the ${theme} page with its own colour`, async ({
-      page,
-      visit,
-      layout,
-    }) => {
+    test(`every accent repaints the ${theme} page with its own colour`, async ({ page, visit }) => {
       await visit("/");
       await stopTransitions(page);
-      await openAppearance(page, layout);
+      await openAppearance(page);
       await themeButton(page, theme === "dark" ? "Dark" : "Light").click();
       const seen = new Set<string>();
 
@@ -209,9 +197,9 @@ test.describe("appearance", () => {
     });
   }
 
-  test("works from the keyboard", async ({ page, visit, layout }) => {
+  test("works from the keyboard", async ({ page, visit }) => {
     await visit("/");
-    await openAppearance(page, layout);
+    await openAppearance(page);
 
     await themeButton(page, "Dark").focus();
     await page.keyboard.press("Space");
@@ -230,11 +218,10 @@ test.describe("appearance", () => {
     page,
     context,
     visit,
-    layout,
   }) => {
     const chosen = { dark: true, accent: "magenta", tone: "soft", chrome: THEME_COLORS.soft };
     await visit("/");
-    await openAppearance(page, layout);
+    await openAppearance(page);
     await themeButton(page, "Dark").click();
     await toneButton(page, "Soft").click();
     await accentRadio(page, "Magenta").click();
@@ -243,18 +230,18 @@ test.describe("appearance", () => {
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "");
     expect(await readApplied(page)).toEqual(chosen);
-    await openAppearance(page, layout);
+    await openAppearance(page);
     await expect(themeButton(page, "Dark")).toHaveAttribute("aria-pressed", "true");
     await expect(toneButton(page, "Soft")).toHaveAttribute("aria-pressed", "true");
     await expect(accentRadio(page, "Magenta")).toBeChecked();
     await page.keyboard.press("Escape");
-    if (layout !== "desktop") {
+    if (!hasHeaderNav(page)) {
       await expect(page.getByRole("dialog", { name: "Appearance" })).toBeHidden();
       await page.keyboard.press("Escape");
       await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
     }
 
-    const navigation = await openSiteNav(page, layout);
+    const navigation = await openSiteNav(page);
     await navigation.getByRole("link", { name: "Blog", exact: true }).click();
     await expect(page).toHaveURL(/\/blog$/);
     expect(await readApplied(page)).toEqual(chosen);
@@ -284,7 +271,6 @@ test.describe("appearance", () => {
   test("falls back to the defaults when stored values are not recognised", async ({
     page,
     visit,
-    layout,
   }) => {
     await store(page, { theme: "neon", accent: "purple", tone: "medium" });
     await visit("/");
@@ -295,7 +281,7 @@ test.describe("appearance", () => {
       tone: DEFAULTS.tone,
       chrome: THEME_COLORS.light,
     });
-    await openAppearance(page, layout);
+    await openAppearance(page);
     await expect(themeButton(page, "System")).toHaveAttribute("aria-pressed", "true");
     await expect(accentRadio(page, "Gold")).toBeChecked();
   });
@@ -319,9 +305,9 @@ test.describe("appearance", () => {
     );
   });
 
-  test("an explicit choice outranks the operating system", async ({ page, visit, layout }) => {
+  test("an explicit choice outranks the operating system", async ({ page, visit }) => {
     await visit("/");
-    await openAppearance(page, layout);
+    await openAppearance(page);
     await themeButton(page, "Light").click();
 
     await page.emulateMedia({ colorScheme: "dark" });
@@ -336,7 +322,7 @@ test.describe("appearance", () => {
   test.describe("for a visitor whose system is dark", () => {
     test.use({ colorScheme: "dark" });
 
-    test("the first visit is dark without storing a choice", async ({ page, visit, layout }) => {
+    test("the first visit is dark without storing a choice", async ({ page, visit }) => {
       await visit("/");
 
       expect(await readApplied(page)).toEqual({
@@ -346,14 +332,14 @@ test.describe("appearance", () => {
         chrome: THEME_COLORS.deep,
       });
       expect(await readStored(page)).toEqual(UNSET);
-      await openAppearance(page, layout);
+      await openAppearance(page);
       await expect(themeButton(page, "System")).toHaveAttribute("aria-pressed", "true");
       await expect(toneButton(page, "Deep")).toBeEnabled();
     });
 
-    test("choosing light overrides it", async ({ page, visit, layout }) => {
+    test("choosing light overrides it", async ({ page, visit }) => {
       await visit("/");
-      await openAppearance(page, layout);
+      await openAppearance(page);
 
       await themeButton(page, "Light").click();
 
@@ -364,11 +350,11 @@ test.describe("appearance", () => {
 });
 
 test.describe("appearance popover", () => {
-  test("lives in the header from desktop width up", async ({ page, visit, layout }) => {
+  test("lives in the header from 1280px up", async ({ page, visit }) => {
     await visit("/");
     const trigger = page.getByRole("button", { name: "Appearance" });
 
-    if (layout !== "desktop") {
+    if (!hasHeaderNav(page)) {
       await expect(trigger).toBeHidden();
       return;
     }
@@ -379,48 +365,40 @@ test.describe("appearance popover", () => {
     await expect(page.getByRole("group", { name: "Color theme" })).toBeInViewport();
   });
 
-  test(
-    "Escape closes it and hands focus back",
-    { tag: "@desktop" },
-    async ({ page, visit, layout }) => {
-      await visit("/");
-      const popover = await openAppearance(page, layout);
-
-      await page.keyboard.press("Escape");
-
-      await expect(popover).toBeHidden();
-      await expect(page.getByRole("button", { name: "Appearance" })).toBeFocused();
-    },
-  );
-
-  test("a click outside closes it", { tag: "@desktop" }, async ({ page, visit, layout }) => {
+  test("Escape closes it and hands focus back", { tag: "@desktop" }, async ({ page, visit }) => {
     await visit("/");
-    const popover = await openAppearance(page, layout);
+    const popover = await openAppearance(page);
+
+    await page.keyboard.press("Escape");
+
+    await expect(popover).toBeHidden();
+    await expect(page.getByRole("button", { name: "Appearance" })).toBeFocused();
+  });
+
+  test("a click outside closes it", { tag: "@desktop" }, async ({ page, visit }) => {
+    await visit("/");
+    const popover = await openAppearance(page);
 
     await page.mouse.click(24, (page.viewportSize()?.height ?? 600) - 24);
 
     await expect(popover).toBeHidden();
   });
 
-  test(
-    "stays open while choices are made",
-    { tag: "@desktop" },
-    async ({ page, visit, layout }) => {
-      await visit("/");
-      const popover = await openAppearance(page, layout);
+  test("stays open while choices are made", { tag: "@desktop" }, async ({ page, visit }) => {
+    await visit("/");
+    const popover = await openAppearance(page);
 
-      await themeButton(page, "Dark").click();
-      await accentRadio(page, "Orange").click();
+    await themeButton(page, "Dark").click();
+    await accentRadio(page, "Orange").click();
 
-      await expect(popover).toBeVisible();
-      await expect(page.locator("html")).toHaveAttribute("data-accent", "orange");
-    },
-  );
+    await expect(popover).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute("data-accent", "orange");
+  });
 
-  test("announces itself with a name", { tag: "@desktop" }, async ({ page, visit, layout }) => {
+  test("announces itself with a name", { tag: "@desktop" }, async ({ page, visit }) => {
     test.fail(true, "AppearanceMenu's popup is a dialog without a Popover.Title or aria-label");
     await visit("/");
-    const popover = await openAppearance(page, layout);
+    const popover = await openAppearance(page);
 
     await expect(popover).toHaveAccessibleName(/\S/, { timeout: 2_000 });
   });

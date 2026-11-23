@@ -35,7 +35,10 @@ export function Header() {
       )}
     >
       <ScrollProgress />
-      <div className="container-page flex h-(--header-h) items-center justify-between gap-6">
+      <div
+        data-header-row
+        className="container-page flex h-(--header-h) items-center justify-between gap-6"
+      >
         {onHome ? (
           <ScrollLink
             href="#top"
@@ -54,7 +57,7 @@ export function Header() {
           </Link>
         )}
 
-        <nav aria-label="Primary" className="hidden lg:block">
+        <nav aria-label="Primary" className="hidden xl:block">
           <ul className="flex items-center gap-2">
             {nav.map((item) => (
               <li key={item.href}>
@@ -77,8 +80,8 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-1">
-          {/* Icon row from lg up; below that it lives in the menu. */}
-          <div className="hidden lg:flex">
+          {/* Icon row from xl up; below that it lives in the menu. */}
+          <div className="hidden xl:flex">
             <AppearanceMenu />
             {contact.links.map((link) => {
               const Icon = socialIcons[link.label];
@@ -96,7 +99,7 @@ export function Header() {
               );
             })}
           </div>
-          <MobileMenu className="lg:hidden" />
+          <MobileMenu className="xl:hidden" />
         </div>
       </div>
     </header>

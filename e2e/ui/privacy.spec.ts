@@ -48,13 +48,9 @@ test.describe("privacy promises", () => {
     expect(await readKeys(page, "sessionStorage")).toEqual([INTRO_KEY]);
   });
 
-  test("changing the appearance stores only the three documented keys", async ({
-    page,
-    visit,
-    layout,
-  }) => {
+  test("changing the appearance stores only the three documented keys", async ({ page, visit }) => {
     await visit("/");
-    const controls = await openAppearance(page, layout);
+    const controls = await openAppearance(page);
 
     await controls.getByRole("button", { name: "Dark", exact: true }).click();
     await controls.getByRole("radio", { name: "Red" }).click();
