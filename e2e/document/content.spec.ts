@@ -65,6 +65,26 @@ test.describe("pages without JavaScript", () => {
       expect(jumps).toEqual([]);
     });
 
+    test(`${path} puts each rolled label in the HTML once, as a whole word`, async ({ page }) => {
+      await page.goto(path);
+
+      const rolled = await page
+        .locator("[aria-hidden='true']:has(> [data-char])")
+        .evaluateAll((layers) =>
+          layers.map((layer) => ({
+            label: [...layer.children].map((glyph) => glyph.getAttribute("data-char")).join(""),
+            text: layer.parentElement?.textContent,
+            glyphText: layer.textContent,
+          })),
+        );
+
+      expect(rolled.length).toBeGreaterThan(0);
+      expect(
+        rolled.filter(({ label, text, glyphText }) => text !== label || glyphText !== ""),
+        "the letters are drawn by CSS, so only the word itself is text",
+      ).toEqual([]);
+    });
+
     test(`${path} starts with a skip link to the main content`, async ({ page }) => {
       await page.goto(path);
 
@@ -90,10 +110,8 @@ test.describe("home without JavaScript", () => {
       /^Backend depth,\s+frontend\s+finish\.$/,
     );
     await expect(
-      hero
-        .getByRole("link", { name: "See selected work" })
-        .locator("[aria-hidden='true']:has([data-char])"),
-      "the rolled-in copy is drawn by CSS, so each letter is in the HTML once",
+      hero.getByRole("link", { name: "See selected work" }),
+      "the letters are drawn by CSS, so the label is in the HTML once",
     ).toHaveText("See selected work", { useInnerText: false });
     await expect(hero).toHaveAttribute("aria-label", "Introduction");
     await expect(hero).toContainText(`I’m ${site.shortName}, a full stack developer`);
@@ -122,6 +140,10 @@ test.describe("home without JavaScript", () => {
     await expect(links).toHaveCount(nav.length);
     for (const [index, item] of nav.entries()) {
       await expect(links.nth(index)).toHaveAccessibleName(item.label);
+      await expect(
+        links.nth(index),
+        "text extraction reads the word, not the word plus spaced-out letters",
+      ).toHaveText(item.label, { useInnerText: true, ignoreCase: true });
       await expect(links.nth(index)).toHaveAttribute("href", item.href);
     }
   });

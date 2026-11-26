@@ -68,7 +68,9 @@ Do not add `"use client"` to a section to animate it. See [Architecture](./archi
 | `OverscrollReveal`  | client | Wheeling past the page end lifts the page over colour bands, then springs back                                                    |
 
 `RevealText` and `RollText` split text into `aria-hidden` glyphs and keep the full string for
-screen readers.
+screen readers. `RollText` keeps its label in the HTML once, as a visually hidden text node, and
+draws each glyph and its rolled-in copy from `data-char` with CSS `content`. Crawlers and text
+extraction then read "Home", not "Home H o m e". Never put per-letter text in the DOM.
 
 ### `HorizontalSection` attributes
 

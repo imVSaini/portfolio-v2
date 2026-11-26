@@ -35,13 +35,11 @@ export function RollText({
               data-char={char}
               className={cn(
                 roll,
-                "relative whitespace-pre after:absolute after:inset-x-0 after:top-full after:content-[attr(data-char)]",
+                "relative whitespace-pre before:content-[attr(data-char)] after:absolute after:inset-x-0 after:top-full after:content-[attr(data-char)]",
                 accent && "after:text-accent",
               )}
               style={delay}
-            >
-              {char}
-            </span>
+            />
           );
         })}
       </span>

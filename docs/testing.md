@@ -99,7 +99,8 @@ Import `test` and `expect` from `e2e/fixtures.ts` in UI specs.
 - Read expectations from `src/data` and `e2e/routes.ts` (`PAGE_ROUTES`, `getPostPath`, …) instead of
   repeating copy, slugs or counts. New posts and pages are then covered automatically.
 - Locate by role and accessible name. `RollText` and `RevealText` split text into hidden glyphs,
-  so match headings by accessible name or with `\s*` between words.
+  so match headings by accessible name or with `\s*` between words. `RollText` glyphs are drawn
+  by CSS and hold no text, so read a glyph's letter from `data-char`, not `textContent`.
 - Use web-first assertions and `expect.poll`. No `waitForTimeout`, no pixel snapshots.
 - After client-side navigation, Next.js keeps the previous page mounted but hidden, so
   `page.locator("main")` can match two elements. Use `getByRole` or `.filter({ visible: true })`.

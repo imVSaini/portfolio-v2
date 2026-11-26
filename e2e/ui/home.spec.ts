@@ -92,13 +92,46 @@ test.describe("hero", () => {
             const box = span.getBoundingClientRect();
             const copy = getComputedStyle(span, "::after").content;
             return (
-              clip !== undefined && box.bottom <= clip.top + 1 && copy === `"${span.textContent}"`
+              clip !== undefined &&
+              box.bottom <= clip.top + 1 &&
+              copy === `"${span.getAttribute("data-char")}"`
             );
           }),
         ),
       )
       .not.toContain(false);
   });
+
+  for (const reducedMotion of ["no-preference", "reduce"] as const) {
+    test.describe(`with reduced motion set to ${reducedMotion}`, () => {
+      test.use({ contextOptions: { reducedMotion } });
+
+      test("draws each letter of a rolled label but keeps the word as text once", async ({
+        page,
+        visit,
+      }) => {
+        await visit("/");
+        const label = CALLS_TO_ACTION[0].name;
+        const link = page.getByRole("link", { name: label });
+        const glyphs = link.locator("[data-char]");
+
+        await expect(link).toHaveText(label, { useInnerText: true, ignoreCase: true });
+        await expect(link).toHaveText(label, { useInnerText: false });
+        await expect(glyphs).toHaveCount(label.length);
+        expect(
+          await glyphs.evaluateAll((spans) =>
+            spans.flatMap((span) => {
+              const char = span.getAttribute("data-char") ?? "";
+              const drawn = getComputedStyle(span, "::before").content === `"${char}"`;
+              const shown = char === " " || span.getBoundingClientRect().width > 0;
+              return drawn && shown && span.textContent === "" ? [] : [char];
+            }),
+          ),
+          "every letter is drawn by CSS and takes up space",
+        ).toEqual([]);
+      });
+    });
+  }
 });
 
 test.describe("selected work", () => {
