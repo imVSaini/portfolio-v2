@@ -1,4 +1,3 @@
-import type { DiagramBlock, TextBlock } from "@/data/article";
 import { blog } from "@/data/blog";
 import { caseStudies, type CaseStudy } from "@/data/caseStudies";
 import { contact } from "@/data/contact";
@@ -7,28 +6,13 @@ import { posts, type Post } from "@/data/posts";
 import { projects } from "@/data/projects";
 import { site } from "@/data/site";
 import { skillGroups } from "@/data/skills";
+import { getCaseStudyArticle, getPostArticle } from "@/lib/articleSources";
 import { DECISIONS_HEADING, getCaseStudyPath } from "@/lib/caseStudies";
+import { toPortableMarkdown } from "@/lib/markdoc";
 import { formatPostDate, getPostPath } from "@/lib/posts";
 
 function absolute(path: `/${string}`) {
   return new URL(path, site.url).href;
-}
-
-function renderBlock(block: TextBlock | DiagramBlock<string>) {
-  switch (block.type) {
-    case "heading":
-      return `## ${block.text}`;
-    case "paragraph":
-      return block.text;
-    case "list":
-      return block.items.map((item) => `- ${item}`).join("\n");
-    case "quote":
-      return `> ${block.text}`;
-    case "code":
-      return `\`\`\`${block.language}\n${block.code}\n\`\`\``;
-    case "diagram":
-      return `**Figure.** ${block.caption} ${block.alt}`;
-  }
 }
 
 /**
@@ -61,6 +45,7 @@ export function getPostMarkdownPath(post: Post): `/${string}` {
  * ```
  */
 export function getPostMarkdown(post: Post): string {
+  const { source, ast, readMinutes } = getPostArticle(post);
   const updated =
     post.updatedAt && post.updatedAt !== post.date
       ? `, updated ${formatPostDate(post.updatedAt)}`
@@ -69,9 +54,9 @@ export function getPostMarkdown(post: Post): string {
   return [
     `# ${post.title}`,
     `> ${post.excerpt}`,
-    `By ${site.name}, ${site.role}. Published ${formatPostDate(post.date)}${updated}. ${post.topic}, ${post.readMinutes} min read.`,
+    `By ${site.name}, ${site.role}. Published ${formatPostDate(post.date)}${updated}. ${post.topic}, ${readMinutes} min read.`,
     `Canonical: ${absolute(getPostPath(post))}`,
-    ...post.body.map(renderBlock),
+    toPortableMarkdown(source, ast),
   ].join("\n\n");
 }
 
@@ -106,6 +91,7 @@ export function getCaseStudyMarkdownPath(study: CaseStudy): `/${string}` {
  * ```
  */
 export function getCaseStudyMarkdown(study: CaseStudy): string {
+  const { source, ast } = getCaseStudyArticle(study);
   const decisions = study.decisions.map((decision) =>
     [
       `### ${decision.title}`,
@@ -123,10 +109,7 @@ export function getCaseStudyMarkdown(study: CaseStudy): string {
     study.facts.map((fact) => `- **${fact.label}**: ${fact.value}`).join("\n"),
     study.metrics.map((metric) => `- **${metric.value}**: ${metric.label}`).join("\n"),
     `Stack: ${study.stack.join(", ")}.`,
-    ...study.overview.map(renderBlock),
-    `## ${DECISIONS_HEADING}`,
-    ...decisions,
-    ...study.outcome.map(renderBlock),
+    toPortableMarkdown(source, ast, [`## ${DECISIONS_HEADING}`, ...decisions].join("\n\n")),
   ].join("\n\n");
 }
 

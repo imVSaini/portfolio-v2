@@ -1,24 +1,24 @@
-import type { DiagramBlock, TextBlock } from "@/data/article";
 import type { ProjectTint } from "@/data/projects";
 
 /** Product mock-up drawn on the cover; each name maps to a drawing in `CaseStudyCover`. */
 export type CaseStudyArtName = "pipeline" | "chat" | "ledger" | "parking";
 
-/** Line drawing set inside a case study; each name maps to a drawing in `CaseStudyDiagram`. */
-export type CaseStudyDiagramName =
-  | "tenantRequest"
-  | "answerPath"
-  | "metaLeads"
-  | "leadCapture"
-  | "knowledgeBase"
-  | "bookingHold"
-  | "paymentPaths"
-  | "priceBuild"
-  | "statementImport"
-  | "documentBill"
-  | "magicLink";
+/** Line drawings set inside a case study; each name maps to a drawing in `CaseStudyDiagram`. */
+export const CASE_STUDY_DIAGRAM_NAMES = [
+  "tenantRequest",
+  "answerPath",
+  "metaLeads",
+  "leadCapture",
+  "knowledgeBase",
+  "bookingHold",
+  "paymentPaths",
+  "priceBuild",
+  "statementImport",
+  "documentBill",
+  "magicLink",
+] as const;
 
-export type CaseStudyBlock = TextBlock | DiagramBlock<CaseStudyDiagramName>;
+export type CaseStudyDiagramName = (typeof CASE_STUDY_DIAGRAM_NAMES)[number];
 
 export type CaseStudyFact = {
   label: string;
@@ -33,7 +33,7 @@ export type CaseStudyMetric = {
 
 export type CaseStudyDecision = {
   title: string;
-  /** The situation that forced a choice. May wrap inline code in backticks. */
+  /** The situation that forced a choice. */
   context: string;
   chose: string;
   cost: string;
@@ -54,13 +54,6 @@ export type CaseStudy = {
   facts: CaseStudyFact[];
   metrics: CaseStudyMetric[];
   stack: string[];
-  /** Prose before the decisions: the problem, the constraints and the architecture. */
-  overview: CaseStudyBlock[];
+  /** Rendered where the body's `{% decisions /%}` tag sits. Fields may use inline Markdown. */
   decisions: CaseStudyDecision[];
-  /** Prose after the decisions: where it stands and what would change. */
-  outcome: CaseStudyBlock[];
 };
-
-export function diagram(name: CaseStudyDiagramName, caption: string, alt: string): CaseStudyBlock {
-  return { type: "diagram", name, caption, alt };
-}

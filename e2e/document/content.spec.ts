@@ -12,6 +12,7 @@ import { INTRO_KEY, STORAGE_KEYS } from "@/lib/appearance";
 import { getHomeHref } from "@/lib/nav";
 import { formatPostDate } from "@/lib/posts";
 
+import { readPostArticle } from "../articles";
 import { getFirstPost, getPostPath, PAGE_ROUTES } from "../routes";
 
 const HOME_SECTIONS = ["top", "work", "experience", "skills", "contact"];
@@ -358,7 +359,7 @@ test.describe("blog index without JavaScript", () => {
 
       await expect(card).toContainText(post.topic);
       await expect(card).toContainText(post.excerpt);
-      await expect(card).toContainText(`${post.readMinutes} min read`);
+      await expect(card).toContainText(`${readPostArticle(post).readMinutes} min read`);
       await expect(card).toContainText(site.name);
       await expect(date).toHaveAttribute("datetime", post.date);
       await expect(date).toHaveText(formatPostDate(post.date));

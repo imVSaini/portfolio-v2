@@ -1,40 +1,40 @@
-import type { DiagramBlock, TextBlock } from "@/data/article";
 import type { ProjectTint } from "@/data/projects";
 
-export type PostBlock = TextBlock | DiagramBlock<PostDiagramName>;
+/** Line drawings set inside an article; each name maps to a drawing in `PostDiagram`. */
+export const POST_DIAGRAM_NAMES = [
+  "cellRouter",
+  "shuffleShards",
+  "workflowSprawl",
+  "journalReplay",
+  "retryBudget",
+  "degradeLadder",
+  "skipLocked",
+  "postgresEnvelope",
+  "lockQueue",
+  "expandContract",
+  "ragPipeline",
+  "toolLoop",
+  "serverTree",
+  "streamingShell",
+  "inpAnatomy",
+  "yieldChunks",
+  "moduleBoundaries",
+  "tokenLayers",
+  "canarySteps",
+  "deployRelease",
+  "gitopsLoop",
+  "goldenPath",
+  "supplyChain",
+  "signedBuild",
+  "doorTest",
+  "rfcFlow",
+  "doraMetrics",
+  "aiAmplifier",
+  "reviewGates",
+  "reviewAttention",
+] as const;
 
-/** Line drawing set inside an article; each name maps to a drawing in `PostDiagram`. */
-export type PostDiagramName =
-  | "cellRouter"
-  | "shuffleShards"
-  | "workflowSprawl"
-  | "journalReplay"
-  | "retryBudget"
-  | "degradeLadder"
-  | "skipLocked"
-  | "postgresEnvelope"
-  | "lockQueue"
-  | "expandContract"
-  | "ragPipeline"
-  | "toolLoop"
-  | "serverTree"
-  | "streamingShell"
-  | "inpAnatomy"
-  | "yieldChunks"
-  | "moduleBoundaries"
-  | "tokenLayers"
-  | "canarySteps"
-  | "deployRelease"
-  | "gitopsLoop"
-  | "goldenPath"
-  | "supplyChain"
-  | "signedBuild"
-  | "doorTest"
-  | "rfcFlow"
-  | "doraMetrics"
-  | "aiAmplifier"
-  | "reviewGates"
-  | "reviewAttention";
+export type PostDiagramName = (typeof POST_DIAGRAM_NAMES)[number];
 
 /** Line diagram drawn on the cover; each name maps to a drawing in `PostArt`. */
 export type PostArtName =
@@ -54,7 +54,7 @@ export type PostArtName =
   | "gauges"
   | "review";
 
-export type PostSource = {
+export type Post = {
   slug: string;
   title: string;
   excerpt: string;
@@ -72,14 +72,4 @@ export type PostSource = {
   art: PostArtName;
   /** Bucket path of the cover image, such as `/blog/outbox.webp`. */
   cover?: `/${string}`;
-  body: PostBlock[];
 };
-
-export type Post = PostSource & {
-  /** Derived from the word count of `body`. */
-  readMinutes: number;
-};
-
-export function diagram(name: PostDiagramName, caption: string, alt: string): PostBlock {
-  return { type: "diagram", name, caption, alt };
-}

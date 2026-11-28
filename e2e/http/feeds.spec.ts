@@ -6,6 +6,7 @@ import { contact } from "@/data/contact";
 import { posts } from "@/data/posts";
 import { site } from "@/data/site";
 
+import { readPostArticle } from "../articles";
 import { getCanonical, getCaseStudyPath, PAGE_ROUTES } from "../routes";
 
 function matchAll(source: string, pattern: RegExp): string[] {
@@ -82,6 +83,22 @@ test.describe("rss.xml", () => {
     for (const body of bodies) {
       const cdata = body.startsWith("<![CDATA[");
       expect(cdata || !/<(?!!\[CDATA\[)/.test(body)).toBe(true);
+    }
+  });
+
+  test("keeps body links and writes figures out as text", async ({ request }) => {
+    const xml = await (await request.get(blog.feedPath)).text();
+    const bodies = matchAll(xml, /<content:encoded>([\s\S]*?)<\/content:encoded>/g);
+
+    for (const [index, post] of posts.entries()) {
+      const html = decodeXml(bodies[index] ?? "");
+      const article = readPostArticle(post);
+
+      expect(html, post.slug).not.toContain("{%");
+      for (const link of article.links) {
+        expect(html, post.slug).toContain(`<a href="${link.href.replaceAll("&", "&amp;")}">`);
+      }
+      expect(html.match(/<figure>/g) ?? [], post.slug).toHaveLength(article.diagrams.length);
     }
   });
 });
@@ -187,8 +204,8 @@ test.describe("llms.txt", () => {
     }
     for (const post of posts) {
       expect(text).toContain(`# ${post.title}`);
-      for (const block of post.body) {
-        if (block.type === "heading") expect(text).toContain(`## ${block.text}`);
+      for (const heading of readPostArticle(post).headings) {
+        expect(text).toContain(`## ${heading}`);
       }
     }
   });

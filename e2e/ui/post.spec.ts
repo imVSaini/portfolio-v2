@@ -2,8 +2,10 @@ import type { Page } from "@playwright/test";
 
 import { posts, type Post } from "@/data/posts";
 import { site } from "@/data/site";
+import { STORAGE_KEYS } from "@/lib/appearance";
 import { getHeadingId } from "@/lib/article";
 
+import { readPostArticle } from "../articles";
 import {
   clickWhenSettled,
   expect,
@@ -17,8 +19,9 @@ import { getFirstPost, getPostPath } from "../routes";
 
 const POST = getFirstPost();
 const PATH = getPostPath(POST);
-const HEADINGS = POST.body.flatMap((block) => (block.type === "heading" ? [block.text] : []));
-const DIAGRAMS = POST.body.flatMap((block) => (block.type === "diagram" ? [block] : []));
+const ARTICLE = readPostArticle(POST);
+const HEADINGS = ARTICLE.headings;
+const DIAGRAMS = ARTICLE.diagrams;
 
 function getCodeHeavyPost(): Post {
   const ranked = [...posts].sort((a, b) => countCode(b) - countCode(a));
@@ -28,7 +31,7 @@ function getCodeHeavyPost(): Post {
 }
 
 function countCode(post: Post): number {
-  return post.body.filter((block) => block.type === "code").length;
+  return readPostArticle(post).codeSamples.length;
 }
 
 async function pickRoomyHeading(page: Page): Promise<string> {
@@ -181,7 +184,7 @@ test.describe("post code samples", () => {
     clipboard,
   }) => {
     const post = getCodeHeavyPost();
-    const samples = post.body.flatMap((block) => (block.type === "code" ? [block] : []));
+    const samples = readPostArticle(post).codeSamples;
     await visit(getPostPath(post));
     const figures = page.locator("figure").filter({ has: page.locator("pre") });
 
@@ -199,7 +202,7 @@ test.describe("post code samples", () => {
   });
 
   test("copy works from the keyboard", async ({ page, visit, clipboard }) => {
-    const [sample] = POST.body.flatMap((block) => (block.type === "code" ? [block] : []));
+    const [sample] = ARTICLE.codeSamples;
     await visit(PATH);
     const button = page
       .locator("figure")
@@ -247,6 +250,32 @@ test.describe("post code samples", () => {
     expect(await sample.evaluate((element) => getComputedStyle(element).overflowX)).toBe("auto");
     expect(await getOverflow(page)).toBe(0);
   });
+
+  for (const theme of ["light", "dark"] as const) {
+    test(`colours code tokens with the ${theme} theme`, async ({ page, visit }) => {
+      await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), {
+        key: STORAGE_KEYS.theme,
+        value: theme,
+      });
+      await visit(getPostPath(getCodeHeavyPost()));
+      const tokens = page.locator("pre code span[style]");
+
+      await expect(tokens.first()).toBeAttached();
+      const colours = await tokens.evaluateAll((spans, variable) => {
+        const probe = document.createElement("span");
+        document.body.append(probe);
+        const pairs = spans.slice(0, 20).map((span) => {
+          probe.style.color = span.style.getPropertyValue(variable);
+          return [getComputedStyle(span).color, getComputedStyle(probe).color];
+        });
+        probe.remove();
+        return pairs;
+      }, `--shiki-${theme}`);
+
+      expect(colours.length).toBeGreaterThan(0);
+      for (const [shown, expected] of colours) expect(shown).toBe(expected);
+    });
+  }
 });
 
 test.describe("post diagrams", () => {

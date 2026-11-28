@@ -3,8 +3,9 @@ import type { Page } from "@playwright/test";
 import { caseStudies, caseStudiesPage, type CaseStudy } from "@/data/caseStudies";
 import { site } from "@/data/site";
 import { getHeadingId } from "@/lib/article";
-import { DECISIONS_HEADING, getCaseStudyHeadings } from "@/lib/caseStudies";
+import { DECISIONS_HEADING } from "@/lib/caseStudies";
 
+import { readCaseStudyArticle } from "../articles";
 import {
   clickWhenSettled,
   expect,
@@ -198,7 +199,7 @@ test.describe("case study", () => {
       page,
       visit,
     }) => {
-      const diagrams = study.overview.flatMap((block) => (block.type === "diagram" ? [block] : []));
+      const { diagrams } = readCaseStudyArticle(study);
       await visit(getCaseStudyPath(study));
 
       expect(diagrams.length).toBeGreaterThan(0);
@@ -221,7 +222,7 @@ test.describe("case study", () => {
     layout,
   }) => {
     await visit(PATH);
-    const headings = getCaseStudyHeadings(STUDY);
+    const { headings } = readCaseStudyArticle(STUDY);
     const id = getHeadingId(DECISIONS_HEADING);
     await openArticleAside(page, layout);
     const contents = page.getByRole("navigation", { name: "On this page" });

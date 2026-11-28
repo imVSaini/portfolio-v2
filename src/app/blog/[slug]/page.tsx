@@ -14,10 +14,12 @@ import { PageShell } from "@/components/layout/PageShell";
 import { RevealText } from "@/components/motion/RevealText";
 import { RollText } from "@/components/motion/RollText";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { posts, type Post } from "@/data/posts";
+import { POST_DIAGRAM_NAMES, posts, type Post } from "@/data/posts";
 import { site } from "@/data/site";
+import { getPostArticle } from "@/lib/articleSources";
 import { getPostJsonLd } from "@/lib/jsonLd";
 import { getPostMarkdownPath } from "@/lib/llms";
+import { getArticleHeadings } from "@/lib/markdoc";
 import { buildPageMetadata } from "@/lib/metadata";
 import { getPostPath } from "@/lib/posts";
 
@@ -79,7 +81,8 @@ export default async function PostPage({ params }: PageProps<"/blog/[slug]">) {
 
 function PostContent({ post }: { post: Post }) {
   const url = `${site.url}${getPostPath(post)}`;
-  const headings = post.body.flatMap((block) => (block.type === "heading" ? [block.text] : []));
+  const { ast } = getPostArticle(post);
+  const headings = getArticleHeadings(ast);
   const related = relatedPosts(post);
 
   return (
@@ -106,7 +109,7 @@ function PostContent({ post }: { post: Post }) {
             <ArticleAside headings={headings} share={{ url, title: post.title }} />
           </aside>
           <div className="flex max-w-prose flex-col gap-12 text-prose lg:col-span-8">
-            <ArticleBody blocks={post.body} Diagram={PostDiagram} />
+            <ArticleBody ast={ast} diagramNames={POST_DIAGRAM_NAMES} Diagram={PostDiagram} />
 
             <PostAuthorCard />
           </div>

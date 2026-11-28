@@ -46,8 +46,10 @@ appearance popover and drawer), which could load on first open instead of with t
 - Animated sections use client wrappers and pass their markup as `children`
   (see [Architecture](./architecture.md#the-client-boundary)). Moving four sections to this pattern
   cut 7.7 KB from the home page and 1.6 KB from every other page.
-- Content (`src/data/posts`, `src/data/caseStudies`) must never be imported by a client component;
-  it would ship every article body to the browser.
+- Content (`src/data/posts`, `src/data/caseStudies`, `src/content`) and the helpers that read it
+  (`src/lib/articleSources.ts`, `src/lib/markdoc.ts`, `src/lib/highlight.ts`) must never be
+  imported by a client component; they would ship every article, Markdoc and Shiki to the browser.
+  The `*.md` rule in `next.config.ts` skips browser code, so importing a body there fails the build.
 - Prefer CSS for simple motion. `RollText` is pure CSS and runs on the server.
 
 ## Rendering and caching

@@ -4,6 +4,7 @@ import { AuthorAvatar } from "@/components/blog/AuthorAvatar";
 import { CalendarIcon, ClockIcon } from "@/components/blog/PostIcons";
 import type { Post } from "@/data/posts";
 import { site } from "@/data/site";
+import { getPostArticle } from "@/lib/articleSources";
 import { formatPostDate } from "@/lib/posts";
 
 type PostAuthorProps = {
@@ -41,7 +42,7 @@ export function PostAuthor({ post, showDate = false }: PostAuthorProps) {
         </Detail>
       )}
       <Detail icon={<ClockIcon aria-hidden="true" className={icon} />}>
-        {post.readMinutes} min read
+        {getPostArticle(post).readMinutes} min read
       </Detail>
     </p>
   );

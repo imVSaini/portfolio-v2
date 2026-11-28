@@ -8,8 +8,8 @@ covers the shape of the code and the rules that keep it that way.
 
 1. **Static first.** Nothing is computed per request. Anything that varies by visitor (theme, the
    current year, the live clock) is resolved in the browser without a hydration mismatch.
-2. **One source, many outputs.** A post is written once in `src/data` and rendered as HTML,
-   Markdown, RSS, `llms.txt`, JSON-LD and an Open Graph card.
+2. **One source, many outputs.** A post is written once (metadata in `src/data`, body in
+   `src/content`) and rendered as HTML, Markdown, RSS, `llms.txt`, JSON-LD and an Open Graph card.
 3. **Server by default, client at the leaves.** Server Components render the markup. Client code
    is limited to the pieces that animate, hold state or handle events.
 4. **Works without motion.** Every page is readable and usable with JavaScript off or with reduced

@@ -4,8 +4,10 @@ import { contact } from "@/data/contact";
 import { posts, type Post } from "@/data/posts";
 import { site } from "@/data/site";
 import { getHeadingId } from "@/lib/article";
+import { findNodes } from "@/lib/markdoc";
 import { formatPostDate } from "@/lib/posts";
 
+import { readPostArticle } from "../articles";
 import { getCanonical, getPostPath } from "../routes";
 
 const RELATED_COUNT = 3;
@@ -31,13 +33,15 @@ test.describe("post data", () => {
     expect(new Set(titles).size).toBe(titles.length);
     for (const slug of slugs) expect(slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
     for (const post of posts) {
-      const ids = post.body.flatMap((block) =>
-        block.type === "heading" ? [getHeadingId(block.text)] : [],
-      );
+      const ids = readPostArticle(post).headings.map(getHeadingId);
 
       expect(new Set(ids).size, post.slug).toBe(ids.length);
       expect(ids.every((id) => id.length > 0)).toBe(true);
     }
+  });
+
+  test("bodies link to their sources", () => {
+    expect(posts.some((post) => readPostArticle(post).links.length > 0)).toBe(true);
   });
 
   test("posts are ordered newest first and dated on real days", () => {
@@ -46,7 +50,7 @@ test.describe("post data", () => {
     expect(times.every((time) => Number.isFinite(time))).toBe(true);
     expect(times).toEqual([...times].sort((a, b) => b - a));
     for (const post of posts) {
-      expect(post.readMinutes, post.slug).toBeGreaterThan(0);
+      expect(readPostArticle(post).readMinutes, post.slug).toBeGreaterThan(0);
       if (post.updatedAt) expect(post.updatedAt >= post.date, post.slug).toBe(true);
     }
   });
@@ -54,7 +58,8 @@ test.describe("post data", () => {
 
 for (const post of posts) {
   test.describe(getPostPath(post), () => {
-    const headings = post.body.flatMap((block) => (block.type === "heading" ? [block.text] : []));
+    const article = readPostArticle(post);
+    const { headings } = article;
 
     test.beforeEach(async ({ page }) => {
       await page.goto(getPostPath(post));
@@ -70,7 +75,7 @@ for (const post of posts) {
       await expect(crumbs.getByRole("link", { name: "Blog" })).toHaveAttribute("href", "/blog");
       await expect(crumbs.getByRole("listitem").last()).toHaveText(post.topic);
       await expect(header).toContainText(site.name);
-      await expect(header).toContainText(`${post.readMinutes} min read`);
+      await expect(header).toContainText(`${article.readMinutes} min read`);
       await expect(date).toHaveAttribute("datetime", post.date);
       await expect(date).toHaveText(formatPostDate(post.date));
     });
@@ -93,21 +98,39 @@ for (const post of posts) {
       const body = page.locator("main article");
       const paragraphs = await body.locator("p").allTextContents();
       const items = await body.locator("ul > li").allTextContents();
-      const quotes = post.body.flatMap((block) => (block.type === "quote" ? [block.text] : []));
 
-      for (const block of post.body) {
-        if (block.type === "paragraph") {
-          expect(paragraphs, block.text).toContain(stripInlineCode(block.text));
-        }
-        if (block.type === "list") {
-          for (const item of block.items) expect(items, item).toContain(stripInlineCode(item));
+      for (const text of article.paragraphs) {
+        expect(paragraphs, text).toContain(stripInlineCode(text));
+      }
+      for (const item of article.listItems) expect(items, item).toContain(stripInlineCode(item));
+      await expect(body.locator("blockquote")).toHaveText(article.quotes);
+    });
+
+    test("links out in a new tab and keeps inline emphasis", async ({ page }) => {
+      const body = page.locator("[data-article-body]");
+      const anchors = body.locator("a");
+
+      await expect(anchors).toHaveCount(article.links.length);
+      for (const [index, link] of article.links.entries()) {
+        const anchor = anchors.nth(index);
+
+        await expect(anchor).toHaveAttribute("href", link.href);
+        await expect(anchor).toHaveText(stripInlineCode(link.text));
+        if (/^https?:\/\//.test(link.href)) {
+          await expect(anchor).toHaveAttribute("target", "_blank");
+          await expect(anchor).toHaveAttribute("rel", "noreferrer");
+          await expect(anchor).toHaveAttribute(
+            "aria-label",
+            `${stripInlineCode(link.text)} (opens in a new tab)`,
+          );
         }
       }
-      await expect(body.locator("blockquote")).toHaveText(quotes);
+      await expect(body.locator("strong")).toHaveCount(findNodes(article.ast, "strong").length);
+      await expect(body.locator("em")).toHaveCount(findNodes(article.ast, "em").length);
     });
 
     test("prints code samples line for line under their language", async ({ page }) => {
-      const samples = post.body.flatMap((block) => (block.type === "code" ? [block] : []));
+      const samples = article.codeSamples;
       const blocks = page.locator("main article figure").filter({ has: page.locator("pre") });
 
       await expect(blocks).toHaveCount(samples.length);
@@ -127,7 +150,7 @@ for (const post of posts) {
     });
 
     test("captions and describes every diagram", async ({ page }) => {
-      const diagrams = post.body.flatMap((block) => (block.type === "diagram" ? [block] : []));
+      const { diagrams } = article;
       const figures = page
         .locator("main article figure")
         .filter({ has: page.locator('[role="group"]') });

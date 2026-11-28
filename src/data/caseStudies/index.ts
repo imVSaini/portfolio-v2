@@ -4,7 +4,6 @@ import { parkingMarketplace } from "@/data/caseStudies/parkingMarketplace";
 import type {
   CaseStudy,
   CaseStudyArtName,
-  CaseStudyBlock,
   CaseStudyDecision,
   CaseStudyDiagramName,
   CaseStudyFact,
@@ -13,10 +12,10 @@ import type {
 import { supportAssistant } from "@/data/caseStudies/supportAssistant";
 import { site } from "@/data/site";
 
+export { CASE_STUDY_DIAGRAM_NAMES } from "@/data/caseStudies/schema";
 export type {
   CaseStudy,
   CaseStudyArtName,
-  CaseStudyBlock,
   CaseStudyDecision,
   CaseStudyDiagramName,
   CaseStudyFact,

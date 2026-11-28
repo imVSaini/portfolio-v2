@@ -19,8 +19,10 @@ for accessible primitives.
 - `src/app`: routes, root layout, `globals.css` (the design system) and self-hosted fonts.
 - `src/components`: `layout`, `sections`, `motion`, `scroll`, `ui`, `appearance`, `article`,
   `blog`, `caseStudies`.
-- `src/data`: typed site content (projects, experience, skills, contact, site meta, blog posts,
-  case studies).
+- `src/data`: typed site content (projects, experience, skills, contact, site meta, blog post and
+  case study metadata).
+- `src/content`: article bodies as Markdoc files (`posts/<slug>.md`, `case-studies/<slug>.md`),
+  loaded by `src/lib/articleSources.ts`. See `docs/content.md`.
 - `src/lib`: shared helpers (`cn`, the `gsap` setup, appearance).
 - `src/hooks`, `src/stores`: React hooks and the zustand store (one slice file per feature).
 - `docs`: how the system works (architecture, content, SEO, design system, motion, state,

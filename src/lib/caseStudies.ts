@@ -1,6 +1,7 @@
 import { caseStudies, type CaseStudy } from "@/data/caseStudies";
+import { getArticleHeadings, type ArticleNode } from "@/lib/markdoc";
 
-/** Heading of the decisions list, which sits between a study's two runs of prose. */
+/** Heading of the decisions list, listed where the body's `{% decisions /%}` tag sits. */
 export const DECISIONS_HEADING = "Decisions and trade-offs";
 
 /**
@@ -22,19 +23,16 @@ export function getCaseStudyPath(study: CaseStudy): `/case-studies/${string}` {
 /**
  * Lists a case study's section headings in reading order, for its table of contents.
  *
- * @param study - The case study being displayed.
- * @returns The overview headings, the decisions heading, then the outcome headings.
+ * @param ast - The case study's parsed body.
+ * @returns The body's headings, with the decisions heading where its tag sits.
  *
  * @example
  * ```tsx
- * <ArticleAside headings={getCaseStudyHeadings(study)} share={{ url, title }} />
+ * <ArticleAside headings={getCaseStudyHeadings(ast)} share={{ url, title }} />
  * ```
  */
-export function getCaseStudyHeadings(study: CaseStudy): string[] {
-  const headings = (blocks: CaseStudy["overview"]) =>
-    blocks.flatMap((block) => (block.type === "heading" ? [block.text] : []));
-
-  return [...headings(study.overview), DECISIONS_HEADING, ...headings(study.outcome)];
+export function getCaseStudyHeadings(ast: ArticleNode): string[] {
+  return getArticleHeadings(ast, DECISIONS_HEADING);
 }
 
 /**

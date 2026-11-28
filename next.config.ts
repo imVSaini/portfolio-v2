@@ -53,6 +53,10 @@ const nextConfig: NextConfig = {
         loaders: ["@tailwindcss/turbopack"],
         as: "*.css",
       },
+      "*.md": {
+        condition: { all: [{ not: "browser" }, { path: /^src\/content\// }] },
+        type: "text",
+      },
     },
   },
 };

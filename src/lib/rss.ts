@@ -1,6 +1,8 @@
 import { blog } from "@/data/blog";
-import type { Post, PostBlock } from "@/data/posts";
+import type { Post } from "@/data/posts";
 import { site } from "@/data/site";
+import { getPostArticle } from "@/lib/articleSources";
+import { getCodeSample, getDiagram, getStringAttribute, type ArticleNode } from "@/lib/markdoc";
 import { formatPostDate, getPostImageUrl, getPostPath } from "@/lib/posts";
 
 /** Bound the full-content feed as the archive grows. */
@@ -52,20 +54,47 @@ function renderInline(text: string): string {
     .join("");
 }
 
-function renderBlock(block: PostBlock): string {
-  switch (block.type) {
+function renderParts(node: ArticleNode): string {
+  return node.children
+    .map((child) => {
+      switch (child.type) {
+        case "text":
+          return escapeXml(getStringAttribute(child, "content"));
+        case "softbreak":
+          return " ";
+        case "code":
+          return `<code>${escapeXml(getStringAttribute(child, "content"))}</code>`;
+        case "strong":
+          return `<strong>${renderParts(child)}</strong>`;
+        case "em":
+          return `<em>${renderParts(child)}</em>`;
+        case "link":
+          return `<a href="${escapeXml(getStringAttribute(child, "href"))}">${renderParts(child)}</a>`;
+        default:
+          return renderParts(child);
+      }
+    })
+    .join("");
+}
+
+function renderBlock(node: ArticleNode): string {
+  switch (node.type) {
     case "heading":
-      return `<h2>${escapeXml(block.text)}</h2>`;
+      return `<h2>${renderParts(node)}</h2>`;
     case "paragraph":
-      return `<p>${renderInline(block.text)}</p>`;
+      return `<p>${renderParts(node)}</p>`;
     case "list":
-      return `<ul>${block.items.map((item) => `<li>${renderInline(item)}</li>`).join("")}</ul>`;
-    case "quote":
-      return `<blockquote><p>${escapeXml(block.text)}</p></blockquote>`;
-    case "code":
-      return `<pre><code>${escapeXml(block.code)}</code></pre>`;
-    case "diagram":
-      return `<figure><p>${escapeXml(block.alt)}</p><figcaption>${escapeXml(block.caption)}</figcaption></figure>`;
+      return `<ul>${node.children.map((item) => `<li>${renderParts(item)}</li>`).join("")}</ul>`;
+    case "blockquote":
+      return `<blockquote>${node.children.map((p) => `<p>${renderParts(p)}</p>`).join("")}</blockquote>`;
+    case "fence":
+      return `<pre><code>${escapeXml(getCodeSample(node).code)}</code></pre>`;
+    case "tag": {
+      const { caption, alt } = getDiagram(node);
+      return `<figure><p>${escapeXml(alt)}</p><figcaption>${escapeXml(caption)}</figcaption></figure>`;
+    }
+    default:
+      throw new Error(`The feed does not render \`${node.type}\` nodes.`);
   }
 }
 
@@ -77,7 +106,7 @@ function renderItem(post: Post): string {
     ...(post.updatedAt && post.updatedAt !== post.date
       ? [`<p>Updated ${escapeXml(formatPostDate(post.updatedAt))}</p>`]
       : []),
-    ...post.body.map(renderBlock),
+    ...getPostArticle(post).ast.children.map(renderBlock),
   ].join("\n");
 
   // HTML is escaped once for its text nodes, then again for the enclosing XML text node.

@@ -7,20 +7,23 @@ old entry; mark it superseded and add a new one.
 Entries 1 to 3 were recorded on 20 November 2026, after the decisions were made. They describe
 what the code does and the trade-offs it carries, not the original discussion.
 
-| #   | Decision                                                                                                               | Status   |
-| --- | ---------------------------------------------------------------------------------------------------------------------- | -------- |
-| 1   | [Content is typed TypeScript blocks](#1-content-is-typed-typescript-blocks)                                            | Accepted |
-| 2   | [Every page is prerendered; CSP avoids nonces](#2-every-page-is-prerendered-csp-avoids-nonces)                         | Accepted |
-| 3   | [Locomotive Scroll runs on GSAP's ticker](#3-locomotive-scroll-runs-on-gsaps-ticker)                                   | Accepted |
-| 4   | [Animated sections stay on the server](#4-animated-sections-stay-on-the-server)                                        | Accepted |
-| 5   | [Architecture rules are enforced by tooling](#5-architecture-rules-are-enforced-by-tooling)                            | Accepted |
-| 6   | [ESLint 10 runs the Next.js presets through a compat shim](#6-eslint-10-runs-the-nextjs-presets-through-a-compat-shim) | Accepted |
-| 7   | [Client state is one store built from slices](#7-client-state-is-one-store-built-from-slices)                          | Accepted |
-| 8   | [CI builds outside the Playwright image](#8-ci-builds-outside-the-playwright-image)                                    | Accepted |
+| #   | Decision                                                                                                               | Status          |
+| --- | ---------------------------------------------------------------------------------------------------------------------- | --------------- |
+| 1   | [Content is typed TypeScript blocks](#1-content-is-typed-typescript-blocks)                                            | Superseded by 9 |
+| 2   | [Every page is prerendered; CSP avoids nonces](#2-every-page-is-prerendered-csp-avoids-nonces)                         | Accepted        |
+| 3   | [Locomotive Scroll runs on GSAP's ticker](#3-locomotive-scroll-runs-on-gsaps-ticker)                                   | Accepted        |
+| 4   | [Animated sections stay on the server](#4-animated-sections-stay-on-the-server)                                        | Accepted        |
+| 5   | [Architecture rules are enforced by tooling](#5-architecture-rules-are-enforced-by-tooling)                            | Accepted        |
+| 6   | [ESLint 10 runs the Next.js presets through a compat shim](#6-eslint-10-runs-the-nextjs-presets-through-a-compat-shim) | Accepted        |
+| 7   | [Client state is one store built from slices](#7-client-state-is-one-store-built-from-slices)                          | Accepted        |
+| 8   | [CI builds outside the Playwright image](#8-ci-builds-outside-the-playwright-image)                                    | Accepted        |
+| 9   | [Article bodies are Markdoc files loaded by Turbopack](#9-article-bodies-are-markdoc-files-loaded-by-turbopack)        | Accepted        |
 
 ---
 
 ## 1. Content is typed TypeScript blocks
+
+- Status: superseded by [9](#9-article-bodies-are-markdoc-files-loaded-by-turbopack) on 28 November 2026.
 
 **Context.** Each article is published as HTML, Markdown, RSS, part of `llms-full.txt`, JSON-LD and
 an Open Graph card. All of those need the article's structure, not just rendered HTML.
@@ -201,3 +204,55 @@ first run does not restore a cache written inside the container.
 - Build and shards share Node (`.nvmrc`), Ubuntu 24.04 and the lockfile, but not the exact image.
 - Revisit if the build starts producing native or path-bound output, such as
   `output: "standalone"`. Move `build` back into the image then.
+
+---
+
+## 9. Article bodies are Markdoc files loaded by Turbopack
+
+- Date: 28 November 2026
+
+**Context.** Under decision 1, about 3,000 lines of prose sat in string literals. Code samples
+needed escaping inside template literals, inline formatting stopped at backticks (no links or
+emphasis), and code was coloured by a hand-written regex. The site still needs one source for six
+outputs: the page, the Markdown twin, `llms-full.txt`, RSS, JSON-LD and the Open Graph card.
+
+**Decision.** Post and case-study bodies are Markdown files in `src/content`, one per slug, written
+in [Markdoc](https://markdoc.dev/docs/syntax) syntax. Diagrams are `{% diagram %}` tags and a case
+study places its decisions list with `{% decisions /%}`. Metadata stays typed TypeScript in
+`src/data`. A Turbopack rule loads `src/content/**/*.md` as text (`type: "text"`, Next.js 16.2+)
+and `src/lib/articleSources.ts` collects the files with `import.meta.glob`. Markdoc parses and
+validates each body; the page, RSS and plain-text outputs walk the same syntax tree. Code is
+highlighted at build time by [Shiki](https://shiki.style/packages/next) with VS Code's Light+ and
+Dark+ themes, switched by CSS variables under `.dark`.
+
+Alternatives considered (npm registry and official docs, November 2026):
+
+- `@next/mdx` compiles each file to a component, so feeds and the Markdown twin cannot read the
+  text, and Turbopack only accepts plugins with serialisable options.
+- Fumadocs MDX is built for documentation sites, needs `fumadocs-core` and exposes processed
+  rather than raw Markdown.
+- Content Collections and Velite add a generator, a watcher and an output folder. Content
+  Collections' Next.js adapter support for Turbopack could not be confirmed.
+- MDX in general runs content as code and breaks on a stray `<` or `{` in prose.
+
+**Consequences.**
+
+- Bodies are plain Markdown with links and emphasis. The Markdown twin and `llms-full.txt` are the
+  file itself with tags written out, byte for byte.
+- `parseArticle` fails the build on an unknown tag, a bad diagram name, a missing attribute, or a
+  block the design does not render (`#`/`###` headings, ordered lists, tables, images). A body file
+  without a matching slug, or a slug without a file, also fails it.
+- The `*.md` rule excludes browser code, so a client component that imports content fails to
+  build.
+- Playwright cannot import `.md` or run `import.meta.glob`, which is why bodies are not part of the
+  objects in `src/data`. Specs read the files through `e2e/articles.ts` and the pure helpers in
+  `src/lib/markdoc.ts`.
+- `import.meta.glob` and `type: "text"` exist only in Turbopack, which the CSS pipeline already
+  requires. The glob's `import: "default"` option returns `undefined` for text modules in 16.4.6,
+  so the loader reads `.default` from eager modules.
+- Markdoc parses `{% %}` inside code fences. A sample that contains that syntax needs
+  `{% process=false %}` on its fence.
+- Shiki reads the clock while tokenising, so `highlightCode` runs under `"use cache"` to keep
+  prerendering static.
+- Two runtime dependencies: `@markdoc/markdoc` (no dependencies of its own) and `shiki`. Both run
+  only on the server.

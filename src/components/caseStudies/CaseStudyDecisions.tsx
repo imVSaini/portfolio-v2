@@ -1,24 +1,11 @@
+import { ArticleInline } from "@/components/article/ArticleInline";
 import type { CaseStudyDecision } from "@/data/caseStudies";
 import { getHeadingId } from "@/lib/article";
 import { DECISIONS_HEADING } from "@/lib/caseStudies";
+import { parseInline } from "@/lib/markdoc";
 
 function Inline({ text }: { text: string }) {
-  return (
-    <>
-      {text.split("`").map((part, i) =>
-        i % 2 === 1 ? (
-          <code
-            key={i}
-            className="rounded-md border border-line bg-surface px-1.5 py-0.5 font-mono text-[0.85em]"
-          >
-            {part}
-          </code>
-        ) : (
-          part
-        ),
-      )}
-    </>
-  );
+  return <ArticleInline node={parseInline(text)} />;
 }
 
 const term = "font-display text-p4 font-medium tracking-wide text-muted uppercase";

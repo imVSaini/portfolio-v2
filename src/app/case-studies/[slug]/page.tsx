@@ -15,8 +15,14 @@ import { PageShell } from "@/components/layout/PageShell";
 import { RevealText } from "@/components/motion/RevealText";
 import { RollText } from "@/components/motion/RollText";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { caseStudies, caseStudiesPage, type CaseStudy } from "@/data/caseStudies";
+import {
+  CASE_STUDY_DIAGRAM_NAMES,
+  caseStudies,
+  caseStudiesPage,
+  type CaseStudy,
+} from "@/data/caseStudies";
 import { site } from "@/data/site";
+import { getCaseStudyArticle } from "@/lib/articleSources";
 import { getCaseStudyHeadings, getCaseStudyPath, getNextCaseStudy } from "@/lib/caseStudies";
 import { getCaseStudyJsonLd } from "@/lib/jsonLd";
 import { getCaseStudyMarkdownPath } from "@/lib/llms";
@@ -68,6 +74,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/case-studies
 
 function CaseStudyContent({ study }: { study: CaseStudy }) {
   const next = getNextCaseStudy(study);
+  const { ast } = getCaseStudyArticle(study);
 
   return (
     <>
@@ -110,7 +117,7 @@ function CaseStudyContent({ study }: { study: CaseStudy }) {
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
           <aside className="lg:order-2 lg:col-span-3 lg:col-start-10">
             <ArticleAside
-              headings={getCaseStudyHeadings(study)}
+              headings={getCaseStudyHeadings(ast)}
               share={{
                 url: `${site.url}${getCaseStudyPath(study)}`,
                 title: `${study.title} case study`,
@@ -118,9 +125,12 @@ function CaseStudyContent({ study }: { study: CaseStudy }) {
             />
           </aside>
           <div className="flex max-w-prose min-w-0 flex-col gap-6 text-prose lg:col-span-8">
-            <ArticleBody blocks={study.overview} Diagram={CaseStudyDiagram} />
-            <CaseStudyDecisions decisions={study.decisions} />
-            <ArticleBody blocks={study.outcome} Diagram={CaseStudyDiagram} />
+            <ArticleBody
+              ast={ast}
+              diagramNames={CASE_STUDY_DIAGRAM_NAMES}
+              Diagram={CaseStudyDiagram}
+              decisions={<CaseStudyDecisions decisions={study.decisions} />}
+            />
           </div>
         </div>
       </article>

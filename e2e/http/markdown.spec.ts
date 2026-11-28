@@ -4,9 +4,22 @@ import { caseStudies } from "@/data/caseStudies";
 import { posts } from "@/data/posts";
 import { site } from "@/data/site";
 
+import { readCaseStudyArticle, readPostArticle, type ArticleView } from "../articles";
 import { getCanonical, getCaseStudyPath, getFirstCaseStudy, getFirstPost } from "../routes";
 
 const MARKDOWN = "text/markdown; charset=utf-8";
+
+function expectPortableBody(text: string, article: ArticleView) {
+  expect(text).not.toContain("{%");
+  for (const heading of article.headings) expect(text).toContain(`## ${heading}`);
+  for (const { language, code } of article.codeSamples) {
+    expect(text).toContain("```" + language + "\n" + code + "\n```");
+  }
+  for (const { caption, alt } of article.diagrams) {
+    expect(text).toContain(`**Figure.** ${caption} ${alt}`);
+  }
+  for (const { href } of article.links) expect(text).toContain(`](${href})`);
+}
 
 test.describe("markdown twins", () => {
   test("/index.md serves the profile with a canonical link", async ({ request }) => {
@@ -34,11 +47,9 @@ test.describe("markdown twins", () => {
       expect(text.startsWith(`# ${post.title}\n`)).toBe(true);
       expect(text).toContain(`> ${post.excerpt}`);
       expect(text).toContain(`Canonical: ${url}`);
-      expect(text).toContain(`${post.readMinutes} min read`);
-      for (const block of post.body) {
-        if (block.type === "heading") expect(text).toContain(`## ${block.text}`);
-        if (block.type === "code") expect(text).toContain("```" + block.language);
-      }
+      const article = readPostArticle(post);
+      expect(text).toContain(`${article.readMinutes} min read`);
+      expectPortableBody(text, article);
     });
   }
 
@@ -59,10 +70,7 @@ test.describe("markdown twins", () => {
       expect(text).toContain(`> ${study.headline}`);
       expect(text).toContain(`Canonical: ${url}`);
       expect(text).toContain(`Stack: ${study.stack.join(", ")}.`);
-      for (const block of [...study.overview, ...study.outcome]) {
-        if (block.type === "heading") expect(text).toContain(`## ${block.text}`);
-        if (block.type === "code") expect(text).toContain("```" + block.language);
-      }
+      expectPortableBody(text, readCaseStudyArticle(study));
       for (const decision of study.decisions) {
         expect(text).toContain(`### ${decision.title}`);
         expect(text).toContain(`**What I chose.** ${decision.chose}`);

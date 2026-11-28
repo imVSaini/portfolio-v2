@@ -4,6 +4,7 @@ import { ImageResponse } from "next/og";
 import { OgCard } from "@/components/seo/OgCard";
 import { posts } from "@/data/posts";
 import { site } from "@/data/site";
+import { getPostArticle } from "@/lib/articleSources";
 import { getAssetUrl } from "@/lib/asset";
 import { getOgFonts, OG_CONTENT_TYPE, OG_SIZE } from "@/lib/og";
 import { formatPostDate } from "@/lib/posts";
@@ -35,7 +36,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     <OgCard
       label={post.topic}
       title={post.title}
-      meta={`${formatPostDate(post.date)} · ${post.readMinutes} min read`}
+      meta={`${formatPostDate(post.date)} · ${getPostArticle(post).readMinutes} min read`}
       path="/blog"
     />,
     { ...OG_SIZE, fonts: await getOgFonts() },
